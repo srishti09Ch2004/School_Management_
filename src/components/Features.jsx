@@ -50,11 +50,12 @@ function Features() {
       <div className="max-w-7xl mx-auto px-6 lg:px-6">
 
         {/* Heading */}
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="inline-block px-5 py-4 text-sm font-semibold text-green-700 bg-green-100 rounded-full">
+        <div className="max-w-3xl mx-auto text-center">
+          <span className="text-red-600 uppercase tracking-[3px] font-semibold">
             {badge}
           </span>
-
+               
+          
           <h2 className="mt-4 text-4xl font-bold text-gray-900 lg:text-5xl">
             {title}
           </h2>

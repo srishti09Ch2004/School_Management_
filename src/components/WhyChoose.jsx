@@ -62,7 +62,7 @@ function WhyChoose() {
         {/* Heading */}
         <div className="max-w-3xl mx-auto text-center">
 
-          <span className="text-red-600 uppercase tracking-[4px] font-semibold">
+          <span className="text-red-600 uppercase tracking-[3px] font-semibold">
             Why Choose Us
           </span>
 

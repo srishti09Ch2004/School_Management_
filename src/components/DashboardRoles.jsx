@@ -32,8 +32,8 @@ function DashboardRoles() {
 
         {/* Heading */}
 
-        <div className="text-center max-w-3xl mx-auto">
-          <span className="inline-block px-4 py-2 rounded-full bg-green-100 text-green-700 font-semibold text-sm">
+         <div className="max-w-3xl mx-auto text-center">
+          <span className="text-red-600 uppercase tracking-[3px] font-semibold">
             Dashboard Access
           </span>
 

@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import Features from "../components/Features";
 import WhyChoose from "../components/WhyChoose";
 import DashboardRoles from "../components/DashboardRoles";
+import Testimonials from "../components/Testimonials";
 // import Footer from "../components/Footer";
 
 function Home() {
@@ -15,6 +16,7 @@ function Home() {
       <Features />
       <WhyChoose />
       <DashboardRoles />
+      <Testimonials />
       {/* <Footer /> */}
     </>
   );
