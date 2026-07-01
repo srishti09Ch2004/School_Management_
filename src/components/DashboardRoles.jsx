@@ -38,7 +38,7 @@ function DashboardRoles() {
           </span>
 
           <h2 className="mt-5 text-4xl lg:text-5xl font-bold text-gray-900">
-            One Platform, <span className="text-green-600">Every User</span>
+            One Platform, Every User
           </h2>
 
           <p className="mt-5 text-gray-600 text-lg">

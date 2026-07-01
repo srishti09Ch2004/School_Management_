@@ -8,7 +8,7 @@ import Testimonials from "../components/Testimonials";
 import FAQ from "../components/FAQ";
 
 import Contact from "../components/Contact";
-// import Footer from "../components/Footer";
+import Footer from "../components/Footer";
 
 function Home() {
   return (
@@ -22,7 +22,7 @@ function Home() {
       <Testimonials />
       <FAQ />
       <Contact/>
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 }

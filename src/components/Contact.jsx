@@ -183,7 +183,7 @@ export default function Contact() {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
             >
               Send Message
               <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform duration-200" />
