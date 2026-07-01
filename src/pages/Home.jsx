@@ -6,6 +6,8 @@ import WhyChoose from "../components/WhyChoose";
 import DashboardRoles from "../components/DashboardRoles";
 import Testimonials from "../components/Testimonials";
 import FAQ from "../components/FAQ";
+
+import Contact from "../components/Contact";
 // import Footer from "../components/Footer";
 
 function Home() {
@@ -19,6 +21,7 @@ function Home() {
       <DashboardRoles />
       <Testimonials />
       <FAQ />
+      <Contact/>
       {/* <Footer /> */}
     </>
   );
