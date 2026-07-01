@@ -1,94 +1,60 @@
 
+import { Link } from "react-router-dom";
+
 function Navbar() {
   const schoolName = "Future Academy";
   const tagline = "School Management System";
 
-  const menus = ["Home", "About", "Contact"];
+  const menus = [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
+  ];
 
   return (
-    <nav
-      className="
-      sticky top-0 z-50
-      bg-gray-100
-      hover:bg-green-100
-      transition-all
-      duration-500
-      border-b
-      border-gray-300
-      shadow-lg
-      "
-    >
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-16 h-20 flex items-center justify-between">
-
+    <nav className="sticky top-0 z-50 bg-gray-100 border-b border-gray-300 shadow-md">
+      <div className="max-w-7xl mx-auto px-6 lg:px-3 h-20 flex items-center justify-between">
+        
         {/* Logo */}
-        <div className="flex items-center gap-4">
+        <Link to="/" className="flex items-center gap-3">
           <img
             src="/images/logo6.png"
-            alt="School Management System Logo"
-            className="h-16 w-auto"
+            alt="Future Academy Logo"
+            className="h-14 w-auto"
           />
 
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900">
               {schoolName}
             </h1>
 
-            <p className="text-xs font-semibold tracking-[2px] uppercase text-red-600">
+            <p className="text-xs uppercase tracking-[2px] font-semibold text-red-600">
               {tagline}
             </p>
           </div>
-        </div>
+        </Link>
 
-        {/* Menu */}
-        <div className="hidden md:flex items-center gap-8">
-
-          {menus.map((menu, index) => (
-            <a
-              key={index}
-              href="#"
-              className="
-              relative
-              font-medium
-              text-gray-700
-              hover:text-green-700
-              transition-all
-              duration-300
-              after:absolute
-              after:left-0
-              after:-bottom-1
-              after:h-[2px]
-              after:w-0
-              after:bg-green-600
-              after:transition-all
-              after:duration-300
-              hover:after:w-full
-              "
+        {/* Navigation */}
+        <div className="hidden md:flex items-center gap-10">
+          {menus.map((menu) => (
+            <Link
+              key={menu.name}
+              to={menu.path}
+              className="relative text-gray-700 font-medium transition-colors duration-300 hover:text-green-600
+              after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0
+              after:bg-green-600 after:transition-all after:duration-300 hover:after:w-full"
             >
-              {menu}
-            </a>
+              {menu.name}
+            </Link>
           ))}
 
-          <button
-            className="
-            ml-2
-            px-6
-            py-3
-            bg-green-600
-            hover:bg-red-600
-            text-white
-            rounded-xl
-            font-semibold
-            shadow-lg
-            transition-all
-            duration-300
-            hover:scale-105
-            "
+          <Link
+            to="/login"
+            className="ml-2 rounded-lg bg-green-600 px-6 py-3 font-semibold text-white transition duration-300 hover:bg-green-700"
           >
             Login
-          </button>
-
+          </Link>
         </div>
-
       </div>
     </nav>
   );

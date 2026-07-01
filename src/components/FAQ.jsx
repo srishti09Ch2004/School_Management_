@@ -52,7 +52,7 @@ export default function FAQ() {
 
           <p className="text-gray-500 mt-5 text-lg">
             Everything you need to know before getting started.
-          </p>
+          </p><br></br>
 
         </div>
 
