@@ -50,10 +50,15 @@ function Navbar() {
 
           <Link
             to="/login"
-            className="ml-2 rounded-lg bg-green-600 px-6 py-3 font-semibold text-white transition duration-300 hover:bg-green-700"
+            className="ml-2 rounded-xl bg-gradient-to-r from-green-600 to-green-700
+            px-6 py-3 font-semibold text-white shadow-lg
+            transition-all duration-300
+            hover:-translate-y-1
+            hover:shadow-xl"
           >
             Login
           </Link>
+          
         </div>
       </div>
     </nav>

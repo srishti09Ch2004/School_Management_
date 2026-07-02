@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Hero() {
   const academyName = "Future Academy";
 
@@ -28,13 +30,42 @@ function Hero() {
 
             <div className="mt-10 flex flex-wrap justify-center lg:justify-start gap-4">
 
-              <button className="px-8 py-3 text-white transition bg-green-600 rounded-full hover:bg-green-700">
-                Get Started
-              </button>
+              <Link to="/login">
 
-              <button className="px-8 py-3 text-green-600 transition bg-white border border-green-600 rounded-full hover:bg-green-50">
-                Login
-              </button>
+            <button
+              className="px-8 py-3 rounded-full
+              bg-gradient-to-r
+              from-green-600
+              to-green-700
+              text-white
+              font-semibold
+              shadow-lg
+              transition-all
+              duration-300
+              hover:-translate-y-1
+              hover:shadow-xl"
+            >
+              Get Started
+            </button>
+
+          </Link>
+
+          <Link to="/login">
+
+            <button
+              className="px-8 py-3 rounded-full
+              border-2 border-green-600
+              text-green-600
+              font-semibold
+              transition-all
+              duration-300
+              hover:bg-green-600
+              hover:text-white"
+            >
+              Login
+            </button>
+
+          </Link>
 
             </div>
 

@@ -12,28 +12,28 @@ function LoginForm({ role }) {
 
   const roleStyles = {
     student: {
-      button: "from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700",
-      badge: "bg-blue-100 text-blue-600",
+      button: "from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600",
+      badge: "bg-blue-100 text-blue-700",
     },
 
     teacher: {
-      button: "from-green-500 to-green-600 hover:from-green-600 hover:to-green-700",
-      badge: "bg-green-100 text-green-600",
+      button: "from-green-400 to-green-500 hover:from-green-500 hover:to-green-600",
+      badge: "bg-green-100 text-green-700",
     },
 
     parent: {
-      button: "from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700",
-      badge: "bg-pink-100 text-pink-600",
+      button: "from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600",
+      badge: "bg-pink-100 text-pink-700",
     },
 
     principal: {
-      button: "from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700",
-      badge: "bg-purple-100 text-purple-600",
+      button: "from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600",
+      badge: "bg-purple-100 text-purple-700",
     },
 
     admin: {
-      button: "from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700",
-      badge: "bg-orange-100 text-orange-600",
+      button: "from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600",
+      badge: "bg-orange-100 text-orange-500",
     },
   };
 
@@ -56,7 +56,7 @@ function LoginForm({ role }) {
         {role.title} Portal
       </div>
 
-      <h2 className="mt-5 text-3xl font-bold text-gray-900">
+      <h2 className="mt-6 text-3xl font-bold text-gray-800">
         Welcome Back 
       </h2>
 
@@ -169,7 +169,7 @@ function LoginForm({ role }) {
         {/* Button */}
 
         <button
-          className={`w-full h-14 rounded-2xl bg-gradient-to-r ${style.button}
+          className={`w-full h-12 rounded-2xl bg-gradient-to-r ${style.button}
           text-white font-semibold flex justify-center items-center gap-3
           transition duration-300 hover:scale-[1.02]`}
         >
