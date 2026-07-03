@@ -7,7 +7,9 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import About from "./components/About";
+import Modules from "./components/Modules";
 import Contact from "./components/Contact";
+import Pricing from "./components/Pricing";
 
 function App() {
     const location = useLocation();
@@ -22,6 +24,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/modules" element={<Modules />} />
+        <Route path="/pricing" element={<Pricing />} />
       </Routes>
 
        {!hideLayout && <Footer />}
