@@ -4,45 +4,57 @@ const title = "School Features, All in One Place";
 
 const subtitle =
   "From attendance to the library — every workflow your school needs.";
-
 const features = [
+  {
+    icon: "school", 
+    title: "Student Management",
+    description:
+      "Manage student admissions, profiles, records and academic information from one place.",
+  },
   {
     icon: "calendar_month",
     title: "Attendance Management",
     description:
-      "Automated attendance with instant reports and parent notifications.",
-  },
-  {
-    icon: "assignment",
-    title: "Result Management",
-    description:
-      "Create, publish and manage student results with ease.",
+      "Track daily attendance with automated reports and instant parent notifications.",
   },
   {
     icon: "payments",
-    title: "Online Fees",
+    title: "Fee Management",
     description:
-      "Secure online fee collection with receipts and payment history.",
+      "Collect fees online, generate receipts and monitor payment history effortlessly.",
   },
   {
-    icon: "menu_book",
-    title: "Homework",
+    icon: "fact_check",
+    title: "Exam Management",
     description:
-      "Assign homework digitally and track submissions effortlessly.",
+      "Schedule exams, manage marks, generate report cards and publish results easily.",
   },
   {
-    icon: "schedule",
-    title: "Class Timetable",
+    icon: "handshake", 
+    title: "Parent Portal",
     description:
-      "Create and manage class schedules without conflicts.",
+      "Keep parents informed with attendance, homework, fees and academic progress.",
   },
   {
-    icon: "library_books",
-    title: "Library Management",
+    icon: "manage_accounts", 
+    title: "Teacher Management",
     description:
-      "Issue, return and manage books through a digital library.",
+      "Manage teacher profiles, subjects, schedules and daily academic activities.",
+  },
+  {
+    icon: "smartphone",
+    title: "Mobile App",
+    description:
+      "Access the school management system anytime with Android and iOS mobile apps.",
+  },
+  {
+    icon: "monitoring", 
+    title: "Reports & Analytics",
+    description:
+      "Generate detailed reports and gain insights through powerful analytics dashboards.",
   },
 ];
+
 
 function Features() {
   return (
@@ -66,15 +78,16 @@ function Features() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 gap-8 mt-16 md:grid-cols-2 lg:grid-cols-3">
+
+        <div className="grid grid-cols-1 gap-9 mt-16 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group bg-white border border-gray-200 rounded-3xl p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 hover:border-green-500 transition-all duration-300"
+              className="group bg-white border border-gray-200 rounded-3xl p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 hover:border-green-400 transition-all duration-300"
             >
               <div className="flex items-start gap-5">
 
-                <div className="flex items-center justify-center w-19 h-11 rounded-2xl bg-gradient-to-br from-red-50 to-green-100 border border-gray-100 shadow-sm group-hover:from-green-500 group-hover:to-green-600 transition-all duration-300">
+                <div className="flex items-center justify-center w-23 h-10 rounded-2xl bg-gradient-to-br from-red-50 to-green-100 border border-gray-100 shadow-sm group-hover:from-green-500 group-hover:to-green-600 transition-all duration-300">
 
                   <span className="material-symbols-outlined text-3xl text-red-600 group-hover:text-white transition-all duration-300">
                     {feature.icon}
