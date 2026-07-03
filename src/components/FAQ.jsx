@@ -2,36 +2,47 @@ import { useState } from "react";
 
 const faqs = [
   {
-    question: "How do I log in to my dashboard?",
+    question: "What is School ERP?",
     answer:
-      "Click the Login button and choose your role. Enter your username and password to securely access your dashboard.",
+      "School ERP is an all-in-one school management system that helps manage admissions, attendance, fees, examinations, communication, and academic activities from a single platform.",
   },
   {
-    question: "Can parents monitor their child's progress?",
+    question: "How can I book a demo?",
     answer:
-      "Yes. Parents can track attendance, homework, exam results, notices and fee status from their dashboard.",
+      "You can request a free demo by filling out the demo request form on our website. Our team will contact you to schedule a personalized demonstration.",
   },
   {
-    question: "Is student and school data secure?",
+    question: "Is training provided?",
     answer:
-      "Absolutely. We use secure authentication, encrypted connections and role-based access to protect school data.",
+      "Yes. We provide complete onboarding and training sessions for administrators, teachers, and staff to ensure a smooth implementation.",
   },
   {
-    question: "Can I use the system on mobile phones?",
+    question: "Can parents use the mobile app?",
     answer:
-      "Yes. The system works smoothly on mobiles, tablets, laptops and desktop devices without installing any app.",
+      "Yes. Parents can use the mobile app to check attendance, homework, exam results, notices, fee status, and communicate with the school anytime.",
   },
   {
-    question: "How can fees be paid online?",
+    question: "Is online fee payment available?",
     answer:
-      "Parents can securely pay fees using UPI, Debit Card, Credit Card or Net Banking with instant payment confirmation.",
+      "Yes. The system supports secure online fee payments through UPI, Debit Cards, Credit Cards, Net Banking, and other supported payment methods.",
   },
   {
-    question: "Can teachers manage attendance and marks?",
+    question: "Is my data secure?",
     answer:
-      "Yes. Teachers can easily manage attendance, upload marks, assign homework and communicate with parents.",
+      "Absolutely. Your data is protected using encrypted connections, secure authentication, regular backups, and role-based access control.",
+  },
+  {
+    question: "Can I customize the software?",
+    answer:
+      "Yes. The software can be customized to match your school's workflows, branding, modules, and specific operational requirements.",
+  },
+  {
+    question: "Do you provide support?",
+    answer:
+      "Yes. Our dedicated support team is available to assist you with technical issues, product guidance, and ongoing maintenance whenever needed.",
   },
 ];
+
 
 export default function FAQ() {
   const [open, setOpen] = useState(0);
