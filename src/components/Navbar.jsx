@@ -8,6 +8,7 @@ function Navbar() {
   const menus = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
+    { name: "Pricing", path: "/Pricing" },
     { name: "Contact", path: "/contact" },
   ];
 
