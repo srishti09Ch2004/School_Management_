@@ -5,353 +5,234 @@ const demos = [
     id: "admin",
     title: "Admin Dashboard",
     icon: "admin_panel_settings",
-    description:
-      "Manage your entire school from one powerful dashboard including students, teachers, fees, academics, reports and more.",
-
+    description: "Manage your entire school from one powerful dashboard including students, teachers, fees, academics, reports and more.",
     image: "/images/admin_dashboard.png",
-
-    credentials: {
-      school: "DEMO",
-      username: "admin",
-      password: "admin123",
-    },
-
-    features: [
-      "Student Management",
-      "Teacher Management",
-      "Fee Management",
-      "Exam Management",
-      "Library",
-      "Transport",
-      "Reports",
-      "Communication",
-    ],
+    credentials: { school: "DEMO", username: "admin", password: "admin123" },
+    features: ["Student Management", "Teacher Management", "Fee Management", "Exam Management", "Library", "Transport", "Reports", "Communication"],
   },
-
   {
     id: "teacher",
     title: "Teacher Panel",
     icon: "co_present",
-
-    description:
-      "Teachers can manage attendance, homework, examinations, marks and communicate with parents effortlessly.",
-
+    description: "Teachers can manage attendance, homework, examinations, marks and communicate with parents effortlessly.",
     image: "/images/teacher_dashboard.png",
-
-    credentials: {
-      school: "DEMO",
-      username: "teacher",
-      password: "teacher123",
-    },
-
-    features: [
-      "Attendance",
-      "Homework",
-      "Class Timetable",
-      "Marks Entry",
-      "Assignments",
-      "Notices",
-      "Student Progress",
-      "Communication",
-    ],
+    credentials: { school: "DEMO", username: "teacher", password: "teacher123" },
+    features: ["Attendance", "Homework", "Class Timetable", "Marks Entry", "Assignments", "Notices", "Student Progress", "Communication"],
   },
-
   {
     id: "student",
     title: "Student Panel",
     icon: "school",
-
-    description:
-      "Students can access homework, results, attendance, notices, timetable and learning resources anytime.",
-
+    description: "Students can access homework, results, attendance, notices, timetable and learning resources anytime.",
     image: "/images/student_dashboard.png",
-
-    credentials: {
-      school: "DEMO",
-      username: "student",
-      password: "student123",
-    },
-
-    features: [
-      "Attendance",
-      "Homework",
-      "Results",
-      "Timetable",
-      "Assignments",
-      "Library",
-      "Fee Status",
-      "Notices",
-    ],
+    credentials: { school: "DEMO", username: "student", password: "student123" },
+    features: ["Attendance", "Homework", "Results", "Timetable", "Assignments", "Library", "Fee Status", "Notices"],
   },
-
   {
     id: "parent",
     title: "Parent Panel",
     icon: "family_restroom",
-
-    description:
-      "Parents stay connected with attendance, fees, homework, exam results and school announcements.",
-
+    description: "Parents stay connected with attendance, fees, homework, exam results and school announcements.",
     image: "/images/parent_dashboard.png",
-
-    credentials: {
-      school: "DEMO",
-      username: "parent",
-      password: "parent123",
-    },
-
-    features: [
-      "Attendance",
-      "Fee Payment",
-      "Homework",
-      "Exam Results",
-      "School Notices",
-      "Progress Reports",
-      "Communication",
-      "Timetable",
-    ],
+    credentials: { school: "DEMO", username: "parent", password: "parent123" },
+    features: ["Attendance", "Fee Payment", "Homework", "Exam Results", "School Notices", "Progress Reports", "Communication", "Timetable"],
   },
-
   {
     id: "mobile",
     title: "Mobile App",
     icon: "smartphone",
-
-    description:
-      "Experience the complete School ERP on Android and iOS with a beautiful mobile application.",
-
+    description: "Experience the complete School ERP on Android and iOS with a beautiful mobile application.",
     image: "/images/mobile_dashboard.png",
-
-    credentials: {
-      school: "DEMO",
-      username: "mobile",
-      password: "mobile123",
-    },
-
-    features: [
-      "Push Notifications",
-      "Attendance",
-      "Homework",
-      "Fees",
-      "Results",
-      "Timetable",
-      "Messages",
-      "Events",
-    ],
+    credentials: { school: "DEMO", username: "mobile", password: "mobile123" },
+    features: ["Push Notifications", "Attendance", "Homework", "Fees", "Results", "Timetable", "Messages", "Events"],
   },
 ];
 
-
 export default function Demo() {
   const [activeDemo, setActiveDemo] = useState(demos[0]);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   return (
-    <section className="bg-gradient-to-b from-[#f6f7fb] to-white py-24">
-
+    <section className="bg-slate-50 py-24 min-h-screen">
       <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Header Section */}
+         <div className="max-w-3xl mx-auto text-center">
 
-        {/* Hero */}
-
-        <div className="max-w-3xl mx-auto text-center">
-
-          <span className="uppercase tracking-[3px] font-semibold text-red-600">
+          <span className="text-red-600 uppercase tracking-[3px] font-semibold">
             Live Demo
           </span>
-
-          <h1 className="text-4xl font-bold text-gray-900 mt-5 leading-tight">
-            Experience Our Future Academy Before You Decide
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mt-6 tracking-tight">
+            Experience Our Future Academy
           </h1>
-
-          <p className="text-gray-500 text-lg mt-6 leading-8">
-            Explore every module including Admin Dashboard, Teacher Panel,
-            Student Portal, Parent Portal and Mobile App with an interactive
-            live preview.
+          <p className="text-slate-500 text-lg mt-5 leading-relaxed">
+            Explore every module with an interactive live preview before making your final decision.
           </p>
-
-
         </div>
+        {/* <div className="mt-10"></div> */}
 
-        {/* Demo Cards */}
 
-        <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-6 mt-20">
+        {/* Tab Switcher - Pill Style */}
 
-          {demos.map((demo) => (
-
-            <button
-              key={demo.id}
-              onClick={() => setActiveDemo(demo)}
-              className={`rounded-2xl border p-9 text-center transition-all duration-300
-
-              ${
-                activeDemo.id === demo.id
-                  ? "border-green-400 shadow-xl bg-green-50"
-                  : "border-gray-200 bg-white hover:border-red-300 hover:-translate-y-2"
-              }
-              
-              `}
-            >
-
-              <div
-                className={`w-14 h-14 rounded-2xl mx-auto flex items-center justify-center
-
-                ${
-                  activeDemo.id === demo.id
-                    ? "bg-green-600"
-                    : "bg-red-100"
-                }
-                
-                `}
+        {/* <div className="flex flex-wrap justify-center gap-6 max-w-8xl mx-auto mb-20 p-2 bg-white rounded-2xl shadow-md border border-slate-100 mt-10"> */}
+        <div className="flex flex-wrap justify-center gap-6 w-full mx-auto mt-10 mb-20 p-4 bg-white rounded-2xl shadow-md border border-slate-100">
+          {demos.map((demo) => {
+            const isActive = activeDemo.id === demo.id;
+            return (
+              <button
+                key={demo.id}
+                onClick={() => setActiveDemo(demo)}
+                className={`flex items-center gap-4 px-7 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                  isActive
+                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
               >
-
-                <span
-                  className={`material-symbols-outlined text-4xl
-
-                  ${
-                    activeDemo.id === demo.id
-                      ? "text-white"
-                      : "text-red-600"
-                  }
-                  
-                  `}
-                >
-                  {demo.icon}
-                </span>
-
-              </div>
-
-              <h3 className="mt-6 text-1xl font-bold text-gray-900">
+                <span className="material-symbols-outlined text-xl">{demo.icon}</span>
                 {demo.title}
-              </h3>
-
-            </button>
-
-          ))}
-
+              </button>
+            );
+          })}
         </div>
 
-        {/* Selected Demo */}
-
-        <div className="mt-20 bg-white rounded-[35px] shadow-xl border border-gray-200 overflow-hidden">
-
-          <div className="grid lg:grid-cols-[58%_42%] items-stretch">
-
-            {/* Image */}
-
-           
-            <div className="bg-gray-100 flex items-center justify-center p-10 min-h-[600px]">
-
+        {/* Main Content Showcase */}
+        <div className="grid lg:grid-cols-[62%_38%] gap-8 items-stretch">
+          
+          {/* Left Side: Image Preview */}
+          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col justify-between">
+            <div className="border-b border-slate-100 pb-5 mb-5 flex justify-between items-center">
+              <div>
+                
+                <h2 className="text-2xl font-bold text-slate-800">{activeDemo.title} Screen</h2>
+              </div>
+              <div className="flex gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-red-400"></span>
+                <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
+                <span className="w-3 h-3 rounded-full bg-green-400"></span>
+              </div>
+            </div>
+            
+            <div className="bg-slate-100/70 rounded-2xl p-4 flex items-center justify-center flex-grow group overflow-hidden">
               <img
                 src={activeDemo.image}
                 alt={activeDemo.title}
-                className="max-w-full max-h-[520px] object-contain mx-auto transition-all duration-300"
+                className="max-w-full h-auto max-h-[450px] object-contain rounded-xl shadow-md transform group-hover:scale-[1.05] transition-transform duration-500"
               />
-
             </div>
+          </div>
 
-            {/* Right Side */}
 
-            <div className="p-8 lg:p-12 flex flex-col justify-center">
 
-              <span className="uppercase tracking-[3px] text-red-600 font-semibold">
-                Live Preview
-              </span>
+          {/* Right Side: Features & Credentials Grid */}
 
-              <h2 className="text-4xl font-bold mt-4 text-gray-900">
-                {activeDemo.title}
-              </h2>
+          <div className="bg-slate-900 text-white rounded-3xl p-8 lg:p-10 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl"></div>
+            
+            <div>
+              <h3 className="text-3xl font-extrabold tracking-tight">{activeDemo.title}</h3>
+              <p className="text-slate-400 mt-3 text-sm leading-relaxed">{activeDemo.description}</p>
 
-              <p className="text-gray-600 mt-6 leading-8">
-                {activeDemo.description}
-              </p>
 
-              {/* Features */}
 
-              <div className="mt-10">
-                <h3 className="text-xl font-bold text-gray-900 mb-5">
-                  Included Features
-                </h3>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {activeDemo.features.map((feature, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-green-600 text-lg">
-                          check
-                        </span>
-                      </div>
-
-                      <span className="text-gray-700 font-medium">
-                        {feature}
-                      </span>
+              {/* Features List */}
+              <div className="mt-9">
+                <h4 className="text-sm uppercase font-semibold tracking-wider text-emerald-400 mb-4">Included Features</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {activeDemo.features.slice(0, 6).map((feature, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs font-medium text-slate-300">
+                      
+                      {feature}
                     </div>
                   ))}
                 </div>
               </div>
+            </div>
 
-              {/* Demo Credentials */}
 
-              <div className="mt-12 rounded-3xl border border-gray-200 bg-gray-50 p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">
-                  Demo Login Credentials
-                </h3>
 
-                <div className="space-y-5">
+            {/* Credentials Fields */}
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-500">
-                      School Code
-                    </label>
-
-                    <div className="mt-2 rounded-xl bg-white border px-4 py-3 font-semibold text-gray-800">
-                      {activeDemo.credentials.school}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-500">
-                      Username
-                    </label>
-
-                    <div className="mt-2 rounded-xl bg-white border px-4 py-3 font-semibold text-gray-800">
-                      {activeDemo.credentials.username}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-500">
-                      Password
-                    </label>
-
-                    <div className="mt-2 rounded-xl bg-white border px-4 py-3 font-semibold text-gray-800">
-                      {activeDemo.credentials.password}
-                    </div>
-                  </div>
-
+            <div className="mt-8 pt-8 border-t border-slate-800">
+              <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-400 mb-4">Demo Credentials</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs mb-6">
+                <div className="bg-slate-800/80 rounded-xl p-2.5 border border-slate-700/50">
+                  <span className="block text-[10px] text-slate-500 font-bold uppercase mb-0.5">School</span>
+                  <span className="font-mono text-emerald-400 font-bold">{activeDemo.credentials.school}</span>
                 </div>
-
-                <button
-                  className="w-full mt-8 bg-gradient-to-r from-green-600 to-green-700
-                  hover:from-green-700 hover:to-green-800
-                  text-white py-4 rounded-2xl font-semibold
-                  shadow-lg transition duration-300 hover:-translate-y-1"
-                >
-                  Launch Live Demo
-                </button>
+                <div className="bg-slate-800/80 rounded-xl p-2.5 border border-slate-700/50">
+                  <span className="block text-[10px] text-slate-500 font-bold uppercase mb-0.5">Username</span>
+                  <span className="font-mono text-slate-200 font-bold">{activeDemo.credentials.username}</span>
+                </div>
+                <div className="bg-slate-800/80 rounded-xl p-2.5 border border-slate-700/50">
+                  <span className="block text-[10px] text-slate-500 font-bold uppercase mb-0.5">Password</span>
+                  <span className="font-mono text-slate-200 font-bold">{activeDemo.credentials.password}</span>
+                </div>
               </div>
 
+
+              {/* Action Button */}
+              <button 
+                onClick={() => setIsVideoOpen(true)}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-800/20 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group"
+              >
+                <span>Watch System Demo</span>
+                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">play_circle</span>
+              </button>
             </div>
 
           </div>
 
         </div>
 
-        
-
       </div>
 
+
+      {/* --- VIDEO --- */}
+      {isVideoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          
+          <div className="relative w-full max-w-4xl bg-slate-500 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+            
+
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-slate-900/50">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <h3 className="text-white font-bold text-sm tracking-wide">System Live Demo: {activeDemo.title}</h3>
+              </div>
+              
+              <button 
+                onClick={() => setIsVideoOpen(false)}
+                className="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 p-1.5 rounded-xl transition"
+              >
+                <span className="material-symbols-outlined block text-xl">close</span>
+              </button>
+            </div>
+
+
+            {/* Video Player  */}
+            <div className="aspect-video bg-black flex items-center justify-center relative">
+              <video
+                className="w-full h-full object-contain"
+                autoPlay
+                loop
+                muted
+                controls
+                playsInline
+                src="images/DemoVideo.mp4"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            {/* Modal Footer Hint */}
+            <div className="px-6 py-3 bg-slate-950/60 text-center text-[11px] text-slate-400 border-t border-slate-800/60">
+               Click the close button anytime to exit the dashboard video walkthrough.
+            </div>
+
+          </div>
+        </div>
+      )}
     </section>
   );
 }
