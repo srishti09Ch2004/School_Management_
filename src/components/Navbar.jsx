@@ -13,6 +13,7 @@ function Navbar() {
     { name: "About", path: "/about" },
     { name: "Pricing", path: "/pricing" },
     { name: "Modules", path: "/modules" },
+    { name: "Demo", path: "/demo" },
     { name: "Contact", path: "/contact" },
   ];
 

@@ -10,6 +10,8 @@ import About from "./components/About";
 import Modules from "./components/Modules";
 import Contact from "./components/Contact";
 import Pricing from "./components/Pricing";
+import Demo from "./pages/Demo";
+
 
 function App() {
     const location = useLocation();
@@ -25,6 +27,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/modules" element={<Modules />} />
+        <Route path="/demo" element={<Demo />} />
         <Route path="/pricing" element={<Pricing />} />
       </Routes>
 
