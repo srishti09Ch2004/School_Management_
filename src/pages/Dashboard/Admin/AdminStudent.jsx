@@ -1,12 +1,27 @@
-import {
-  Search,
-  Plus,
-  Users,
-  UserCheck,
-  UserPlus,
-} from "lucide-react";
+import { Search, Plus, Users, UserCheck, UserPlus } from "lucide-react";
 
 export default function AdminStudent() {
+  const stats = [
+    {
+      title: "Total Students",
+      value: "2,540",
+      icon: <Users size={26} />,
+      color: "bg-red-500",
+    },
+    {
+      title: "Active Students",
+      value: "2,410",
+      icon: <UserCheck size={26} />,
+      color: "bg-green-600",
+    },
+    {
+      title: "New Admissions",
+      value: "130",
+      icon: <UserPlus size={26} />,
+      color: "bg-red-600",
+    },
+  ];
+
   const students = [
     {
       id: 1,
@@ -50,36 +65,14 @@ export default function AdminStudent() {
     },
   ];
 
-  const stats = [
-    {
-      title: "Total Students",
-      value: "2,540",
-      icon: <Users size={28} />,
-      color: "bg-red-500",
-    },
-    {
-      title: "Active Students",
-      value: "2,410",
-      icon: <UserCheck size={28} />,
-      color: "bg-green-600",
-    },
-    {
-      title: "New Admissions",
-      value: "130",
-      icon: <UserPlus size={28} />,
-      color: "bg-red-600",
-    },
-  ];
-
   return (
-    <div>
+    <div className="space-y-8">
 
-      {/* Heading */}
+      {/* Header */}
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex items-center justify-between">
 
         <div>
-
           <h1 className="text-3xl font-bold text-gray-800">
             Student Management
           </h1>
@@ -87,40 +80,29 @@ export default function AdminStudent() {
           <p className="text-gray-500 mt-1">
             Manage all students of Future Academy
           </p>
-
         </div>
 
-        <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl flex items-center gap-2">
-
+        <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition">
           <Plus size={18} />
-
           Add Student
-
         </button>
-
       </div>
 
       {/* Cards */}
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         {stats.map((item) => (
-
           <div
             key={item.title}
-            className="bg-white rounded-2xl shadow-sm p-6 flex justify-between items-center"
+            className="bg-white rounded-2xl shadow p-6 flex justify-between items-center"
           >
-
             <div>
-
-              <p className="text-gray-500">
-                {item.title}
-              </p>
+              <p className="text-gray-500">{item.title}</p>
 
               <h2 className="text-3xl font-bold mt-2">
                 {item.value}
               </h2>
-
             </div>
 
             <div
@@ -128,18 +110,15 @@ export default function AdminStudent() {
             >
               {item.icon}
             </div>
-
           </div>
-
         ))}
-
       </div>
 
       {/* Search */}
 
-      <div className="bg-white rounded-2xl shadow-sm mt-8 p-5">
+      <div className="bg-white rounded-2xl shadow p-5 flex justify-between items-center">
 
-        <div className="relative">
+        <div className="relative w-96">
 
           <Search
             size={18}
@@ -149,7 +128,7 @@ export default function AdminStudent() {
           <input
             type="text"
             placeholder="Search Student..."
-            className="w-full border rounded-xl pl-11 pr-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full border rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
           />
 
         </div>
@@ -158,96 +137,122 @@ export default function AdminStudent() {
 
       {/* Table */}
 
-      <div className="bg-white rounded-2xl shadow-sm mt-8 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow overflow-hidden">
 
-        <div className="p-5 border-b">
+        <div className="flex justify-between items-center p-6 border-b">
 
           <h2 className="text-xl font-semibold">
             Student List
           </h2>
 
+          <span className="text-gray-500">
+            Total : {students.length}
+          </span>
+
         </div>
 
-        <table className="w-full">
+        <div className="overflow-x-auto">
 
-          <thead className="bg-gray-100">
+          <table className="min-w-full">
 
-            <tr>
+            <thead className="bg-gray-100">
 
-              <th className="text-left p-4">Name</th>
+              <tr>
 
-              <th>Class</th>
+                <th className="px-6 py-4 text-left">
+                  Name
+                </th>
 
-              <th>Roll</th>
+                <th className="px-6 py-4 text-center">
+                  Class
+                </th>
 
-              <th>Gender</th>
+                <th className="px-6 py-4 text-center">
+                  Roll
+                </th>
 
-              <th>Status</th>
+                <th className="px-6 py-4 text-center">
+                  Gender
+                </th>
 
-              <th>Action</th>
+                <th className="px-6 py-4 text-center">
+                  Status
+                </th>
 
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {students.map((student) => (
-
-              <tr
-                key={student.id}
-                className="border-t hover:bg-gray-50"
-              >
-
-                <td className="p-4 font-medium">
-                  {student.name}
-                </td>
-
-                <td>{student.class}</td>
-
-                <td>{student.roll}</td>
-
-                <td>{student.gender}</td>
-
-                <td>
-
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      student.status === "Active"
-                        ? "bg-green-100 text-green-700"
-                        : student.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {student.status}
-                  </span>
-
-                </td>
-
-                <td>
-
-                  <div className="flex gap-2">
-
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg">
-                      Edit
-                    </button>
-
-                    <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg">
-                      Delete
-                    </button>
-
-                  </div>
-
-                </td>
+                <th className="px-6 py-4 text-center">
+                  Action
+                </th>
 
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody>
 
-        </table>
+              {students.map((student) => (
+
+                <tr
+                  key={student.id}
+                  className="border-t hover:bg-green-50 transition"
+                >
+
+                  <td className="px-6 py-5 font-medium">
+                    {student.name}
+                  </td>
+
+                  <td className="px-6 py-5 text-center">
+                    {student.class}
+                  </td>
+
+                  <td className="px-6 py-5 text-center">
+                    {student.roll}
+                  </td>
+
+                  <td className="px-6 py-5 text-center">
+                    {student.gender}
+                  </td>
+
+                  <td className="px-6 py-5 text-center">
+
+                    <span
+                      className={`px-4 py-1 rounded-full text-sm font-medium ${
+                        student.status === "Active"
+                          ? "bg-green-100 text-green-700"
+                          : student.status === "Pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {student.status}
+                    </span>
+
+                  </td>
+
+                  <td className="px-6 py-5">
+
+                    <div className="flex justify-center gap-3">
+
+                      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        Edit
+                      </button>
+
+                      <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                        Delete
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 
