@@ -34,7 +34,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Dashboard */}
+       
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
 
