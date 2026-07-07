@@ -7,7 +7,7 @@ import Topbar from "../../../components/Topbar";
 import AdminHome from "./AdminHome";
 import AdminStudent from "./AdminStudent";
 import AdminTeacher from "./AdminTeacher";
-// import AdminParent from "./AdminParent";
+import AdminParent from "./AdminParent";
 // import AdminFees from "./AdminFees";
 // import AdminExam from "./AdminExam";
 // import AdminLibrary from "./AdminLibrary";
