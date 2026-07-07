@@ -12,19 +12,19 @@ export default function AdminFees() {
     {
       title: "Collected Fees",
       value: "₹12.4 L",
-      icon: <IndianRupee size={24} />,
+      icon: <IndianRupee size={20} />,
       color: "bg-green-600",
     },
     {
       title: "Pending Fees",
       value: "₹3.8 L",
-      icon: <Wallet size={24} />,
+      icon: <Wallet size={20} />,
       color: "bg-red-500",
     },
     {
       title: "Today's Collection",
       value: "₹45,000",
-      icon: <CircleDollarSign size={24} />,
+      icon: <CircleDollarSign size={20} />,
       color: "bg-red-600",
     },
   ];
@@ -66,7 +66,7 @@ export default function AdminFees() {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-800">
             Fee Management
           </h1>
 
@@ -100,7 +100,7 @@ export default function AdminFees() {
             </div>
 
             <div
-              className={`${item.color} w-14 h-14 rounded-xl flex items-center justify-center text-white`}
+              className={`${item.color} w-11 h-11 rounded-xl flex items-center justify-center text-white`}
             >
               {item.icon}
             </div>
@@ -128,7 +128,7 @@ export default function AdminFees() {
       {/* Table */}
 
       <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-100">
+        <div className="px-8 py-5 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-gray-800">
             Student Fee Records
           </h2>
@@ -138,23 +138,23 @@ export default function AdminFees() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                <th className="text-left px-8 py-4 text-sm font-semibold text-gray-600">
                   Student
                 </th>
 
-                <th className="text-center px-6 py-4 text-sm font-semibold text-gray-600">
+                <th className="text-center px-8 py-4 text-sm font-semibold text-gray-600">
                   Class
                 </th>
 
-                <th className="text-center px-6 py-4 text-sm font-semibold text-gray-600">
+                <th className="text-center px-8 py-4 text-sm font-semibold text-gray-600">
                   Amount
                 </th>
 
-                <th className="text-center px-6 py-4 text-sm font-semibold text-gray-600">
+                <th className="text-center px-8 py-4 text-sm font-semibold text-gray-600">
                   Status
                 </th>
 
-                <th className="text-center px-6 py-4 text-sm font-semibold text-gray-600">
+                <th className="text-center px-8 py-4 text-sm font-semibold text-gray-600">
                   Action
                 </th>
               </tr>
@@ -166,7 +166,7 @@ export default function AdminFees() {
                   key={fee.id}
                   className="border-t border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <td className="px-6 py-5 font-medium text-gray-800">
+                  <td className="px-8 py-5 font-medium text-gray-800">
                     {fee.student}
                   </td>
 
