@@ -8,7 +8,7 @@ import AdminHome from "./AdminHome";
 import AdminStudent from "./AdminStudent";
 import AdminTeacher from "./AdminTeacher";
 import AdminParent from "./AdminParent";
-// import AdminFees from "./AdminFees";
+import AdminFees from "./AdminFees";
 // import AdminExam from "./AdminExam";
 // import AdminLibrary from "./AdminLibrary";
 // import AdminTransport from "./AdminTransport";
