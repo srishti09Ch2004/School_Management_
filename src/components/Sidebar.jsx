@@ -22,11 +22,11 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-white border-r shadow-sm flex flex-col">
+    <aside className="w-64 min-h-screen bg-white border-r border-gray-100 shadow-sm flex flex-col">
 
       {/* Logo */}
 
-      <div className="h-20 border-b flex items-center justify-center gap-3">
+      <div className="h-20 border-b border-gray-100 flex items-center justify-center gap-3">
 
         <img
           src="/images/logo6.png"
@@ -70,7 +70,7 @@ export default function Sidebar({
 
       {/* Logout */}
 
-      <div className="border-t p-4">
+      <div className="border-t border-gray-100 p-4">
 
         <button className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50">
 

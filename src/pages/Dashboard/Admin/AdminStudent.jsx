@@ -5,19 +5,19 @@ export default function AdminStudent() {
     {
       title: "Total Students",
       value: "2,540",
-      icon: <Users size={26} />,
+      icon: <Users size={20} />,
       color: "bg-red-500",
     },
     {
       title: "Active Students",
       value: "2,410",
-      icon: <UserCheck size={26} />,
+      icon: <UserCheck size={20} />,
       color: "bg-green-600",
     },
     {
       title: "New Admissions",
       value: "130",
-      icon: <UserPlus size={26} />,
+      icon: <UserPlus size={20} />,
       color: "bg-red-600",
     },
   ];
@@ -66,14 +66,14 @@ export default function AdminStudent() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-9">
 
       {/* Header */}
 
       <div className="flex items-center justify-between">
 
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-800">
             Student Management
           </h1>
 
@@ -106,7 +106,7 @@ export default function AdminStudent() {
             </div>
 
             <div
-              className={`${item.color} text-white w-16 h-16 rounded-2xl flex items-center justify-center`}
+              className={`${item.color} text-white w-11 h-11 rounded-2xl flex items-center justify-center`}
             >
               {item.icon}
             </div>
@@ -116,9 +116,9 @@ export default function AdminStudent() {
 
       {/* Search */}
 
-      <div className="bg-white rounded-2xl shadow p-5 flex justify-between items-center">
+      <div className="bg-white rounded-2xl shadow p-7 flex justify-between items-center">
 
-        <div className="relative w-96">
+        <div className="relative w-90">
 
           <Search
             size={18}
@@ -128,7 +128,7 @@ export default function AdminStudent() {
           <input
             type="text"
             placeholder="Search Student..."
-            className="w-full border rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full border rounded-xl py-2 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
           />
 
         </div>
@@ -159,27 +159,27 @@ export default function AdminStudent() {
 
               <tr>
 
-                <th className="px-6 py-4 text-left">
+                <th className="px-8 py-5 text-left">
                   Name
                 </th>
 
-                <th className="px-6 py-4 text-center">
+                <th className="px-8 py-4 text-center">
                   Class
                 </th>
 
-                <th className="px-6 py-4 text-center">
+                <th className="px-8 py-4 text-center">
                   Roll
                 </th>
 
-                <th className="px-6 py-4 text-center">
+                <th className="px-8 py-4 text-center">
                   Gender
                 </th>
 
-                <th className="px-6 py-4 text-center">
+                <th className="px-8 py-4 text-center">
                   Status
                 </th>
 
-                <th className="px-6 py-4 text-center">
+                <th className="px-8 py-4 text-center">
                   Action
                 </th>
 
@@ -196,23 +196,23 @@ export default function AdminStudent() {
                   className="border-t hover:bg-green-50 transition"
                 >
 
-                  <td className="px-6 py-5 font-medium">
+                  <td className="px-8 py-5 font-medium">
                     {student.name}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
                     {student.class}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
                     {student.roll}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
                     {student.gender}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
 
                     <span
                       className={`px-4 py-1 rounded-full text-sm font-medium ${
@@ -228,7 +228,7 @@ export default function AdminStudent() {
 
                   </td>
 
-                  <td className="px-6 py-5">
+                  <td className="px-8 py-5">
 
                     <div className="flex justify-center gap-3">
 
@@ -236,7 +236,7 @@ export default function AdminStudent() {
                         Edit
                       </button>
 
-                      <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                      <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg">
                         Delete
                       </button>
 

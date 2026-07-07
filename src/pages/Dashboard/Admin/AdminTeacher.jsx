@@ -6,19 +6,19 @@ export default function AdminTeacher() {
     {
       title: "Total Teachers",
       value: "185",
-      icon: <Users size={26} />,
+      icon: <Users size={20} />,
       color: "bg-red-500",
     },
     {
       title: "Departments",
       value: "12",
-      icon: <BookOpen size={26} />,
+      icon: <BookOpen size={20} />,
       color: "bg-green-600",
     },
     {
       title: "Class Teachers",
       value: "42",
-      icon: <GraduationCap size={26} />,
+      icon: <GraduationCap size={20} />,
       color: "bg-red-600",
     },
   ];
@@ -56,7 +56,7 @@ export default function AdminTeacher() {
       <div className="flex justify-between items-center">
 
         <div>
-          <h1 className="text-3xl font-bold">Teacher Management</h1>
+          <h1 className="text-2xl font-bold">Teacher Management</h1>
           <p className="text-gray-500">Manage all teachers</p>
         </div>
 
@@ -70,14 +70,14 @@ export default function AdminTeacher() {
       <div className="grid md:grid-cols-3 gap-6">
 
         {stats.map((item)=>(
-          <div key={item.title} className="bg-white rounded-2xl shadow p-6 flex justify-between">
+          <div key={item.title} className="bg-white rounded-2xl shadow p-7 flex justify-between">
 
             <div>
               <p className="text-gray-500">{item.title}</p>
               <h2 className="text-3xl font-bold mt-2">{item.value}</h2>
             </div>
 
-            <div className={`${item.color} w-16 h-16 rounded-2xl text-white flex items-center justify-center`}>
+            <div className={`${item.color} w-11 h-11 rounded-2xl text-white flex items-center justify-center`}>
               {item.icon}
             </div>
 
@@ -88,14 +88,14 @@ export default function AdminTeacher() {
 
       <div className="bg-white rounded-2xl shadow p-5">
 
-        <div className="relative w-96">
+        <div className="relative w-90">
 
           <Search className="absolute left-4 top-4 text-gray-400" size={18}/>
 
           <input
             type="text"
             placeholder="Search Teacher..."
-            className="w-full border rounded-xl py-3 pl-11"
+            className="w-full border rounded-xl py-2 pl-11"
           />
 
         </div>
@@ -110,7 +110,7 @@ export default function AdminTeacher() {
 
             <tr>
 
-              <th className="text-left p-4">Teacher</th>
+              <th className="text-left p-8">Teacher</th>
               <th>Subject</th>
               <th>Phone</th>
               <th>Experience</th>
@@ -127,7 +127,7 @@ export default function AdminTeacher() {
 
               <tr key={teacher.id} className="border-t hover:bg-green-50">
 
-                <td className="p-4">{teacher.name}</td>
+                <td className="p-8">{teacher.name}</td>
                 <td className="text-center">{teacher.subject}</td>
                 <td className="text-center">{teacher.phone}</td>
                 <td className="text-center">{teacher.experience}</td>

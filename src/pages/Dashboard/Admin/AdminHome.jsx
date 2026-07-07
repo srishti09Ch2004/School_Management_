@@ -12,37 +12,37 @@ export default function AdminHome() {
     {
       title: "Total Students",
       value: "2,540",
-      icon: <Users size={30} />,
+      icon: <Users size={20} />,
       color: "bg-red-500",
     },
     {
       title: "Total Teachers",
       value: "185",
-      icon: <GraduationCap size={30} />,
+      icon: <GraduationCap size={20} />,
       color: "bg-green-600",
     },
     {
       title: "Fees Collected",
       value: "₹12.4 L",
-      icon: <IndianRupee size={30} />,
+      icon: <IndianRupee size={20} />,
       color: "bg-red-600",
     },
     {
       title: "Library Books",
       value: "4,530",
-      icon: <BookOpen size={30} />,
+      icon: <BookOpen size={20} />,
       color: "bg-green-500",
     },
     {
       title: "Staff Members",
       value: "62",
-      icon: <UserCheck size={30} />,
+      icon: <UserCheck size={20} />,
       color: "bg-red-500",
     },
     {
       title: "Today's Attendance",
       value: "95%",
-      icon: <CalendarCheck size={30} />,
+      icon: <CalendarCheck size={20} />,
       color: "bg-green-600",
     },
   ];
@@ -50,9 +50,9 @@ export default function AdminHome() {
   return (
     <div>
 
-      <div className="mb-8">
+      <div className="mb-9">
 
-        <h2 className="text-3xl font-bold text-gray-800">
+        <h2 className="text-2xl font-bold text-gray-800">
           Dashboard Overview
         </h2>
 
@@ -64,7 +64,7 @@ export default function AdminHome() {
 
       {/* Cards */}
 
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
 
         {stats.map((item) => (
 
@@ -86,7 +86,7 @@ export default function AdminHome() {
             </div>
 
             <div
-              className={`${item.color} w-16 h-16 rounded-2xl flex items-center justify-center text-white`}
+              className={`${item.color} w-11 h-11 rounded-2xl flex items-center justify-center text-white`}
             >
               {item.icon}
             </div>
@@ -101,7 +101,7 @@ export default function AdminHome() {
 
       <div className="bg-white mt-10 rounded-2xl shadow-sm">
 
-        <div className="p-6 border-b">
+        <div className="p-7 border-b">
 
           <h3 className="text-xl font-semibold">
             Recent Admissions
@@ -115,7 +115,7 @@ export default function AdminHome() {
 
             <tr>
 
-              <th className="text-left p-4">Student</th>
+              <th className="text-left p-8">Student</th>
 
               <th className="text-left">Class</th>
 
@@ -131,7 +131,7 @@ export default function AdminHome() {
 
             <tr className="border-t">
 
-              <td className="p-4">Rahul Sharma</td>
+              <td className="p-8">Rahul Sharma</td>
 
               <td>10-A</td>
 
@@ -145,7 +145,7 @@ export default function AdminHome() {
 
             <tr className="border-t">
 
-              <td className="p-4">Priya Singh</td>
+              <td className="p-8">Priya Singh</td>
 
               <td>9-B</td>
 
@@ -159,7 +159,7 @@ export default function AdminHome() {
 
             <tr className="border-t">
 
-              <td className="p-4">Ankit Verma</td>
+              <td className="p-8">Ankit Verma</td>
 
               <td>8-C</td>
 
@@ -180,3 +180,4 @@ export default function AdminHome() {
     </div>
   );
 }
+

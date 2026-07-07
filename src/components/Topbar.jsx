@@ -4,7 +4,7 @@ export default function Topbar({
   title = "Dashboard",
 }) {
   return (
-    <header className="bg-white h-20 border-b flex items-center justify-between px-8">
+    <header className="bg-white h-20 border-b border-gray-100 flex items-center justify-between px-8">
 
       <div>
 

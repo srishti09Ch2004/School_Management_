@@ -5,19 +5,19 @@ export default function AdminParent() {
     {
       title: "Total Parents",
       value: "1,850",
-      icon: <Users size={26} />,
+      icon: <Users size={20} />,
       color: "bg-red-500",
     },
     {
       title: "Active Parents",
       value: "1,760",
-      icon: <UserCheck size={26} />,
+      icon: <UserCheck size={20} />,
       color: "bg-green-600",
     },
     {
       title: "Linked Students",
       value: "2,540",
-      icon: <HeartHandshake size={26} />,
+      icon: <HeartHandshake size={20} />,
       color: "bg-red-600",
     },
   ];
@@ -65,7 +65,7 @@ export default function AdminParent() {
       <div className="flex justify-between items-center">
 
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-800">
             Parent Management
           </h1>
 
@@ -103,7 +103,7 @@ export default function AdminParent() {
             </div>
 
             <div
-              className={`${item.color} text-white w-16 h-16 rounded-2xl flex items-center justify-center`}
+              className={`${item.color} text-white w-11 h-11 rounded-2xl flex items-center justify-center`}
             >
               {item.icon}
             </div>
@@ -118,7 +118,7 @@ export default function AdminParent() {
 
       <div className="bg-white rounded-2xl shadow p-5">
 
-        <div className="relative w-96">
+        <div className="relative w-90">
 
           <Search
             size={18}
@@ -139,7 +139,7 @@ export default function AdminParent() {
 
       <div className="bg-white rounded-2xl shadow overflow-hidden">
 
-        <div className="flex justify-between items-center p-6 border-b">
+        <div className="flex justify-between items-center p-7 border-b">
 
           <h2 className="text-xl font-semibold">
             Parent List
@@ -159,17 +159,17 @@ export default function AdminParent() {
 
               <tr>
 
-                <th className="px-6 py-4 text-left">Parent Name</th>
+                <th className="px-8 py-4 text-left">Parent Name</th>
 
-                <th className="px-6 py-4 text-center">Relation</th>
+                <th className="px-8 py-4 text-center">Relation</th>
 
-                <th className="px-6 py-4 text-center">Student</th>
+                <th className="px-8 py-4 text-center">Student</th>
 
-                <th className="px-6 py-4 text-center">Phone</th>
+                <th className="px-8 py-4 text-center">Phone</th>
 
-                <th className="px-6 py-4 text-center">Status</th>
+                <th className="px-8 py-4 text-center">Status</th>
 
-                <th className="px-6 py-4 text-center">Action</th>
+                <th className="px-8 py-4 text-center">Action</th>
 
               </tr>
 
@@ -184,23 +184,23 @@ export default function AdminParent() {
                   className="border-t hover:bg-green-50 transition"
                 >
 
-                  <td className="px-6 py-5 font-medium">
+                  <td className="px-8 py-5 font-medium">
                     {parent.name}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
                     {parent.relation}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
                     {parent.student}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
                     {parent.phone}
                   </td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-8 py-5 text-center">
 
                     <span
                       className={`px-4 py-1 rounded-full text-sm font-medium ${
