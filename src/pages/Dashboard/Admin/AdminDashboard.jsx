@@ -10,7 +10,9 @@ import AdminTeacher from "./AdminTeacher";
 import AdminParent from "./AdminParent";
 import AdminFees from "./AdminFees";
 import AdminExam from "./AdminExam";
-// import AdminLibrary from "./AdminLibrary";
+import AdminLibrary from "./AdminLibrary";
+import AdminAttendance from "./AdminAttendance";
+
 // import AdminTransport from "./AdminTransport";
 // import AdminReports from "./AdminReports";
 // import AdminSettings from "./AdminSettings";
@@ -49,6 +51,9 @@ export default function AdminDashboard() {
 
       case "Settings":
         return <AdminSettings />;
+
+      case "Attendance":
+       return <AdminAttendance />;
 
       default:
         return <AdminHome />;

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Mail,
   Lock,
@@ -9,6 +11,7 @@ import {
 
 function LoginForm({ role }) {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const roleStyles = {
     student: {
@@ -39,13 +42,29 @@ function LoginForm({ role }) {
 
   const style = roleStyles[role.id];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = (e) => {
+  e.preventDefault();
 
-    alert(`${role.title} Login Successfully`);
+  if (role.id === "admin") {
+    navigate("/admin");
+  }
 
+  if (role.id === "teacher") {
+    navigate("/teacher");
+  }
 
-  };
+  if (role.id === "student") {
+    navigate("/student");
+  }
+
+  if (role.id === "parent") {
+    alert("Parent Dashboard Coming Soon");
+  }
+
+  if (role.id === "principal") {
+    alert("Principal Dashboard Coming Soon");
+  }
+};
 
   return (
     <div>

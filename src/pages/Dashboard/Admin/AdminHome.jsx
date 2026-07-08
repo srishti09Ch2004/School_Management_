@@ -95,7 +95,7 @@ export default function AdminHome() {
                 {item.title}
               </p>
 
-              <h3 className="text-3xl font-bold text-gray-800 mt-2">
+              <h3 className="text-2xl font-bold text-gray-800 mt-2">
                 {item.value}
               </h3>
             </div>
@@ -107,6 +107,29 @@ export default function AdminHome() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl p-6">
+          <h3 className="font-bold text-xl mb-4">
+            Attendance
+          </h3>
+
+          
+        </div>
+
+        <div className="bg-white rounded-2xl p-6">
+          <h3 className="font-bold text-xl mb-4">
+            Notifications
+          </h3>
+
+          <ul className="space-y-3">
+            <li>New Admission Added</li>
+            <li>Fees Collection Updated</li>
+            <li>Exam Schedule Released</li>
+            <li>Attendance Report Generated</li>
+          </ul>
+        </div>
       </div>
 
       {/* Recent Admissions */}

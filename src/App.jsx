@@ -3,6 +3,9 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+import TeacherDashboard from "./pages/Dashboard/TeacherDashboard";
+import StudentDashboard from "./pages/Dashboard/StudentDashboard";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Demo from "./pages/Demo";
@@ -18,8 +21,10 @@ function App() {
   const location = useLocation();
 
   const hideLayout =
-    location.pathname === "/login" ||
-    location.pathname.startsWith("/admin");
+  location.pathname === "/login" ||
+  location.pathname.startsWith("/admin") ||
+  location.pathname.startsWith("/teacher") ||
+  location.pathname.startsWith("/student");
 
   return (
     <>
@@ -33,6 +38,9 @@ function App() {
         <Route path="/demo" element={<Demo />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
+
+        <Route path="/teacher" element={<TeacherDashboard />} />
+        <Route path="/student" element={<StudentDashboard />} />
 
        
         <Route path="/admin" element={<AdminDashboard />} />

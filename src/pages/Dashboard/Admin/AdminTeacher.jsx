@@ -74,7 +74,7 @@ export default function AdminTeacher() {
 
             <div>
               <p className="text-gray-500">{item.title}</p>
-              <h2 className="text-3xl font-bold mt-2">{item.value}</h2>
+              <h2 className="text-2xl font-bold mt-2">{item.value}</h2>
             </div>
 
             <div className={`${item.color} w-11 h-11 rounded-2xl text-white flex items-center justify-center`}>
