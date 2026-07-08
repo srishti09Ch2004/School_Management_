@@ -1,251 +1,881 @@
-// import { useRef, useState } from "react";
+// // import { useState } from "react";
+// // import {
+// //   CalendarCheck,
+// //   Download,
+// //   Search,
+// // } from "lucide-react";
+
+// // export default function AdminAttendance() {
+// //   const dates = Array.from(
+// //     { length: 10 },
+// //     (_, i) => i + 1
+// //   );
+
+// //   const [search, setSearch] =
+// //     useState("");
+
+// //   const [students, setStudents] =
+// //     useState([
+// //       {
+// //         id: 1,
+// //         roll: "101",
+// //         name: "Rahul Sharma",
+// //         attendance: {},
+// //       },
+// //       {
+// //         id: 2,
+// //         roll: "102",
+// //         name: "Priya Singh",
+// //         attendance: {},
+// //       },
+// //       {
+// //         id: 3,
+// //         roll: "103",
+// //         name: "Ankit Verma",
+// //         attendance: {},
+// //       },
+// //       {
+// //         id: 4,
+// //         roll: "104",
+// //         name: "Neha Gupta",
+// //         attendance: {},
+// //       },
+// //       {
+// //         id: 5,
+// //         roll: "105",
+// //         name: "Aman Yadav",
+// //         attendance: {},
+// //       },
+// //     ]);
+
+// //   const toggleAttendance = (
+// //     studentId,
+// //     date
+// //   ) => {
+// //     setStudents((prev) =>
+// //       prev.map((student) => {
+// //         if (student.id !== studentId)
+// //           return student;
+
+// //         const current =
+// //           student.attendance[date];
+
+// //         let next = "P";
+
+// //         if (current === "P")
+// //           next = "A";
+// //         else if (current === "A")
+// //           next = "L";
+// //         else if (current === "L")
+// //           next = "";
+
+// //         return {
+// //           ...student,
+// //           attendance: {
+// //             ...student.attendance,
+// //             [date]: next,
+// //           },
+// //         };
+// //       })
+// //     );
+// //   };
+
+// //   const getColor = (value) => {
+// //     if (value === "P")
+// //       return "bg-green-100 text-green-700";
+
+// //     if (value === "A")
+// //       return "bg-red-100 text-red-700";
+
+// //     if (value === "L")
+// //       return "bg-yellow-100 text-yellow-700";
+
+// //     return "bg-gray-100 text-gray-500";
+// //   };
+
+// //   const filteredStudents =
+// //     students.filter(
+// //       (student) =>
+// //         student.name
+// //           .toLowerCase()
+// //           .includes(
+// //             search.toLowerCase()
+// //           ) ||
+// //         student.roll.includes(search)
+// //     );
+
+// //   const exportAttendance = () => {
+// //     const headers = [
+// //       "Roll No",
+// //       "Student Name",
+// //       ...dates.map(
+// //         (d) => `Day ${d}`
+// //       ),
+// //     ];
+
+// //     const rows = students.map(
+// //       (student) => [
+// //         student.roll,
+// //         student.name,
+// //         ...dates.map(
+// //           (d) =>
+// //             student.attendance[d] ||
+// //             "-"
+// //         ),
+// //       ]
+// //     );
+
+// //     const csvContent = [
+// //       headers.join(","),
+// //       ...rows.map((r) =>
+// //         r.join(",")
+// //       ),
+// //     ].join("\n");
+
+// //     const blob = new Blob(
+// //       [csvContent],
+// //       {
+// //         type:
+// //           "text/csv;charset=utf-8;",
+// //       }
+// //     );
+
+// //     const url =
+// //       window.URL.createObjectURL(
+// //         blob
+// //       );
+
+// //     const link =
+// //       document.createElement("a");
+
+// //     link.href = url;
+// //     link.download =
+// //       "attendance-sheet.csv";
+
+// //     link.click();
+// //   };
+
+// //   const totalPresent =
+// //     students.reduce(
+// //       (acc, student) =>
+// //         acc +
+// //         Object.values(
+// //           student.attendance
+// //         ).filter(
+// //           (x) => x === "P"
+// //         ).length,
+// //       0
+// //     );
+
+// //   const totalAbsent =
+// //     students.reduce(
+// //       (acc, student) =>
+// //         acc +
+// //         Object.values(
+// //           student.attendance
+// //         ).filter(
+// //           (x) => x === "A"
+// //         ).length,
+// //       0
+// //     );
+
+// //   const totalLeave =
+// //     students.reduce(
+// //       (acc, student) =>
+// //         acc +
+// //         Object.values(
+// //           student.attendance
+// //         ).filter(
+// //           (x) => x === "L"
+// //         ).length,
+// //       0
+// //     );
+
+// //   return (
+// //     <div className="space-y-6">
+// //       {/* Header */}
+
+// //       <div className="bg-white p-6 rounded-3xl shadow-sm border flex justify-between items-center">
+// //         <div>
+// //           <h1 className="text-2xl font-bold text-gray-800">
+// //             Attendance Sheet
+// //           </h1>
+
+// //           <p className="text-gray-500 mt-1">
+// //             Excel Style Attendance
+// //             Management
+// //           </p>
+// //         </div>
+
+// //         <button
+// //           onClick={
+// //             exportAttendance
+// //           }
+// //           className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
+// //         >
+// //           <Download size={18} />
+// //           Export Excel
+// //         </button>
+// //       </div>
+
+// //       {/* Stats */}
+
+// //       <div className="grid md:grid-cols-3 gap-5">
+// //         <div className="bg-white rounded-3xl p-5 shadow-sm border">
+// //           <p className="text-gray-500">
+// //             Present
+// //           </p>
+
+// //           <h2 className="text-3xl font-bold text-green-600 mt-2">
+// //             {totalPresent}
+// //           </h2>
+// //         </div>
+
+// //         <div className="bg-white rounded-3xl p-5 shadow-sm border">
+// //           <p className="text-gray-500">
+// //             Absent
+// //           </p>
+
+// //           <h2 className="text-3xl font-bold text-red-600 mt-2">
+// //             {totalAbsent}
+// //           </h2>
+// //         </div>
+
+// //         <div className="bg-white rounded-3xl p-5 shadow-sm border">
+// //           <p className="text-gray-500">
+// //             Leave
+// //           </p>
+
+// //           <h2 className="text-3xl font-bold text-yellow-500 mt-2">
+// //             {totalLeave}
+// //           </h2>
+// //         </div>
+// //       </div>
+
+// //       {/* Search */}
+
+// //       <div className="bg-white p-5 rounded-3xl shadow-sm border">
+// //         <div className="relative max-w-md">
+// //           <Search
+// //             size={18}
+// //             className="absolute left-4 top-4 text-gray-400"
+// //           />
+
+// //           <input
+// //             value={search}
+// //             onChange={(e) =>
+// //               setSearch(
+// //                 e.target.value
+// //               )
+// //             }
+// //             placeholder="Search Student..."
+// //             className="w-full border rounded-xl py-3 pl-11 outline-none focus:ring-2 focus:ring-green-500"
+// //           />
+// //         </div>
+// //       </div>
+
+// //       {/* Table */}
+
+// //       <div className="bg-white rounded-3xl shadow-sm border overflow-hidden">
+// //         <div className="p-5 border-b flex items-center gap-3">
+// //           <CalendarCheck
+// //             className="text-green-600"
+// //             size={22}
+// //           />
+
+// //           <h2 className="font-semibold text-lg">
+// //             Monthly Attendance
+// //             Sheet
+// //           </h2>
+// //         </div>
+
+// //         <div className="overflow-x-auto">
+// //           <table className="min-w-max w-full">
+// //             <thead className="bg-gray-50">
+// //               <tr>
+// //                 <th className="sticky left-0 bg-gray-50 p-4 text-left min-w-[90px] z-20">
+// //                   Roll
+// //                 </th>
+
+// //                 <th className="sticky left-[90px] bg-gray-50 p-4 text-left min-w-[220px] z-20">
+// //                   Student Name
+// //                 </th>
+
+// //                 {dates.map(
+// //                   (date) => (
+// //                     <th
+// //                       key={date}
+// //                       className="p-4 text-center min-w-[60px]"
+// //                     >
+// //                       {date}
+// //                     </th>
+// //                   )
+// //                 )}
+// //               </tr>
+// //             </thead>
+
+// //             <tbody>
+// //               {filteredStudents.map(
+// //                 (student) => (
+// //                   <tr
+// //                     key={
+// //                       student.id
+// //                     }
+// //                     className="border-t hover:bg-gray-50"
+// //                   >
+// //                     <td className="sticky left-0 bg-white p-4 font-medium z-10">
+// //                       {
+// //                         student.roll
+// //                       }
+// //                     </td>
+
+// //                     <td className="sticky left-[90px] bg-white p-4 z-10">
+// //                       {
+// //                         student.name
+// //                       }
+// //                     </td>
+
+// //                     {dates.map(
+// //                       (date) => {
+// //                         const value =
+// //                           student
+// //                             .attendance[
+// //                             date
+// //                           ] ||
+// //                           "";
+
+// //                         return (
+// //                           <td
+// //                             key={
+// //                               date
+// //                             }
+// //                             className="p-2 text-center"
+// //                           >
+// //                             <button
+// //                               onClick={() =>
+// //                                 toggleAttendance(
+// //                                   student.id,
+// //                                   date
+// //                                 )
+// //                               }
+// //                               className={`w-10 h-10 rounded-lg font-bold transition ${getColor(
+// //                                 value
+// //                               )}`}
+// //                             >
+// //                               {value ||
+// //                                 "-"}
+// //                             </button>
+// //                           </td>
+// //                         );
+// //                       }
+// //                     )}
+// //                   </tr>
+// //                 )
+// //               )}
+
+// //               {filteredStudents.length ===
+// //                 0 && (
+// //                 <tr>
+// //                   <td
+// //                     colSpan={
+// //                       dates.length +
+// //                       2
+// //                     }
+// //                     className="text-center p-10 text-gray-500"
+// //                   >
+// //                     No Student Found
+// //                   </td>
+// //                 </tr>
+// //               )}
+// //             </tbody>
+// //           </table>
+// //         </div>
+// //       </div>
+
+// //       {/* Legend */}
+
+// //       <div className="bg-white p-5 rounded-3xl shadow-sm border">
+// //         <div className="flex gap-6 flex-wrap text-sm">
+// //           <div className="flex items-center gap-2">
+// //             <div className="w-5 h-5 rounded bg-green-100"></div>
+// //             Present (P)
+// //           </div>
+
+// //           <div className="flex items-center gap-2">
+// //             <div className="w-5 h-5 rounded bg-red-100"></div>
+// //             Absent (A)
+// //           </div>
+
+// //           <div className="flex items-center gap-2">
+// //             <div className="w-5 h-5 rounded bg-yellow-100"></div>
+// //             Leave (L)
+// //           </div>
+// //         </div>
+// //       </div>
+// //     </div>
+// //   );
+// // }
+
+
+
+
+
+
+
+
+
+
+
+// import { useState } from "react";
 // import {
-//   ScanFace,
-//   Fingerprint,
-//   X,
+//   CalendarCheck,
+//   Download,
+//   Search,
 // } from "lucide-react";
 
 // export default function AdminAttendance() {
-//   const videoRef = useRef(null);
-//   const canvasRef = useRef(null);
+//   const dates = Array.from(
+//     { length: 10 },
+//     (_, i) => i + 1
+//   );
 
-//   const [cameraOpen, setCameraOpen] = useState(false);
-//   const [fingerOpen, setFingerOpen] = useState(false);
-//   const [capturedImage, setCapturedImage] = useState(null);
+//   const [search, setSearch] = useState("");
+//   const [selectedDate, setSelectedDate] =
+//     useState(1);
 
-//   // Open Camera
-//   const openCamera = async () => {
-//     setCapturedImage(null);
-//     setCameraOpen(true);
+//   const [students, setStudents] =
+//     useState([
+//       {
+//         id: 1,
+//         roll: "101",
+//         name: "Rahul Sharma",
+//         attendance: {},
+//       },
+//       {
+//         id: 2,
+//         roll: "102",
+//         name: "Priya Singh",
+//         attendance: {},
+//       },
+//       {
+//         id: 3,
+//         roll: "103",
+//         name: "Ankit Verma",
+//         attendance: {},
+//       },
+//       {
+//         id: 4,
+//         roll: "104",
+//         name: "Neha Gupta",
+//         attendance: {},
+//       },
+//       {
+//         id: 5,
+//         roll: "105",
+//         name: "Aman Yadav",
+//         attendance: {},
+//       },
+//     ]);
 
-//     try {
-//       const stream = await navigator.mediaDevices.getUserMedia({
-//         video: true,
-//       });
+//   const toggleAttendance = (
+//     studentId,
+//     date
+//   ) => {
+//     setStudents((prev) =>
+//       prev.map((student) => {
+//         if (student.id !== studentId)
+//           return student;
 
-//       setTimeout(() => {
-//         if (videoRef.current) {
-//           videoRef.current.srcObject = stream;
-//         }
-//       }, 100);
-//     } catch (error) {
-//       console.error(error);
-//       alert("Camera access denied.");
-//       setCameraOpen(false);
-//     }
+//         const current =
+//           student.attendance[date];
+
+//         let next = "P";
+
+//         if (current === "P")
+//           next = "A";
+//         else if (current === "A")
+//           next = "L";
+//         else if (current === "L")
+//           next = "";
+
+//         return {
+//           ...student,
+//           attendance: {
+//             ...student.attendance,
+//             [date]: next,
+//           },
+//         };
+//       })
+//     );
 //   };
 
-//   // Close Camera
-//   const closeCamera = () => {
-//     if (videoRef.current?.srcObject) {
-//       const tracks = videoRef.current.srcObject.getTracks();
-//       tracks.forEach((track) => track.stop());
-//     }
+//   const getColor = (value) => {
+//     if (value === "P")
+//       return "bg-green-100 text-green-700";
 
-//     setCameraOpen(false);
-//     setCapturedImage(null);
+//     if (value === "A")
+//       return "bg-red-100 text-red-700";
+
+//     if (value === "L")
+//       return "bg-yellow-100 text-yellow-700";
+
+//     return "bg-gray-100 text-gray-500";
 //   };
 
-//   // Capture Photo
-//   const capturePhoto = () => {
-//     const video = videoRef.current;
-//     const canvas = canvasRef.current;
+//   const filteredStudents =
+//     students.filter(
+//       (student) =>
+//         student.name
+//           .toLowerCase()
+//           .includes(
+//             search.toLowerCase()
+//           ) ||
+//         student.roll.includes(search)
+//     );
 
-//     if (!video || !canvas) return;
+//   const totalPresent =
+//     students.filter(
+//       (student) =>
+//         student.attendance[
+//           selectedDate
+//         ] === "P"
+//     ).length;
 
-//     canvas.width = video.videoWidth;
-//     canvas.height = video.videoHeight;
+//   const totalAbsent =
+//     students.filter(
+//       (student) =>
+//         student.attendance[
+//           selectedDate
+//         ] === "A"
+//     ).length;
 
-//     const ctx = canvas.getContext("2d");
-//     ctx.drawImage(video, 0, 0);
+//   const totalLeave =
+//     students.filter(
+//       (student) =>
+//         student.attendance[
+//           selectedDate
+//         ] === "L"
+//     ).length;
 
-//     const image = canvas.toDataURL("image/png");
-//     setCapturedImage(image);
+//   const exportAttendance = () => {
+//     const headers = [
+//       "Roll No",
+//       "Student Name",
+//       ...dates.map(
+//         (d) => `Day ${d}`
+//       ),
+//       "Total Present",
+//     ];
 
-//     // Camera band kar do capture ke baad
-//     if (video.srcObject) {
-//       const tracks = video.srcObject.getTracks();
-//       tracks.forEach((track) => track.stop());
-//     }
-//   };
+//     const rows = students.map(
+//       (student) => [
+//         student.roll,
+//         student.name,
+//         ...dates.map(
+//           (d) =>
+//             student.attendance[d] ||
+//             "-"
+//         ),
+//         Object.values(
+//           student.attendance
+//         ).filter(
+//           (x) => x === "P"
+//         ).length,
+//       ]
+//     );
 
-//   // Submit Attendance
-//   const submitAttendance = async () => {
-//     try {
-//       // Yahan API call laga sakte ho
-//       // await axios.post("/api/attendance", {
-//       //   image: capturedImage,
-//       // });
+//     const csvContent = [
+//       headers.join(","),
+//       ...rows.map((r) =>
+//         r.join(",")
+//       ),
+//     ].join("\n");
 
-//       alert("Attendance submitted successfully!");
+//     const blob = new Blob(
+//       [csvContent],
+//       {
+//         type:
+//           "text/csv;charset=utf-8;",
+//       }
+//     );
 
-//       closeCamera();
-//     } catch (error) {
-//       console.error(error);
-//       alert("Failed to submit attendance.");
-//     }
+//     const url =
+//       window.URL.createObjectURL(
+//         blob
+//       );
+
+//     const link =
+//       document.createElement("a");
+
+//     link.href = url;
+//     link.download =
+//       "attendance-sheet.csv";
+
+//     link.click();
 //   };
 
 //   return (
-//     <div className="space-y-8">
-//       <h2 className="text-3xl font-bold">
-//         Attendance Management
-//       </h2>
+//     <div className="space-y-6">
+//       {/* Header */}
+//       <div className="bg-white p-6 rounded-3xl shadow-sm border flex justify-between items-center">
+//         <div>
+//           <h1 className="text-2xl font-bold text-gray-800">
+//             Attendance Sheet
+//           </h1>
 
-//       <div className="grid md:grid-cols-2 gap-6">
-//         {/* Face Recognition Card */}
-//         <div className="bg-white p-8 rounded-3xl shadow">
-//           <h3 className="text-xl font-bold mb-4">
-//             Face Recognition
-//           </h3>
-
-//           <div className="flex justify-center py-10">
-//             <div className="bg-green-100 p-8 rounded-full">
-//               <ScanFace
-//                 size={80}
-//                 className="text-green-600"
-//               />
-//             </div>
-//           </div>
-
-//           <button
-//             onClick={openCamera}
-//             className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl transition"
-//           >
-//             Scan Face
-//           </button>
+//           <p className="text-gray-500 mt-1">
+//             Monthly Attendance
+//             Management
+//           </p>
 //         </div>
 
-//         {/* Fingerprint Card */}
-//         <div className="bg-white p-8 rounded-3xl shadow">
-//           <h3 className="text-xl font-bold mb-4">
-//             Fingerprint Scanner
-//           </h3>
+//         <button
+//           onClick={
+//             exportAttendance
+//           }
+//           className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
+//         >
+//           <Download size={18} />
+//           Export Excel
+//         </button>
+//       </div>
 
-//           <div className="flex justify-center py-10">
-//             <div className="bg-blue-100 p-8 rounded-full">
-//               <Fingerprint
-//                 size={80}
-//                 className="text-blue-600"
-//               />
-//             </div>
-//           </div>
+//       {/* Date Selector */}
+//       <div className="bg-white p-5 rounded-3xl shadow-sm border flex items-center gap-4">
+//         <label className="font-semibold">
+//           Select Date :
+//         </label>
 
-//           <button
-//             onClick={() => setFingerOpen(true)}
-//             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
-//           >
-//             Scan Fingerprint
-//           </button>
+//         <select
+//           value={selectedDate}
+//           onChange={(e) =>
+//             setSelectedDate(
+//               Number(
+//                 e.target.value
+//               )
+//             )
+//           }
+//           className="border rounded-xl px-4 py-2 outline-none"
+//         >
+//           {dates.map((date) => (
+//             <option
+//               key={date}
+//               value={date}
+//             >
+//               Day {date}
+//             </option>
+//           ))}
+//         </select>
+//       </div>
+
+//       {/* Selected Day Stats */}
+//       <div className="grid md:grid-cols-3 gap-5">
+//         <div className="bg-white rounded-3xl p-5 shadow-sm border">
+//           <p className="text-gray-500">
+//             Present on Day{" "}
+//             {selectedDate}
+//           </p>
+
+//           <h2 className="text-3xl font-bold text-green-600 mt-2">
+//             {totalPresent}
+//           </h2>
+//         </div>
+
+//         <div className="bg-white rounded-3xl p-5 shadow-sm border">
+//           <p className="text-gray-500">
+//             Absent on Day{" "}
+//             {selectedDate}
+//           </p>
+
+//           <h2 className="text-3xl font-bold text-red-600 mt-2">
+//             {totalAbsent}
+//           </h2>
+//         </div>
+
+//         <div className="bg-white rounded-3xl p-5 shadow-sm border">
+//           <p className="text-gray-500">
+//             Leave on Day{" "}
+//             {selectedDate}
+//           </p>
+
+//           <h2 className="text-3xl font-bold text-yellow-500 mt-2">
+//             {totalLeave}
+//           </h2>
 //         </div>
 //       </div>
 
-//       {/* Camera Modal */}
-//       {cameraOpen && (
-//         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 p-4">
-//           <div className="bg-white rounded-3xl p-6 w-full max-w-2xl relative">
-//             <button
-//               onClick={closeCamera}
-//               className="absolute top-4 right-4"
-//             >
-//               <X size={28} />
-//             </button>
+//       {/* Search */}
+//       <div className="bg-white p-5 rounded-3xl shadow-sm border">
+//         <div className="relative max-w-md">
+//           <Search
+//             size={18}
+//             className="absolute left-4 top-4 text-gray-400"
+//           />
 
-//             <h3 className="text-2xl font-bold text-center mb-5">
-//               Face Attendance
-//             </h3>
+//           <input
+//             value={search}
+//             onChange={(e) =>
+//               setSearch(
+//                 e.target.value
+//               )
+//             }
+//             placeholder="Search Student..."
+//             className="w-full border rounded-xl py-3 pl-11 outline-none focus:ring-2 focus:ring-green-500"
+//           />
+//         </div>
+//       </div>
 
-//             {!capturedImage ? (
-//               <>
-//                 <video
-//                   ref={videoRef}
-//                   autoPlay
-//                   playsInline
-//                   className="w-full rounded-2xl border"
-//                 />
+//       {/* Table */}
+//       <div className="bg-white rounded-3xl shadow-sm border overflow-hidden">
+//         <div className="p-5 border-b flex items-center gap-3">
+//           <CalendarCheck
+//             className="text-green-600"
+//             size={22}
+//           />
 
-//                 <button
-//                   onClick={capturePhoto}
-//                   className="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl"
-//                 >
-//                   Capture Photo
-//                 </button>
-//               </>
-//             ) : (
-//               <>
-//                 <img
-//                   src={capturedImage}
-//                   alt="Captured"
-//                   className="w-full rounded-2xl border"
-//                 />
+//           <h2 className="font-semibold text-lg">
+//             Monthly Attendance
+//             Sheet
+//           </h2>
+//         </div>
 
-//                 <div className="grid grid-cols-2 gap-4 mt-5">
-//                   <button
-//                     onClick={openCamera}
-//                     className="bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl"
+//         <div className="overflow-x-auto">
+//           <table className="min-w-max w-full">
+//             <thead className="bg-gray-50">
+//               <tr>
+//                 <th className="sticky left-0 bg-gray-50 p-4 text-left min-w-[90px] z-20">
+//                   Roll
+//                 </th>
+
+//                 <th className="sticky left-[90px] bg-gray-50 p-4 text-left min-w-[220px] z-20">
+//                   Student Name
+//                 </th>
+
+//                 {dates.map(
+//                   (date) => (
+//                     <th
+//                       key={date}
+//                       className="p-4 text-center min-w-[60px]"
+//                     >
+//                       {date}
+//                     </th>
+//                   )
+//                 )}
+
+//                 <th className="p-4 text-center min-w-[140px]">
+//                   Total Present
+//                 </th>
+//               </tr>
+//             </thead>
+
+//             <tbody>
+//               {filteredStudents.map(
+//                 (student) => (
+//                   <tr
+//                     key={
+//                       student.id
+//                     }
+//                     className="border-t hover:bg-gray-50"
 //                   >
-//                     Retake
-//                   </button>
+//                     <td className="sticky left-0 bg-white p-4 font-medium z-10">
+//                       {
+//                         student.roll
+//                       }
+//                     </td>
 
-//                   <button
-//                     onClick={submitAttendance}
-//                     className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl"
+//                     <td className="sticky left-[90px] bg-white p-4 z-10">
+//                       {
+//                         student.name
+//                       }
+//                     </td>
+
+//                     {dates.map(
+//                       (date) => {
+//                         const value =
+//                           student
+//                             .attendance[
+//                             date
+//                           ] || "";
+
+//                         return (
+//                           <td
+//                             key={
+//                               date
+//                             }
+//                             className="p-2 text-center"
+//                           >
+//                             <button
+//                               onClick={() =>
+//                                 toggleAttendance(
+//                                   student.id,
+//                                   date
+//                                 )
+//                               }
+//                               className={`w-10 h-10 rounded-lg font-bold transition ${getColor(
+//                                 value
+//                               )}`}
+//                             >
+//                               {value ||
+//                                 "-"}
+//                             </button>
+//                           </td>
+//                         );
+//                       }
+//                     )}
+
+//                     <td className="p-4 text-center font-bold text-green-600">
+//                       {
+//                         Object.values(
+//                           student.attendance
+//                         ).filter(
+//                           (x) =>
+//                             x ===
+//                             "P"
+//                         ).length
+//                       }
+//                     </td>
+//                   </tr>
+//                 )
+//               )}
+
+//               {filteredStudents.length ===
+//                 0 && (
+//                 <tr>
+//                   <td
+//                     colSpan={
+//                       dates.length +
+//                       3
+//                     }
+//                     className="text-center p-10 text-gray-500"
 //                   >
-//                     Submit Attendance
-//                   </button>
-//                 </div>
-//               </>
-//             )}
+//                     No Student Found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
 
-//             <canvas
-//               ref={canvasRef}
-//               className="hidden"
-//             />
+//       {/* Legend */}
+//       <div className="bg-white p-5 rounded-3xl shadow-sm border">
+//         <div className="flex gap-6 flex-wrap text-sm">
+//           <div className="flex items-center gap-2">
+//             <div className="w-5 h-5 rounded bg-green-100"></div>
+//             Present (P)
+//           </div>
+
+//           <div className="flex items-center gap-2">
+//             <div className="w-5 h-5 rounded bg-red-100"></div>
+//             Absent (A)
+//           </div>
+
+//           <div className="flex items-center gap-2">
+//             <div className="w-5 h-5 rounded bg-yellow-100"></div>
+//             Leave (L)
 //           </div>
 //         </div>
-//       )}
-
-//       {/* Fingerprint Modal */}
-//       {fingerOpen && (
-//         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 p-4">
-//           <div className="bg-white rounded-3xl p-8 w-full max-w-md relative text-center">
-//             <button
-//               onClick={() => setFingerOpen(false)}
-//               className="absolute top-4 right-4"
-//             >
-//               <X size={28} />
-//             </button>
-
-//             <div className="flex justify-center mb-6">
-//               <Fingerprint
-//                 size={90}
-//                 className="text-blue-600"
-//               />
-//             </div>
-
-//             <h3 className="text-2xl font-bold mb-3">
-//               Fingerprint Scanner
-//             </h3>
-
-//             <p className="text-gray-600 mb-6">
-//               Place your finger on the biometric device to
-//               mark attendance.
-//             </p>
-
-//             <button
-//               onClick={() => {
-//                 alert(
-//                   "Fingerprint scanned successfully!"
-//                 );
-//                 setFingerOpen(false);
-//               }}
-//               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl"
-//             >
-//               Start Scan
-//             </button>
-//           </div>
-//         </div>
-//       )}
+//       </div>
 //     </div>
 //   );
 // }
@@ -262,221 +892,528 @@
 
 
 
-
-
+import { useState } from "react";
 import {
-Users,
-UserCheck,
-UserX,
-Calendar,
+  CalendarCheck,
+  Search,
+  Users,
+  GraduationCap,
 } from "lucide-react";
 
 export default function AdminAttendance() {
-const attendanceData = [
-{
-class: "10-A",
-present: 42,
-absent: 3,
-percentage: "93%",
-},
-{
-class: "9-B",
-present: 38,
-absent: 2,
-percentage: "95%",
-},
-{
-class: "8-C",
-present: 40,
-absent: 5,
-percentage: "89%",
-},
-{
-class: "12-A",
-present: 36,
-absent: 1,
-percentage: "97%",
-},
-];
+  const today = new Date()
+    .toISOString()
+    .split("T")[0];
 
-const cards = [
-{
-title: "Total Students",
-value: "2,540",
-icon: <Users size={22} />,
-color: "bg-blue-500",
-},
-{
-title: "Present Today",
-value: "2,412",
-icon: <UserCheck size={22} />,
-color: "bg-green-600",
-},
-{
-title: "Absent Today",
-value: "128",
-icon: <UserX size={22} />,
-color: "bg-red-500",
-},
-{
-title: "Attendance Rate",
-value: "95%",
-icon: <Calendar size={22} />,
-color: "bg-purple-500",
-},
-];
+  const [selectedDate, setSelectedDate] =
+    useState(today);
 
-return ( <div className="space-y-8"> <div> <h2 className="text-3xl font-bold text-gray-800">
-Attendance Reports </h2>
+  const [search, setSearch] =
+    useState("");
 
+  const [activeTab, setActiveTab] =
+    useState("students");
 
-    <p className="text-gray-500 mt-2">
-      Monitor school attendance and daily reports.
-    </p>
-  </div>
+  const [students, setStudents] =
+    useState([
+      {
+        id: 1,
+        roll: "101",
+        name: "Rahul Sharma",
+        attendance: {},
+      },
+      {
+        id: 2,
+        roll: "102",
+        name: "Priya Singh",
+        attendance: {},
+      },
+      {
+        id: 3,
+        roll: "103",
+        name: "Ankit Verma",
+        attendance: {},
+      },
+      {
+        id: 4,
+        roll: "104",
+        name: "Neha Gupta",
+        attendance: {},
+      },
+      {
+        id: 5,
+        roll: "105",
+        name: "Aman Yadav",
+        attendance: {},
+      },
+    ]);
 
-  <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
-    {cards.map((item) => (
-      <div
-        key={item.title}
-        className="bg-white rounded-3xl p-6 shadow hover:shadow-lg transition"
-      >
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-gray-500">
-              {item.title}
-            </p>
+  const [teachers, setTeachers] =
+    useState([
+      {
+        id: 1,
+        name: "Amit Sir",
+        subject: "Math",
+        attendance: {},
+      },
+      {
+        id: 2,
+        name: "Neha Ma'am",
+        subject: "Science",
+        attendance: {},
+      },
+      {
+        id: 3,
+        name: "Rohit Sir",
+        subject: "English",
+        attendance: {},
+      },
+    ]);
 
-            <h3 className="text-3xl font-bold mt-3">
-              {item.value}
-            </h3>
+  const data =
+    activeTab === "students"
+      ? students
+      : teachers;
+
+  const setData =
+    activeTab === "students"
+      ? setStudents
+      : setTeachers;
+
+  const toggleAttendance = (id) => {
+    setData((prev) =>
+      prev.map((item) => {
+        if (item.id !== id)
+          return item;
+
+        const current =
+          item.attendance[selectedDate];
+
+        let next = "P";
+
+        if (current === "P")
+          next = "A";
+        else if (current === "A")
+          next = "L";
+        else if (current === "L")
+          next = "";
+
+        return {
+          ...item,
+          attendance: {
+            ...item.attendance,
+            [selectedDate]: next,
+          },
+        };
+      })
+    );
+  };
+
+  const getColor = (value) => {
+    if (value === "P")
+      return "bg-green-100 text-green-700";
+
+    if (value === "A")
+      return "bg-red-100 text-red-700";
+
+    if (value === "L")
+      return "bg-yellow-100 text-yellow-700";
+
+    return "bg-gray-100 text-gray-500";
+  };
+
+  const filteredData =
+    data.filter((item) =>
+      item.name
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        )
+    );
+
+  const totalPresent =
+    data.filter(
+      (item) =>
+        item.attendance[
+          selectedDate
+        ] === "P"
+    ).length;
+
+  const totalAbsent =
+    data.filter(
+      (item) =>
+        item.attendance[
+          selectedDate
+        ] === "A"
+    ).length;
+
+  const totalLeave =
+    data.filter(
+      (item) =>
+        item.attendance[
+          selectedDate
+        ] === "L"
+    ).length;
+
+  const presentList =
+    data.filter(
+      (item) =>
+        item.attendance[
+          selectedDate
+        ] === "P"
+    );
+
+  const absentList =
+    data.filter(
+      (item) =>
+        item.attendance[
+          selectedDate
+        ] === "A"
+    );
+
+  const leaveList =
+    data.filter(
+      (item) =>
+        item.attendance[
+          selectedDate
+        ] === "L"
+    );
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6 space-y-7">
+      {/* Header */}
+      <div className="bg-white p-8 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">
+            Attendance Management
+          </h1>
+
+          <p className="text-gray-500 mt-1">
+            Date Wise Student &
+            Teacher Attendance
+          </p>
+        </div>
+
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) =>
+            setSelectedDate(
+              e.target.value
+            )
+          }
+          className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        />
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-4">
+        <button
+          onClick={() =>
+            setActiveTab(
+              "students"
+            )
+          }
+          className={`px-5 py-7 rounded-xl flex items-center gap-2 ${
+            activeTab ===
+            "students"
+              ? "bg-green-600 text-white"
+              : "bg-white border"
+          }`}
+        >
+          <GraduationCap
+            size={20}
+          />
+          Students
+        </button>
+
+        <button
+          onClick={() =>
+            setActiveTab(
+              "teachers"
+            )
+          }
+          className={`px-5 py-3 rounded-xl flex items-center gap-2 ${
+            activeTab ===
+            "teachers"
+              ? "bg-green-600 text-white"
+              : "bg-white border"
+          }`}
+        >
+          <Users size={20} />
+          Teachers
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid md:grid-cols-3 gap-5">
+        <div className="bg-white p-5 rounded-3xl shadow-sm">
+          <p className="text-gray-500">
+            Present
+          </p>
+
+          <h2 className="text-3xl font-bold text-green-600 mt-2">
+            {totalPresent}
+          </h2>
+        </div>
+
+        <div className="bg-white p-5 rounded-3xl shadow-sm">
+          <p className="text-gray-500">
+            Absent
+          </p>
+
+          <h2 className="text-3xl font-bold text-red-600 mt-2">
+            {totalAbsent}
+          </h2>
+        </div>
+
+        <div className="bg-white p-5 rounded-3xl shadow-sm">
+          <p className="text-gray-500">
+            Leave
+          </p>
+
+          <h2 className="text-3xl font-bold text-yellow-500 mt-2">
+            {totalLeave}
+          </h2>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="bg-white p-5 rounded-3xl shadow-sm">
+        <div className="relative max-w-md">
+          <Search
+            size={18}
+            className="absolute left-4 top-4 text-gray-400"
+          />
+
+          <input
+            value={search}
+            onChange={(e) =>
+              setSearch(
+                e.target.value
+              )
+            }
+            placeholder={`Search ${activeTab}`}
+            className="w-full border border-gray-200 rounded-xl py-3 pl-11 outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+      </div>
+
+      {/* Attendance Table */}
+      <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+        <div className="p-5 border-b flex items-center gap-3">
+          <CalendarCheck
+            className="text-green-600"
+            size={22}
+          />
+
+          <h2 className="font-semibold text-lg">
+            Attendance For{" "}
+            {selectedDate}
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="p-4 text-left">
+                  Name
+                </th>
+
+                {activeTab ===
+                  "students" && (
+                  <th className="p-4 text-left">
+                    Roll No
+                  </th>
+                )}
+
+                {activeTab ===
+                  "teachers" && (
+                  <th className="p-4 text-left">
+                    Subject
+                  </th>
+                )}
+
+                <th className="p-4 text-center">
+                  Status
+                </th>
+
+                <th className="p-4 text-center">
+                  Total Present
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filteredData.map(
+                (item) => {
+                  const status =
+                    item.attendance[
+                      selectedDate
+                    ] || "";
+
+                  const total =
+                    Object.values(
+                      item.attendance
+                    ).filter(
+                      (x) =>
+                        x ===
+                        "P"
+                    ).length;
+
+                  return (
+                    <tr
+                      key={
+                        item.id
+                      }
+                      className="border-t border-gray-100 hover:bg-gray-50 transition"
+                    >
+                      <td className="p-4">
+                        {item.name}
+                      </td>
+
+                      {activeTab ===
+                        "students" && (
+                        <td className="p-4">
+                          {
+                            item.roll
+                          }
+                        </td>
+                      )}
+
+                      {activeTab ===
+                        "teachers" && (
+                        <td className="p-4">
+                          {
+                            item.subject
+                          }
+                        </td>
+                      )}
+
+                      <td className="p-4 text-center">
+                        <button
+                          onClick={() =>
+                            toggleAttendance(
+                              item.id
+                            )
+                          }
+                          className={`w-12 h-12 rounded-xl font-bold ${getColor(
+                            status
+                          )}`}
+                        >
+                          {status ||
+                            "-"}
+                        </button>
+                      </td>
+
+                      <td className="p-4 text-center font-bold text-green-600">
+                        {total}
+                      </td>
+                    </tr>
+                  );
+                }
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Date Wise Details */}
+      <div className="grid md:grid-cols-3 gap-5">
+        <div className="bg-white p-5 rounded-3xl shadow-sm">
+          <h3 className="font-bold text-green-600 mb-4">
+            Present (
+            {presentList.length})
+          </h3>
+
+          <div className="space-y-2">
+            {presentList.length ===
+            0 ? (
+              <p className="text-gray-500">
+                No Records
+              </p>
+            ) : (
+              presentList.map(
+                (item) => (
+                  <p
+                    key={
+                      item.id
+                    }
+                  >
+                    {" "}
+                    {
+                      item.name
+                    }
+                  </p>
+                )
+              )
+            )}
           </div>
+        </div>
 
-          <div
-            className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white`}
-          >
-            {item.icon}
+        <div className="bg-white p-5 rounded-3xl shadow-sm">
+          <h3 className="font-bold text-red-600 mb-4">
+            Absent (
+            {absentList.length})
+          </h3>
+
+          <div className="space-y-2">
+            {absentList.length ===
+            0 ? (
+              <p className="text-gray-500">
+                No Records
+              </p>
+            ) : (
+              absentList.map(
+                (item) => (
+                  <p
+                    key={
+                      item.id
+                    }
+                  >
+                    {" "}
+                    {
+                      item.name
+                    }
+                  </p>
+                )
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-3xl shadow-sm">
+          <h3 className="font-bold text-yellow-600 mb-4">
+            Leave (
+            {leaveList.length})
+          </h3>
+
+          <div className="space-y-2">
+            {leaveList.length ===
+            0 ? (
+              <p className="text-gray-500">
+                No Records
+              </p>
+            ) : (
+              leaveList.map(
+                (item) => (
+                  <p
+                    key={
+                      item.id
+                    }
+                  >
+                    {" "}
+                    {
+                      item.name
+                    }
+                  </p>
+                )
+              )
+            )}
           </div>
         </div>
       </div>
-    ))}
-  </div>
-
-  <div className="bg-white rounded-3xl p-8 shadow">
-    <div className="flex justify-between items-center mb-8">
-      <div>
-        <h3 className="text-2xl font-bold">
-          Class Wise Attendance
-        </h3>
-
-        <p className="text-gray-500 mt-2">
-          Today's attendance summary.
-        </p>
-      </div>
-
-      <button className="bg-green-600 text-white px-5 py-3 rounded-xl">
-        Export Report
-      </button>
     </div>
-
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left py-4">
-              Class
-            </th>
-
-            <th className="text-left py-4">
-              Present
-            </th>
-
-            <th className="text-left py-4">
-              Absent
-            </th>
-
-            <th className="text-left py-4">
-              Percentage
-            </th>
-
-            <th className="text-left py-4">
-              Status
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {attendanceData.map((item) => (
-            <tr
-              key={item.class}
-              className="border-b hover:bg-gray-50"
-            >
-              <td className="py-5 font-semibold">
-                {item.class}
-              </td>
-
-              <td className="py-5">
-                {item.present}
-              </td>
-
-              <td className="py-5">
-                {item.absent}
-              </td>
-
-              <td className="py-5">
-                {item.percentage}
-              </td>
-
-              <td className="py-5">
-                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                  Good
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div className="bg-white rounded-3xl p-8 shadow">
-    <h3 className="text-2xl font-bold mb-6">
-      Attendance Insights
-    </h3>
-
-    <div className="grid md:grid-cols-3 gap-6">
-      <div className="bg-blue-50 rounded-2xl p-6">
-        <h4 className="font-bold text-lg">
-          Best Attendance
-        </h4>
-
-        <p className="text-gray-500 mt-2">
-          Class 12-A has the highest attendance with 97%.
-        </p>
-      </div>
-
-      <div className="bg-red-50 rounded-2xl p-6">
-        <h4 className="font-bold text-lg">
-          Needs Attention
-        </h4>
-
-        <p className="text-gray-500 mt-2">
-          Class 8-C attendance is below the school average.
-        </p>
-      </div>
-
-      <div className="bg-green-50 rounded-2xl p-6">
-        <h4 className="font-bold text-lg">
-          Overall Performance
-        </h4>
-
-        <p className="text-gray-500 mt-2">
-          School attendance rate improved by 3% this month.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-);
+  );
 }

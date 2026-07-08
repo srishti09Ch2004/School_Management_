@@ -70,16 +70,42 @@ export default function AdminHome() {
 
   return (
     <div className="space-y-8">
-      {/* Heading */}
+      {/* Welcome Card */}
 
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800">
-          Dashboard Overview
-        </h2>
+      <div className="bg-white border border-gray-100 rounded-3xl p-7 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Welcome Back, Admin 
+            </h2>
 
-        <p className="text-gray-500 mt-2">
-          Welcome to Future Academy School Management System
-        </p>
+            <p className="text-gray-500 mt-2">
+              Here's what's happening in Future Academy today.
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            <div className="bg-red-50 px-5 py-3 rounded-2xl">
+              <p className="text-xs text-gray-500">
+                Total Students
+              </p>
+
+              <h3 className="font-bold text-red-600 text-lg">
+                2,540
+              </h3>
+            </div>
+
+            <div className="bg-green-50 px-5 py-3 rounded-2xl">
+              <p className="text-xs text-gray-500">
+                Attendance
+              </p>
+
+              <h3 className="font-bold text-green-600 text-lg">
+                95%
+              </h3>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -88,7 +114,7 @@ export default function AdminHome() {
         {stats.map((item) => (
           <div
             key={item.title}
-            className="bg-white border border-gray-100 rounded-2xl p-6 flex items-center justify-between hover:shadow-md transition duration-300"
+            className="bg-white border border-gray-100 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition"
           >
             <div>
               <p className="text-sm text-gray-500">
@@ -101,7 +127,7 @@ export default function AdminHome() {
             </div>
 
             <div
-              className={`${item.color} w-11 h-11 rounded-xl flex items-center justify-center text-white`}
+              className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-sm`}
             >
               {item.icon}
             </div>
@@ -109,32 +135,112 @@ export default function AdminHome() {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl p-6">
-          <h3 className="font-bold text-xl mb-4">
-            Attendance
-          </h3>
+      {/* Attendance & Notifications */}
 
-          
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Attendance */}
+
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-xl text-gray-800">
+              Attendance Overview
+            </h3>
+
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+              Today : 95%
+            </span>
+          </div>
+
+          <div className="space-y-5">
+            <div>
+              <div className="flex justify-between mb-2 text-sm">
+                <span>Boys Attendance</span>
+                <span>93%</span>
+              </div>
+
+              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-[93%] h-full bg-red-500 rounded-full"></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-2 text-sm">
+                <span>Girls Attendance</span>
+                <span>97%</span>
+              </div>
+
+              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-[97%] h-full bg-green-600 rounded-full"></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-2 text-sm">
+                <span>Staff Attendance</span>
+                <span>91%</span>
+              </div>
+
+              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-[91%] h-full bg-blue-500 rounded-full"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6">
-          <h3 className="font-bold text-xl mb-4">
+        {/* Notifications */}
+
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          <h3 className="font-bold text-xl mb-5 text-gray-800">
             Notifications
           </h3>
 
-          <ul className="space-y-3">
-            <li>New Admission Added</li>
-            <li>Fees Collection Updated</li>
-            <li>Exam Schedule Released</li>
-            <li>Attendance Report Generated</li>
-          </ul>
+          <div className="space-y-4">
+            <div className="bg-red-50 p-4 rounded-2xl">
+              <p className="font-medium">
+                New Admission Added
+              </p>
+
+              <span className="text-sm text-gray-500">
+                Rahul Sharma joined Class 10-A
+              </span>
+            </div>
+
+            <div className="bg-green-50 p-4 rounded-2xl">
+              <p className="font-medium">
+                Fees Collection Updated
+              </p>
+
+              <span className="text-sm text-gray-500">
+                ₹45,000 collected today
+              </span>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-2xl">
+              <p className="font-medium">
+                Exam Schedule Released
+              </p>
+
+              <span className="text-sm text-gray-500">
+                Mid-Term exam timetable published
+              </span>
+            </div>
+
+            <div className="bg-yellow-50 p-4 rounded-2xl">
+              <p className="font-medium">
+                Attendance Report Generated
+              </p>
+
+              <span className="text-sm text-gray-500">
+                Daily attendance report is ready.
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Recent Admissions */}
 
-      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+      <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm">
         <div className="px-8 py-6 border-b border-gray-100">
           <h3 className="text-xl font-semibold text-gray-800">
             Recent Admissions
@@ -146,22 +252,22 @@ export default function AdminHome() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+          <table className="w-full">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-8 py-5 text-left font-semibold text-gray-700 w-[35%]">
+                <th className="px-8 py-5 text-left text-gray-700">
                   Student
                 </th>
 
-                <th className="px-8 py-5 text-left font-semibold text-gray-700 w-[18%]">
+                <th className="px-8 py-5 text-left text-gray-700">
                   Class
                 </th>
 
-                <th className="px-8 py-5 text-left font-semibold text-gray-700 w-[25%]">
+                <th className="px-8 py-5 text-left text-gray-700">
                   Admission No
                 </th>
 
-                <th className="px-8 py-5 text-left font-semibold text-gray-700 w-[22%]">
+                <th className="px-8 py-5 text-left text-gray-700">
                   Status
                 </th>
               </tr>
@@ -171,21 +277,21 @@ export default function AdminHome() {
               {admissions.map((student, index) => (
                 <tr
                   key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition"
+                  className="border-t border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <td className="px-8 py-6 font-medium text-gray-800">
+                  <td className="px-8 py-5 font-medium text-gray-800">
                     {student.student}
                   </td>
 
-                  <td className="px-8 py-6 text-gray-700">
+                  <td className="px-8 py-5 text-gray-700">
                     {student.class}
                   </td>
 
-                  <td className="px-8 py-6 text-gray-700">
+                  <td className="px-8 py-5 text-gray-700">
                     {student.admission}
                   </td>
 
-                  <td className="px-8 py-6">
+                  <td className="px-8 py-5">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         student.status === "Active"
