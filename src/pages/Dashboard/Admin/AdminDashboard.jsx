@@ -13,9 +13,9 @@ import AdminExam from "./AdminExam";
 import AdminLibrary from "./AdminLibrary";
 import AdminAttendance from "./AdminAttendance";
 
-// import AdminTransport from "./AdminTransport";
-// import AdminReports from "./AdminReports";
-// import AdminSettings from "./AdminSettings";
+import AdminTransport from "./AdminTransport";
+import AdminReports from "./AdminReports";
+import AdminSettings from "./AdminSettings";
 
 export default function AdminDashboard() {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
