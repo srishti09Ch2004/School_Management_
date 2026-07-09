@@ -42,7 +42,7 @@ return ( <div className="space-y-8">
 
 `
   <div>
-    <h2 className="text-3xl font-bold text-gray-800">
+    <h2 className="text-2xl font-bold text-gray-800">
       Take Attendance
     </h2>
 

@@ -10,25 +10,25 @@ const stats = [
 {
 title: "Today's Classes",
 value: "06",
-icon: <BookOpen size={22} />,
+icon: <BookOpen size={20} />,
 color: "bg-blue-500",
 },
 {
 title: "Total Students",
 value: "320",
-icon: <GraduationCap size={22} />,
+icon: <GraduationCap size={20} />,
 color: "bg-green-600",
 },
 {
 title: "Assignments",
 value: "18",
-icon: <ClipboardList size={22} />,
+icon: <ClipboardList size={20} />,
 color: "bg-orange-500",
 },
 {
 title: "Attendance",
 value: "95%",
-icon: <CalendarCheck size={22} />,
+icon: <CalendarCheck size={20} />,
 color: "bg-purple-600",
 },
 ];
@@ -60,7 +60,7 @@ return ( <div className="space-y-8">
 
 
   <div>
-    <h2 className="text-3xl font-bold text-gray-800">
+    <h2 className="text-2xl font-bold text-gray-800">
       Teacher Dashboard
     </h2>
 
@@ -82,13 +82,13 @@ return ( <div className="space-y-8">
               {item.title}
             </p>
 
-            <h3 className="text-3xl font-bold mt-3">
+            <h3 className="text-2xl font-bold mt-3">
               {item.value}
             </h3>
           </div>
 
           <div
-            className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white`}
+            className={`${item.color} w-11 h-11 rounded-2xl flex items-center justify-center text-white`}
           >
             {item.icon}
           </div>
