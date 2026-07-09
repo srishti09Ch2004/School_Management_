@@ -7,30 +7,36 @@ ClipboardList,
 
 export default function TeacherHome() {
 const stats = [
+
 {
-title: "Today's Classes",
-value: "06",
-icon: <BookOpen size={20} />,
-color: "bg-blue-500",
+  title: "Today's Classes",
+  value: "06",
+  icon: <BookOpen size={20} />,
+  bg: "bg-blue-100",
+  text: "text-blue-600",
 },
 {
-title: "Total Students",
-value: "320",
-icon: <GraduationCap size={20} />,
-color: "bg-green-600",
+  title: "Total Students",
+  value: "320",
+  icon: <GraduationCap size={20} />,
+  bg: "bg-green-100",
+  text: "text-green-600",
 },
 {
-title: "Assignments",
-value: "18",
-icon: <ClipboardList size={20} />,
-color: "bg-orange-500",
+  title: "Assignments",
+  value: "18",
+  icon: <ClipboardList size={20} />,
+  bg: "bg-orange-100",
+  text: "text-orange-600",
 },
 {
-title: "Attendance",
-value: "95%",
-icon: <CalendarCheck size={20} />,
-color: "bg-purple-600",
+  title: "Attendance",
+  value: "95%",
+  icon: <CalendarCheck size={20} />,
+  bg: "bg-purple-100",
+  text: "text-purple-600",
 },
+
 ];
 
 const schedule = [
@@ -88,7 +94,7 @@ return ( <div className="space-y-8">
           </div>
 
           <div
-            className={`${item.color} w-11 h-11 rounded-2xl flex items-center justify-center text-white`}
+            className={`${item.bg} ${item.text} w-11 h-11 rounded-2xl flex items-center justify-center`}
           >
             {item.icon}
           </div>
@@ -137,7 +143,7 @@ return ( <div className="space-y-8">
 
       <div className="space-y-5">
 
-        <div className="border-l-4 border-green-600 pl-4">
+        <div className="border-l-3 border-green-400 pl-4">
           <h4 className="font-semibold">
             Staff Meeting
           </h4>
@@ -147,7 +153,7 @@ return ( <div className="space-y-8">
           </p>
         </div>
 
-        <div className="border-l-4 border-blue-600 pl-4">
+        <div className="border-l-3 border-blue-400 pl-4">
           <h4 className="font-semibold">
             Examination Notice
           </h4>
@@ -157,7 +163,7 @@ return ( <div className="space-y-8">
           </p>
         </div>
 
-        <div className="border-l-4 border-orange-500 pl-4">
+        <div className="border-l-3 border-orange-400 pl-4">
           <h4 className="font-semibold">
             Assignment Submission
           </h4>
