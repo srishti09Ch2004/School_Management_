@@ -3,7 +3,7 @@ export default function Topbar({
 role = "Admin",
 title = "Dashboard",
 }) {
-return ( <header className="bg-white h-20 border-b border-gray-100 shadow-sm flex items-center justify-between px-18">
+return ( <header className="bg-white h-20 border-b border-gray-100 shadow-sm flex items-center justify-between px-17">
 
   <div>
     <h1 className="text-2xl font-bold text-gray-700">
@@ -15,9 +15,9 @@ return ( <header className="bg-white h-20 border-b border-gray-100 shadow-sm fle
     </p>
   </div>
 
-  <div className="flex items-center gap-6">
+  <div className="flex items-center gap-5">
 
-    <div className="hidden md:flex items-center bg-gray-100 rounded-xl px-4 py-2">
+    <div className="hidden md:flex items-center bg-gray-100 rounded-xl px-2 py-2">
       <span className="material-symbols-outlined text-gray-500">
         search
       </span>
@@ -34,16 +34,16 @@ return ( <header className="bg-white h-20 border-b border-gray-100 shadow-sm fle
         notifications
       </span>
 
-      <span className="absolute -top-0 -right-0 w-3 h-3 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-        3
-      </span>
+     <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center shadow-md border-2 border-white">
+         3
+    </span>
     </button>
 
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-5">
       <img
         src="https://i.pravatar.cc/100"
         alt="profile"
-        className="w-11 h-11 rounded-full"
+        className="w-10 h-10 rounded-full"
       />
 
       <div className="hidden md:block">

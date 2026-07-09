@@ -9,7 +9,7 @@ import TeacherTimetable from "./TeacherTimetable";
 import TeacherHomework from "./TeacherHomework";
 import TeacherMarks from "./TeacherMarks";
 import TeacherNotice from "./TeacherNotice";
-// import TeacherProfile from "./TeacherProfile";
+import TeacherProfile from "./TeacherProfile";
 
 export default function TeacherDashboard() {
 const [activeMenu, setActiveMenu] =
