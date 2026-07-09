@@ -8,7 +8,7 @@ import TeacherAttendance from "./TeacherAttendance";
 import TeacherTimetable from "./TeacherTimetable";
 import TeacherHomework from "./TeacherHomework";
 import TeacherMarks from "./TeacherMarks";
-// import TeacherNotice from "./TeacherNotice";
+import TeacherNotice from "./TeacherNotice";
 // import TeacherProfile from "./TeacherProfile";
 
 export default function TeacherDashboard() {
