@@ -5,7 +5,7 @@ import Topbar from "../../../components/Topbar";
 
 import TeacherHome from "./TeacherHome";
 import TeacherAttendance from "./TeacherAttendance";
-import TeacherTimetable from "./TeacherTimetable";
+// import TeacherTimetable from "./TeacherTimetable";
 // import TeacherHomework from "./TeacherHomework";
 // import TeacherMarks from "./TeacherMarks";
 // import TeacherNotice from "./TeacherNotice";
