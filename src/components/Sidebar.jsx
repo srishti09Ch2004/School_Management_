@@ -153,6 +153,7 @@ teacher: [
   { name: "Timetable", icon: "calendar_month" },
   { name: "Homework", icon: "assignment" },
   { name: "Marks", icon: "grading" },
+  { name: "Notices", icon: "campaign" },
   { name: "Profile", icon: "person" },
 ],
 
