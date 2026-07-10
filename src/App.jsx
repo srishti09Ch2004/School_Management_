@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -28,6 +29,7 @@ function App() {
 
   return (
     <>
+    <Toaster position="top-right" />
       {!hideLayout && <Navbar />}
 
       <Routes>
