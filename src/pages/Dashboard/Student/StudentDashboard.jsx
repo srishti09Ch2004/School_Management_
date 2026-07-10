@@ -4,7 +4,7 @@ import Sidebar from "../../../components/Sidebar";
 import Topbar from "../../../components/Topbar";
 
 import StudentHome from "./StudentHome";
-// import StudentAttendance from "./StudentAttendance";
+import StudentAttendance from "./StudentAttendance";
 // import StudentTimetable from "./StudentTimetable";
 // import StudentHomework from "./StudentHomework";
 // import StudentResult from "./StudentResult";
