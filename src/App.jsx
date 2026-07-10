@@ -5,7 +5,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 import TeacherDashboard from "./pages/Dashboard/Teacher/TeacherDashboard";
-import StudentDashboard from "./pages/Dashboard/StudentDashboard";
+
+import StudentDashboard from "./pages/Dashboard/Student/StudentDashboard";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";

@@ -164,8 +164,8 @@ student: [
   { name: "Homework", icon: "assignment" },
   { name: "Results", icon: "workspace_premium" },
   { name: "Fees", icon: "payments" },
-  { name: "Profile", icon: "person" },
-],
+  { name: "Notices", icon: "campaign" },
+]
 
 
 };
