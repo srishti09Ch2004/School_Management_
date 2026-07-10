@@ -6,7 +6,7 @@ import Topbar from "../../../components/Topbar";
 import StudentHome from "./StudentHome";
 import StudentAttendance from "./StudentAttendance";
 import StudentTimetable from "./StudentTimetable";
-// import StudentHomework from "./StudentHomework";
+import StudentHomework from "./StudentHomework";
 // import StudentResult from "./StudentResult";
 // import StudentFees from "./StudentFees";
 // import StudentNotice from "./StudentNotice";
