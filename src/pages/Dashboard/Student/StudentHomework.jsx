@@ -243,8 +243,6 @@
 
 
 
-
-
 import { useMemo, useState } from "react";
 import {
   Calendar,
@@ -256,57 +254,68 @@ import {
 } from "lucide-react";
 
 export default function StudentHomework() {
+  // Demo data (only today & previous dates)
   const homework = [
     {
       id: 1,
       subject: "Mathematics",
       title: "Complete Algebra Worksheet - Chapter 5",
-      date: "2026-07-11",
+      date: "2026-07-10",
       status: "Pending",
     },
     {
       id: 2,
       subject: "Science",
       title: "Prepare Solar System Project",
-      date: "2026-07-11",
+      date: "2026-07-10",
       status: "Submitted",
     },
     {
       id: 3,
       subject: "English",
       title: "Write Essay on My Favourite Teacher",
-      date: "2026-07-12",
+      date: "2026-07-09",
       status: "Pending",
     },
     {
       id: 4,
       subject: "Computer",
-      title: "Create MS PowerPoint Presentation",
-      date: "2026-07-13",
+      title: "Create PowerPoint Presentation",
+      date: "2026-07-08",
       status: "Pending",
     },
     {
       id: 5,
       subject: "Hindi",
       title: "Learn Poem and Write Question Answers",
-      date: "2026-07-13",
+      date: "2026-07-07",
       status: "Submitted",
     },
   ];
 
-  const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(
-    today.toISOString().split("T")[0]
-  );
+  // Real current date
+  const today = new Date().toISOString().split("T")[0];
 
+  const [selectedDate, setSelectedDate] = useState(today);
+
+  // Previous & Next date change
   const changeDate = (days) => {
     const date = new Date(selectedDate);
     date.setDate(date.getDate() + days);
-    setSelectedDate(date.toISOString().split("T")[0]);
+
+    const newDate = date.toISOString().split("T")[0];
+
+    // Future date allow nahi hogi
+    if (newDate <= today) {
+      setSelectedDate(newDate);
+    }
   };
 
+  // Filter homework according to selected date
   const filteredHomework = useMemo(() => {
-    return homework.filter((item) => item.date === selectedDate);
+    return homework.filter(
+      (item) => item.date === selectedDate
+    );
   }, [selectedDate]);
 
   const pending = filteredHomework.filter(
@@ -324,14 +333,15 @@ export default function StudentHomework() {
         <h2 className="text-2xl font-bold text-gray-800">
           My Homework
         </h2>
+
         <p className="text-sm text-gray-500 mt-1">
-          View your homework according to date.
+          View homework date-wise.
         </p>
       </div>
 
       {/* Date Selector */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <button
             type="button"
             onClick={() => changeDate(-1)}
@@ -341,20 +351,27 @@ export default function StudentHomework() {
           </button>
 
           <div className="text-center">
-            <div className="flex items-center justify-center gap-2 text-gray-500 mb-2">
+            <div className="flex items-center justify-center gap-2 text-gray-500 mb-3">
               <Calendar size={16} />
-              <span className="text-sm">Selected Date</span>
+              <span className="text-sm">
+                Select Date
+              </span>
             </div>
 
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              max={today}
+              onChange={(e) =>
+                setSelectedDate(e.target.value)
+              }
               className="border border-gray-200 rounded-2xl px-4 py-2 outline-none focus:ring-2 focus:ring-gray-200"
             />
 
-            <p className="text-sm text-gray-500 mt-2">
-              {new Date(selectedDate).toLocaleDateString("en-IN", {
+            <p className="text-sm text-gray-500 mt-3">
+              {new Date(
+                selectedDate
+              ).toLocaleDateString("en-IN", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
@@ -365,8 +382,13 @@ export default function StudentHomework() {
 
           <button
             type="button"
+            disabled={selectedDate === today}
             onClick={() => changeDate(1)}
-            className="w-11 h-11 rounded-2xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition"
+            className={`w-11 h-11 rounded-2xl border border-gray-200 flex items-center justify-center transition ${
+              selectedDate === today
+                ? "opacity-40 cursor-not-allowed"
+                : "hover:bg-gray-50"
+            }`}
           >
             <ChevronRight size={20} />
           </button>
@@ -378,11 +400,17 @@ export default function StudentHomework() {
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-gray-100 flex items-center justify-center">
-              <Clock3 size={20} className="text-gray-700" />
+              <Clock3
+                size={20}
+                className="text-gray-700"
+              />
             </div>
 
             <div>
-              <p className="text-sm text-gray-500">Pending</p>
+              <p className="text-sm text-gray-500">
+                Pending
+              </p>
+
               <h3 className="text-xl font-bold text-gray-800">
                 {pending}
               </h3>
@@ -393,11 +421,17 @@ export default function StudentHomework() {
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-gray-100 flex items-center justify-center">
-              <CheckCircle2 size={20} className="text-gray-700" />
+              <CheckCircle2
+                size={20}
+                className="text-gray-700"
+              />
             </div>
 
             <div>
-              <p className="text-sm text-gray-500">Submitted</p>
+              <p className="text-sm text-gray-500">
+                Submitted
+              </p>
+
               <h3 className="text-xl font-bold text-gray-800">
                 {submitted}
               </h3>
@@ -411,15 +445,18 @@ export default function StudentHomework() {
         {filteredHomework.length === 0 ? (
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-12 text-center">
             <div className="w-16 h-16 rounded-3xl bg-gray-100 mx-auto flex items-center justify-center mb-4">
-              <FileText size={28} className="text-gray-500" />
+              <FileText
+                size={28}
+                className="text-gray-500"
+              />
             </div>
 
             <h3 className="text-lg font-semibold text-gray-800">
-              No Homework
+              No Homework Found
             </h3>
 
             <p className="text-gray-500 mt-2">
-              No homework available for this date.
+              There is no homework for this date.
             </p>
           </div>
         ) : (
@@ -428,10 +465,13 @@ export default function StudentHomework() {
               key={item.id}
               className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition"
             >
-              <div className="flex justify-between gap-4">
+              <div className="flex items-start justify-between gap-4">
                 <div className="flex gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <FileText size={20} className="text-gray-700" />
+                    <FileText
+                      size={20}
+                      className="text-gray-700"
+                    />
                   </div>
 
                   <div>
@@ -446,7 +486,7 @@ export default function StudentHomework() {
                 </div>
 
                 <span
-                  className={`px-4 py-2 h-fit rounded-full text-sm font-medium ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
                     item.status === "Submitted"
                       ? "bg-gray-100 text-gray-700"
                       : "bg-orange-50 text-orange-700"
@@ -462,4 +502,3 @@ export default function StudentHomework() {
     </div>
   );
 }
-
