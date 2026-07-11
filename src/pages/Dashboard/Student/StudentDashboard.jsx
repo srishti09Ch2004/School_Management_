@@ -8,7 +8,7 @@ import StudentAttendance from "./StudentAttendance";
 import StudentTimetable from "./StudentTimetable";
 import StudentHomework from "./StudentHomework";
 import StudentResult from "./StudentResult";
-// import StudentFees from "./StudentFees";
+import StudentFees from "./StudentFees";
 // import StudentNotice from "./StudentNotice";
 // import StudentProfile from "./StudentProfile";
 
