@@ -40,9 +40,6 @@ return <StudentHome />;
   case "Notices":
     return <StudentNotice />;
 
-  case "Profile":
-    return <StudentProfile />;
-
   default:
     return <StudentHome />;
 }

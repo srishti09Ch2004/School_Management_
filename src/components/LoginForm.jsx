@@ -45,6 +45,8 @@ function LoginForm({ role }) {
  const handleSubmit = (e) => {
   e.preventDefault();
 
+    console.log(role.id);
+
   if (role.id === "admin") {
     navigate("/admin");
   }
