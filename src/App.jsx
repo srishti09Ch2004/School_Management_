@@ -1,12 +1,9 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
-import TeacherDashboard from "./pages/Dashboard/Teacher/TeacherDashboard";
-
-import StudentDashboard from "./pages/Dashboard/Student/StudentDashboard";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -18,19 +15,31 @@ import Contact from "./components/Contact";
 import Pricing from "./components/Pricing";
 
 import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
+import TeacherDashboard from "./pages/Dashboard/Teacher/TeacherDashboard";
+import StudentDashboard from "./pages/Dashboard/Student/StudentDashboard";
 
 function App() {
   const location = useLocation();
 
+  // Scroll to top on every route change
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, [location.pathname]);
+
   const hideLayout =
-  location.pathname === "/login" ||
-  location.pathname.startsWith("/admin") ||
-  location.pathname.startsWith("/teacher") ||
-  location.pathname.startsWith("/student");
+    location.pathname === "/login" ||
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/teacher") ||
+    location.pathname.startsWith("/student");
 
   return (
     <>
-    <Toaster position="top-right" />
+      <Toaster position="top-right" />
+
       {!hideLayout && <Navbar />}
 
       <Routes>
@@ -44,8 +53,6 @@ function App() {
 
         <Route path="/teacher" element={<TeacherDashboard />} />
         <Route path="/student" element={<StudentDashboard />} />
-
-       
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
 
