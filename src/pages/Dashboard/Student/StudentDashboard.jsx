@@ -9,8 +9,8 @@ import StudentTimetable from "./StudentTimetable";
 import StudentHomework from "./StudentHomework";
 import StudentResult from "./StudentResult";
 import StudentFees from "./StudentFees";
-// import StudentNotice from "./StudentNotice";
-// import StudentProfile from "./StudentProfile";
+import StudentNotice from "./StudentNotice";
+
 
 export default function StudentDashboard() {
 const [activeMenu, setActiveMenu] =
