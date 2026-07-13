@@ -35,7 +35,8 @@ function App() {
     location.pathname === "/login" ||
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/teacher") ||
-    location.pathname.startsWith("/student");
+    location.pathname.startsWith("/student") ||
+    location.pathname.startsWith("/parent");
 
   return (
     <>
