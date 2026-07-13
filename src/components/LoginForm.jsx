@@ -60,7 +60,7 @@ function LoginForm({ role }) {
   }
 
   if (role.id === "parent") {
-    alert("Parent Dashboard Coming Soon");
+  navigate("/parent");
   }
 
   if (role.id === "principal") {

@@ -17,6 +17,7 @@ import Pricing from "./components/Pricing";
 import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
 import TeacherDashboard from "./pages/Dashboard/Teacher/TeacherDashboard";
 import StudentDashboard from "./pages/Dashboard/Student/StudentDashboard";
+import ParentDashboard from "./pages/Dashboard/Parent/ParentDashboard";
 
 function App() {
   const location = useLocation();
@@ -54,6 +55,7 @@ function App() {
         <Route path="/teacher" element={<TeacherDashboard />} />
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/parent" element={<ParentDashboard />} />
       </Routes>
 
       {!hideLayout && <Footer />}

@@ -165,7 +165,15 @@ student: [
   { name: "Results", icon: "workspace_premium" },
   { name: "Fees", icon: "payments" },
   { name: "Notices", icon: "campaign" },
-]
+],
+
+parent: [
+  { name: "Dashboard", icon: "dashboard" },
+  { name: "Child Profile", icon: "person" },
+  { name: "Attendance", icon: "fact_check" },
+  { name: "Fees", icon: "payments" },
+  { name: "Report Card", icon: "workspace_premium" },
+],
 
 
 };
