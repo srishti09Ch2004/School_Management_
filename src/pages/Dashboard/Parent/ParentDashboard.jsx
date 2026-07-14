@@ -5,8 +5,8 @@ import Topbar from "../../../components/Topbar";
 
 import ParentHome from "./ParentHome";
 import ParentAttendance from "./ParentAttendance";
-// import ParentFees from "./ParentFees";
-// import ParentReportCard from "./ParentReportCard";
+import ParentFees from "./ParentFees";
+import ParentReportCard from "./ParentReportCard";
 import ParentChildProfile from "./ParentChildProfile";
 
 export default function ParentDashboard() {
