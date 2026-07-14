@@ -3,7 +3,7 @@ import { useState } from "react";
 import Sidebar from "../../../components/Sidebar";
 import Topbar from "../../../components/Topbar";
 
-// import PrincipalHome from "./PrincipalHome";
+import PrincipalHome from "./PrincipalHome";
 // import PrincipalStudents from "./PrincipalStudents";
 // import PrincipalTeachers from "./PrincipalTeachers";
 // import PrincipalAttendance from "./PrincipalAttendance";

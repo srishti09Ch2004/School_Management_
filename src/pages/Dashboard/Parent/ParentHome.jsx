@@ -65,7 +65,7 @@ export default function ParentHome() {
               </p>
 
               <h3 className="text-xl font-bold mt-2">
-                Aarav Sharma
+                Aarti Sharma
               </h3>
             </div>
 
