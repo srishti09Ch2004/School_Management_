@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
 import TeacherDashboard from "./pages/Dashboard/Teacher/TeacherDashboard";
 import StudentDashboard from "./pages/Dashboard/Student/StudentDashboard";
 import ParentDashboard from "./pages/Dashboard/Parent/ParentDashboard";
+import PrincipalDashboard from "./pages/Dashboard/Principal/PrincipalDashboard";
 
 function App() {
   const location = useLocation();
@@ -36,7 +37,8 @@ function App() {
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/teacher") ||
     location.pathname.startsWith("/student") ||
-    location.pathname.startsWith("/parent");
+    location.pathname.startsWith("/parent") ||
+    location.pathname.startsWith("/principal");
 
   return (
     <>
@@ -57,6 +59,7 @@ function App() {
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/parent" element={<ParentDashboard />} />
+        <Route path="/principal" element={<PrincipalDashboard />} />
       </Routes>
 
       {!hideLayout && <Footer />}

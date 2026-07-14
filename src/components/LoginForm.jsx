@@ -64,7 +64,7 @@ function LoginForm({ role }) {
   }
 
   if (role.id === "principal") {
-    alert("Principal Dashboard Coming Soon");
+  navigate("/principal");
   }
 };
 
