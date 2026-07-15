@@ -4,7 +4,7 @@ import Sidebar from "../../../components/Sidebar";
 import Topbar from "../../../components/Topbar";
 
 import PrincipalHome from "./PrincipalHome";
-// import PrincipalStudents from "./PrincipalStudents";
+import PrincipalStudents from "./PrincipalStudents";
 // import PrincipalTeachers from "./PrincipalTeachers";
 // import PrincipalAttendance from "./PrincipalAttendance";
 // import PrincipalExams from "./PrincipalExams";
