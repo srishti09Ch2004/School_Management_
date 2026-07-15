@@ -88,7 +88,7 @@ export default function PrincipalStudents() {
                 Total Students
               </p>
 
-              <h3 className="text-3xl font-bold mt-2">
+              <h3 className="text-2xl font-bold mt-2">
                 50
               </h3>
             </div>
@@ -106,7 +106,7 @@ export default function PrincipalStudents() {
                 Avg Attendance
               </p>
 
-              <h3 className="text-3xl font-bold mt-2">
+              <h3 className="text-2xl font-bold mt-2">
                 95%
               </h3>
             </div>
@@ -124,7 +124,7 @@ export default function PrincipalStudents() {
                 Pending Fees
               </p>
 
-              <h3 className="text-3xl font-bold mt-2">
+              <h3 className="text-2xl font-bold mt-2">
                 ₹40,000
               </h3>
             </div>
@@ -142,7 +142,7 @@ export default function PrincipalStudents() {
                 Overall Result
               </p>
 
-              <h3 className="text-3xl font-bold mt-2">
+              <h3 className="text-2xl font-bold mt-2">
                 92%
               </h3>
             </div>
