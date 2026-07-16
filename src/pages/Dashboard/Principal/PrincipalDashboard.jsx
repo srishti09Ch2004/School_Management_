@@ -8,7 +8,7 @@ import PrincipalStudents from "./PrincipalStudents";
 import PrincipalTeachers from "./PrincipalTeachers";
 import PrincipalAttendance from "./PrincipalAttendance";
 import PrincipalExams from "./PrincipalExams";
-// import PrincipalReports from "./PrincipalReports";
+import PrincipalReports from "./PrincipalReports";
 // import PrincipalNotice from "./PrincipalNotice";
 // import PrincipalProfile from "./PrincipalProfile";
 
