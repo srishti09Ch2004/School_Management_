@@ -9,7 +9,7 @@ import PrincipalTeachers from "./PrincipalTeachers";
 import PrincipalAttendance from "./PrincipalAttendance";
 import PrincipalExams from "./PrincipalExams";
 import PrincipalReports from "./PrincipalReports";
-// import PrincipalNotice from "./PrincipalNotice";
+import PrincipalNotice from "./PrincipalNotice";
 // import PrincipalProfile from "./PrincipalProfile";
 
 export default function PrincipalDashboard() {
