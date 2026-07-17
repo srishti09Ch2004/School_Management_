@@ -10,7 +10,7 @@ import PrincipalAttendance from "./PrincipalAttendance";
 import PrincipalExams from "./PrincipalExams";
 import PrincipalReports from "./PrincipalReports";
 import PrincipalNotice from "./PrincipalNotice";
-// import PrincipalProfile from "./PrincipalProfile";
+import PrincipalProfile from "./PrincipalProfile";
 
 export default function PrincipalDashboard() {
   const [activeMenu, setActiveMenu] =
