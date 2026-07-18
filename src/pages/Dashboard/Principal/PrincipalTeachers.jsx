@@ -59,7 +59,7 @@ export default function PrincipalTeachers() {
                 Total Teachers
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 20
               </h3>
             </div>
@@ -77,7 +77,7 @@ export default function PrincipalTeachers() {
                 Departments
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 8
               </h3>
             </div>
@@ -95,7 +95,7 @@ export default function PrincipalTeachers() {
                 Attendance
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 95%
               </h3>
             </div>
@@ -113,7 +113,7 @@ export default function PrincipalTeachers() {
                 Top Rating
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 A+
               </h3>
             </div>

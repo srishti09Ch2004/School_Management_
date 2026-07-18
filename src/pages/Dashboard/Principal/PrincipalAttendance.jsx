@@ -49,7 +49,7 @@ export default function PrincipalAttendance() {
                 Student Attendance
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 95%
               </h3>
             </div>
@@ -67,7 +67,7 @@ export default function PrincipalAttendance() {
                 Teacher Attendance
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 97%
               </h3>
             </div>
@@ -85,7 +85,7 @@ export default function PrincipalAttendance() {
                 Overall Attendance
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 96%
               </h3>
             </div>
@@ -103,7 +103,7 @@ export default function PrincipalAttendance() {
                 Absent Today
               </p>
 
-              <h3 className="text-2xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 12
               </h3>
             </div>
@@ -128,8 +128,8 @@ export default function PrincipalAttendance() {
               <span>95%</span>
             </div>
 
-            <div className="w-full h-3 bg-gray-200 rounded-full">
-              <div className="h-2 w-[95%] bg-green-500 rounded-full"></div>
+            <div className="w-full h-2 bg-gray-200 rounded-full">
+              <div className="h-2 w-[95%] bg-green-400 rounded-full"></div>
             </div>
           </div>
 
@@ -139,8 +139,8 @@ export default function PrincipalAttendance() {
               <span>97%</span>
             </div>
 
-            <div className="w-full h-3 bg-gray-200 rounded-full">
-              <div className="h-2 w-[97%] bg-blue-500 rounded-full"></div>
+            <div className="w-full h-2 bg-gray-200 rounded-full">
+              <div className="h-2 w-[97%] bg-blue-400 rounded-full"></div>
             </div>
           </div>
 
@@ -150,7 +150,7 @@ export default function PrincipalAttendance() {
               <span>89%</span>
             </div>
 
-            <div className="w-full h-3 bg-gray-200 rounded-full">
+            <div className="w-full h-2 bg-gray-200 rounded-full">
               <div className="h-2 w-[89%] bg-orange-400 rounded-full"></div>
             </div>
           </div>
