@@ -88,7 +88,7 @@ return ( <div className="space-y-8">
               {item.title}
             </p>
 
-            <h3 className="text-2xl font-bold mt-3">
+            <h3 className="text-xl font-bold mt-3">
               {item.value}
             </h3>
           </div>
