@@ -29,8 +29,8 @@ export default function ParentAttendance() {
       <div className="bg-white rounded-3xl p-6 shadow-sm">
         <div className="grid md:grid-cols-3 gap-5">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
-              <User size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+              <User size={20} />
             </div>
 
             <div>
@@ -45,8 +45,8 @@ export default function ParentAttendance() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
-              <GraduationCap size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
+              <GraduationCap size={20} />
             </div>
 
             <div>
@@ -61,8 +61,8 @@ export default function ParentAttendance() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
-              <Hash size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
+              <Hash size={20} />
             </div>
 
             <div>
@@ -87,13 +87,13 @@ export default function ParentAttendance() {
                 Present Days
               </p>
 
-              <h3 className="text-3xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 112
               </h3>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
-              <CalendarCheck size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
+              <CalendarCheck size={20} />
             </div>
           </div>
         </div>
@@ -105,13 +105,13 @@ export default function ParentAttendance() {
                 Absent Days
               </p>
 
-              <h3 className="text-3xl font-bold mt-2">
+              <h3 className="text-xl font-bold mt-2">
                 06
               </h3>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center">
-              <CalendarX size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center">
+              <CalendarX size={20} />
             </div>
           </div>
         </div>
@@ -123,13 +123,13 @@ export default function ParentAttendance() {
                 Attendance %
               </p>
 
-              <h3 className="text-3xl font-bold text-green-600 mt-2">
+              <h3 className="text-xl font-bold text-green-600 mt-2">
                 95%
               </h3>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-              <Clock3 size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <Clock3 size={20} />
             </div>
           </div>
         </div>

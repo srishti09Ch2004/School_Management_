@@ -69,8 +69,8 @@ export default function ParentHome() {
               </h3>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center">
-              <User size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center">
+              <User size={20} />
             </div>
           </div>
         </div>
@@ -87,8 +87,8 @@ export default function ParentHome() {
               </h3>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center">
-              <Users size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center">
+              <Users size={20} />
             </div>
           </div>
         </div>
@@ -105,8 +105,8 @@ export default function ParentHome() {
               </h3>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-              <CalendarCheck size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <CalendarCheck size={20} />
             </div>
           </div>
         </div>
@@ -123,8 +123,8 @@ export default function ParentHome() {
               </h3>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-700 flex items-center justify-center">
-              <IndianRupee size={22} />
+            <div className="w-11 h-11 rounded-2xl bg-orange-100 text-orange-700 flex items-center justify-center">
+              <IndianRupee size={20} />
             </div>
           </div>
         </div>

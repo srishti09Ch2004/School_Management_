@@ -62,7 +62,7 @@ export default function ParentFees() {
 
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
-              <GraduationCap size={22} />
+              <GraduationCap size={20} />
             </div>
 
             <div>
