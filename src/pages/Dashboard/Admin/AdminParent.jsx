@@ -10,25 +10,28 @@ import {
 
 export default function AdminParent() {
   const stats = [
-    {
-      title: "Total Parents",
-      value: "1,850",
-      icon: <Users size={22} />,
-      color: "bg-blue-500",
-    },
-    {
-      title: "Active Parents",
-      value: "1,760",
-      icon: <UserCheck size={22} />,
-      color: "bg-green-600",
-    },
-    {
-      title: "Linked Students",
-      value: "2,540",
-      icon: <HeartHandshake size={22} />,
-      color: "bg-purple-500",
-    },
-  ];
+  {
+    title: "Total Parents",
+    value: "1,850",
+    icon: Users,
+    bg: "bg-blue-100",
+    iconColor: "text-blue-600",
+  },
+  {
+    title: "Active Parents",
+    value: "1,760",
+    icon: UserCheck,
+    bg: "bg-green-100",
+    iconColor: "text-green-600",
+  },
+  {
+    title: "Linked Students",
+    value: "2,540",
+    icon: HeartHandshake,
+    bg: "bg-purple-100",
+    iconColor: "text-purple-600",
+  },
+];
 
   const parents = [
     {
@@ -87,30 +90,37 @@ export default function AdminParent() {
 
       {/* Stats */}
       <div className="grid md:grid-cols-3 gap-5">
-        {stats.map((item) => (
-          <div
-            key={item.title}
-            className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-xs text-gray-500">
-                  {item.title}
-                </p>
+        {stats.map((item) => {
+          const Icon = item.icon;
 
-                <h2 className="text-2xl font-bold text-gray-800 mt-2">
-                  {item.value}
-                </h2>
-              </div>
+          return (
+            <div
+              key={item.title}
+              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-xs text-gray-500">
+                    {item.title}
+                  </p>
 
-              <div
-                className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white`}
-              >
-                {item.icon}
+                  <h2 className="text-xl font-bold text-gray-800 mt-2">
+                    {item.value}
+                  </h2>
+                </div>
+
+                <div
+                  className={`${item.bg} w-11 h-11 rounded-2xl flex items-center justify-center`}
+                >
+                  <Icon
+                    size={20}
+                    className={item.iconColor}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Search */}

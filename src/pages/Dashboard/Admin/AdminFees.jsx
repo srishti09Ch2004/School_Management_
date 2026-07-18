@@ -10,26 +10,28 @@ import {
 
 export default function AdminFees() {
   const stats = [
-    {
-      title: "Collected Fees",
-      value: "₹12.4 L",
-      icon: <IndianRupee size={22} />,
-      color: "bg-green-600",
-    },
-    {
-      title: "Pending Fees",
-      value: "₹3.8 L",
-      icon: <Wallet size={22} />,
-      color: "bg-red-500",
-    },
-    {
-      title: "Today's Collection",
-      value: "₹45,000",
-      icon: <CircleDollarSign size={22} />,
-      color: "bg-blue-600",
-    },
-  ];
-
+  {
+    title: "Collected Fees",
+    value: "₹12.4 L",
+    icon: IndianRupee,
+    bg: "bg-green-100",
+    iconColor: "text-green-600",
+  },
+  {
+    title: "Pending Fees",
+    value: "₹3.8 L",
+    icon: Wallet,
+    bg: "bg-red-100",
+    iconColor: "text-red-600",
+  },
+  {
+    title: "Today's Collection",
+    value: "₹45,000",
+    icon: CircleDollarSign,
+    bg: "bg-blue-100",
+    iconColor: "text-blue-600",
+  },
+];
   const fees = [
     {
       id: 1,
@@ -76,37 +78,44 @@ export default function AdminFees() {
         </div>
 
         <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition">
-          <Plus size={16} />
+          <Plus size={18} />
           Collect Fee
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid md:grid-cols-3 gap-5">
-        {stats.map((item) => (
-          <div
-            key={item.title}
-            className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-xs text-gray-500">
-                  {item.title}
-                </p>
+        {stats.map((item) => {
+          const Icon = item.icon;
 
-                <h2 className="text-2xl font-bold text-gray-800 mt-2">
-                  {item.value}
-                </h2>
-              </div>
+          return (
+            <div
+              key={item.title}
+              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-xs text-gray-500">
+                    {item.title}
+                  </p>
 
-              <div
-                className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white`}
-              >
-                {item.icon}
+                  <h2 className="text-xl font-bold text-gray-800 mt-2">
+                    {item.value}
+                  </h2>
+                </div>
+
+                <div
+                  className={`${item.bg} w-11 h-11 rounded-2xl flex items-center justify-center`}
+                >
+                  <Icon
+                    size={20}
+                    className={item.iconColor}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Search */}

@@ -85,7 +85,7 @@ export default function AdminTeacher() {
           >
             <div>
               <p className="text-sm text-gray-500">{item.title}</p>
-              <h2 className="text-2xl font-bold text-gray-800 mt-2">
+              <h2 className="text-xl font-bold text-gray-800 mt-2">
                 {item.value}
               </h2>
             </div>

@@ -10,25 +10,28 @@ import {
 
 export default function AdminExam() {
   const stats = [
-    {
-      title: "Total Exams",
-      value: "18",
-      icon: <ClipboardCheck size={22} />,
-      color: "bg-red-500",
-    },
-    {
-      title: "Upcoming Exams",
-      value: "5",
-      icon: <CalendarDays size={22} />,
-      color: "bg-green-600",
-    },
-    {
-      title: "Results Published",
-      value: "13",
-      icon: <Award size={22} />,
-      color: "bg-blue-600",
-    },
-  ];
+  {
+    title: "Total Exams",
+    value: "18",
+    icon: ClipboardCheck,
+    bg: "bg-red-100",
+    iconColor: "text-red-600",
+  },
+  {
+    title: "Upcoming Exams",
+    value: "5",
+    icon: CalendarDays,
+    bg: "bg-green-100",
+    iconColor: "text-green-600",
+  },
+  {
+    title: "Results Published",
+    value: "13",
+    icon: Award,
+    bg: "bg-blue-100",
+    iconColor: "text-blue-600",
+  },
+];
 
   const exams = [
     {
@@ -69,37 +72,44 @@ export default function AdminExam() {
         </div>
 
         <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition">
-          <Plus size={16} />
+          <Plus size={18} />
           Add Exam
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid md:grid-cols-3 gap-5">
-        {stats.map((item) => (
-          <div
-            key={item.title}
-            className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-xs text-gray-500">
-                  {item.title}
-                </p>
+        {stats.map((item) => {
+          const Icon = item.icon;
 
-                <h2 className="text-2xl font-bold text-gray-800 mt-2">
-                  {item.value}
-                </h2>
-              </div>
+          return (
+            <div
+              key={item.title}
+              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {item.title}
+                  </p>
 
-              <div
-                className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white`}
-              >
-                {item.icon}
+                  <h2 className="text-xl font-bold text-gray-800 mt-2">
+                    {item.value}
+                  </h2>
+                </div>
+
+                <div
+                  className={`${item.bg} w-11 h-11 rounded-2xl flex items-center justify-center`}
+                >
+                  <Icon
+                    size={20}
+                    className={item.iconColor}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Search */}

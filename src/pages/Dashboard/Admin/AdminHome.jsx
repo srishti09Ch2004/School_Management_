@@ -12,38 +12,55 @@ export default function AdminHome() {
     {
       title: "Total Students",
       value: "2,540",
-      icon: <Users size={20} />,
-      color: "bg-red-500",
+      // icon: <Users size={20} />,
+      icon: Users,
+      bg: "bg-red-100",
+      iconColor: "text-red-600",
     },
     {
       title: "Total Teachers",
       value: "185",
-      icon: <GraduationCap size={20} />,
-      color: "bg-green-600",
+      // icon: <GraduationCap size={20} />,
+      icon: GraduationCap,
+      // color: "bg-green-100",
+       bg: "bg-green-100",
+      iconColor: "text-green-600",
     },
     {
       title: "Fees Collected",
       value: "₹12.4 L",
-      icon: <IndianRupee size={20} />,
-      color: "bg-red-600",
+      // icon: <IndianRupee size={20} />,
+      icon: IndianRupee,
+      // color: "bg-red-100",
+       bg: "bg-red-100",
+      iconColor: "text-red-600",
     },
     {
       title: "Library Books",
       value: "4,530",
-      icon: <BookOpen size={20} />,
-      color: "bg-green-500",
+      // icon: <BookOpen size={20} />,
+      icon: BookOpen,
+      // color: "bg-green-100",
+       bg: "bg-green-100",
+      iconColor: "text-green-600",
     },
     {
       title: "Staff Members",
       value: "62",
-      icon: <UserCheck size={20} />,
-      color: "bg-red-500",
+      // icon: <UserCheck size={20} />,
+      icon: UserCheck,
+      // color: "bg-red-100",
+       bg: "bg-red-100",
+      iconColor: "text-red-600",
     },
     {
       title: "Today's Attendance",
       value: "95%",
-      icon: <CalendarCheck size={20} />,
-      color: "bg-green-600",
+      // icon: <CalendarCheck size={20} />,
+      icon: CalendarCheck,
+      // color: "bg-green-100",
+      bg: "bg-green-100",
+      iconColor: "text-green-600",
     },
   ];
 
@@ -111,28 +128,30 @@ export default function AdminHome() {
       {/* Statistics Cards */}
 
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
-        {stats.map((item) => (
-          <div
-            key={item.title}
-            className="bg-white border border-gray-100 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition"
-          >
-            <div>
-              <p className="text-sm text-gray-500">
-                {item.title}
-              </p>
+        {stats.map((item) => {
+          const Icon = item.icon;
 
-              <h3 className="text-2xl font-bold text-gray-800 mt-2">
-                {item.value}
-              </h3>
-            </div>
-
+          return (
             <div
-              className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-sm`}
+              key={item.title}
+              className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition"
             >
-              {item.icon}
+              <div>
+                <p className="text-sm text-gray-500">{item.title}</p>
+
+                <h3 className="text-xl font-bold text-gray-800 mt-2">
+                  {item.value}
+                </h3>
+              </div>
+
+              <div
+                className={`${item.bg} w-11 h-11 rounded-2xl flex items-center justify-center`}
+              >
+                <Icon size={20} className={item.iconColor} />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Attendance & Notifications */}
@@ -158,8 +177,8 @@ export default function AdminHome() {
                 <span>93%</span>
               </div>
 
-              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                <div className="w-[93%] h-full bg-red-500 rounded-full"></div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-[93%] h-full bg-red-400 rounded-full"></div>
               </div>
             </div>
 
@@ -169,8 +188,8 @@ export default function AdminHome() {
                 <span>97%</span>
               </div>
 
-              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                <div className="w-[97%] h-full bg-green-600 rounded-full"></div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-[97%] h-full bg-green-500 rounded-full"></div>
               </div>
             </div>
 
@@ -180,8 +199,8 @@ export default function AdminHome() {
                 <span>91%</span>
               </div>
 
-              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                <div className="w-[91%] h-full bg-blue-500 rounded-full"></div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-[91%] h-full bg-blue-400 rounded-full"></div>
               </div>
             </div>
           </div>

@@ -10,26 +10,28 @@ import {
 
 export default function AdminLibrary() {
   const stats = [
-    {
-      title: "Total Books",
-      value: "4,530",
-      icon: <Library size={22} />,
-      color: "bg-red-500",
-    },
-    {
-      title: "Issued Books",
-      value: "1,245",
-      icon: <BookCheck size={22} />,
-      color: "bg-green-600",
-    },
-    {
-      title: "Available Books",
-      value: "3,285",
-      icon: <BookOpen size={22} />,
-      color: "bg-blue-600",
-    },
-  ];
-
+  {
+    title: "Total Books",
+    value: "4,530",
+    icon: Library,
+    bg: "bg-red-100",
+    iconColor: "text-red-600",
+  },
+  {
+    title: "Issued Books",
+    value: "1,245",
+    icon: BookCheck,
+    bg: "bg-green-100",
+    iconColor: "text-green-600",
+  },
+  {
+    title: "Available Books",
+    value: "3,285",
+    icon: BookOpen,
+    bg: "bg-blue-100",
+    iconColor: "text-blue-600",
+  },
+];
   const books = [
     {
       id: 1,
@@ -83,30 +85,37 @@ export default function AdminLibrary() {
 
       {/* Stats */}
       <div className="grid md:grid-cols-3 gap-5">
-        {stats.map((item) => (
-          <div
-            key={item.title}
-            className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-xs text-gray-500">
-                  {item.title}
-                </p>
+        {stats.map((item) => {
+          const Icon = item.icon;
 
-                <h2 className="text-2xl font-bold text-gray-800 mt-2">
-                  {item.value}
-                </h2>
-              </div>
+          return (
+            <div
+              key={item.title}
+              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-xs text-gray-500">
+                    {item.title}
+                  </p>
 
-              <div
-                className={`${item.color} w-12 h-12 rounded-2xl flex items-center justify-center text-white`}
-              >
-                {item.icon}
+                  <h2 className="text-xl font-bold text-gray-800 mt-2">
+                    {item.value}
+                  </h2>
+                </div>
+
+                <div
+                  className={`${item.bg} w-11 h-11 rounded-2xl flex items-center justify-center`}
+                >
+                  <Icon
+                    size={20}
+                    className={item.iconColor}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Search */}
