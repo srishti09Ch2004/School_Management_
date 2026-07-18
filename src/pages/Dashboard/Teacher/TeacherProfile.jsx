@@ -110,7 +110,7 @@ avatar:
           <p className="text-slate-400 text-sm">
             Assigned Classes
           </p>
-          <h2 className="text-3xl font-bold mt-2">
+          <h2 className="text-xl font-bold mt-2">
             {teacherData.assignedClasses.length}
           </h2>
         </div>
@@ -119,7 +119,7 @@ avatar:
           <p className="text-slate-400 text-sm">
             Total Students
           </p>
-          <h2 className="text-3xl font-bold mt-2">
+          <h2 className="text-xl font-bold mt-2">
             {totalStudents}
           </h2>
         </div>
@@ -128,7 +128,7 @@ avatar:
           <p className="text-slate-400 text-sm">
             Experience
           </p>
-          <h2 className="text-3xl font-bold mt-2">
+          <h2 className="text-xl font-bold mt-2">
             {teacherData.experience}
           </h2>
         </div>

@@ -16,7 +16,6 @@ import {
   Camera,
 } from "lucide-react";
 
-
 function useToast() {
   const [toast, setToast] = useState({
     message: "",
@@ -33,7 +32,6 @@ function useToast() {
 
   return { toast, showToast };
 }
-
 
 function useCamera() {
   const videoRef = useRef(null);
@@ -68,7 +66,6 @@ function useCamera() {
   return { videoRef, active, start, stop };
 }
 
-
 function usePagination(items, itemsPerPage = 10) {
   const [currentPage, setCurrentPage] = useState(1);
   const totalItems = items.length;
@@ -91,7 +88,6 @@ function usePagination(items, itemsPerPage = 10) {
   };
 }
 
-
 const generateStudents = (base, count) => {
   const names = [
     "Rahul", "Priya", "Ankit", "Sneha", "Aman", "Neha", "Rohit", "Pooja",
@@ -113,28 +109,29 @@ const classData = {
   "8-C": generateStudents(81, 100),
 };
 
-
 const cardColors = {
   blue: {
     bg: "bg-blue-50",
+    badgeBg: "bg-blue-100",
     border: "border-blue-200",
     text: "text-blue-700",
     icon: "text-blue-600",
   },
   green: {
     bg: "bg-green-50",
+    badgeBg: "bg-green-100",
     border: "border-green-200",
     text: "text-green-700",
     icon: "text-green-600",
   },
   red: {
     bg: "bg-red-50",
+    badgeBg: "bg-red-100",
     border: "border-red-200",
     text: "text-red-700",
     icon: "text-red-600",
   },
 };
-
 
 function TeacherCard({ teacherMarked, setMethod }) {
   const methods = [
@@ -163,7 +160,7 @@ function TeacherCard({ teacherMarked, setMethod }) {
         </div>
         {teacherMarked && (
           <span className="mt-3 sm:mt-0 inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium">
-            <CheckCircle size={16} />
+            <CheckCircle size={14} />
             Present Today
           </span>
         )}
@@ -182,7 +179,7 @@ function TeacherCard({ teacherMarked, setMethod }) {
             >
               <div className="flex items-center gap-4">
                 <Icon
-                  size={40}
+                  size={36}
                   className={item.color === "green" ? "text-green-600" : "text-blue-600"}
                 />
                 <div>
@@ -197,7 +194,6 @@ function TeacherCard({ teacherMarked, setMethod }) {
     </div>
   );
 }
-
 
 function SummaryCards({ total, present, absent }) {
   const cards = [
@@ -216,12 +212,12 @@ function SummaryCards({ total, present, absent }) {
             key={card.label}
             className={`${c.bg} ${c.border} border rounded-2xl p-5 shadow-sm flex items-center gap-4`}
           >
-            <div className="p-3 bg-white rounded-xl shadow-sm">
-              <Icon size={24} className={c.icon} />
+            <div className={`p-3 ${c.badgeBg} rounded-xl shadow-sm`}>
+              <Icon size={20} className={c.icon} />
             </div>
             <div>
               <p className="text-sm text-gray-500">{card.label}</p>
-              <h3 className={`text-3xl font-bold ${c.text}`}>{card.value}</h3>
+              <h3 className={`text-2xl font-bold ${c.text}`}>{card.value}</h3>
             </div>
           </div>
         );
@@ -230,7 +226,6 @@ function SummaryCards({ total, present, absent }) {
   );
 }
 
-
 function ProgressBar({ percentage }) {
   return (
     <div className="bg-white rounded-2xl p-5 shadow-md border">
@@ -238,7 +233,7 @@ function ProgressBar({ percentage }) {
         <span className="text-gray-500">Attendance Rate</span>
         <span className="font-bold text-gray-800">{percentage}%</span>
       </div>
-      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
         <div
           className="h-full bg-green-600 rounded-full transition-all duration-500"
           style={{ width: `${percentage}%` }}
@@ -247,7 +242,6 @@ function ProgressBar({ percentage }) {
     </div>
   );
 }
-
 
 function Filters({
   selectedClass,
@@ -270,7 +264,6 @@ function Filters({
           <option value="10-A">10-A</option>
           <option value="9-B">9-B</option>
           <option value="8-C">8-C</option>
-          
         </select>
 
         <input
@@ -281,7 +274,7 @@ function Filters({
         />
 
         <div className="relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search students..."
@@ -296,14 +289,13 @@ function Filters({
           disabled={loading}
           className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-3 flex items-center justify-center gap-2 disabled:opacity-60"
         >
-          {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           Load Students
         </button>
       </div>
     </div>
   );
 }
-
 
 function StudentList({
   selectedClass,
@@ -335,7 +327,6 @@ function StudentList({
 
   return (
     <div className="bg-white rounded-2xl shadow-md border overflow-hidden">
-      {/* Header */}
       <div className="px-6 py-4 border-b bg-gray-50 flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-semibold text-gray-800">Class {selectedClass}</h3>
         <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -359,7 +350,6 @@ function StudentList({
         </div>
       </div>
 
-      {/* List */}
       {paginatedItems.length === 0 ? (
         <div className="text-center py-16 text-gray-500">No students found</div>
       ) : (
@@ -400,7 +390,6 @@ function StudentList({
         </div>
       )}
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="px-6 py-4 border-t bg-gray-50 flex flex-wrap items-center justify-between gap-3">
           <div className="flex gap-1">
@@ -409,7 +398,7 @@ function StudentList({
               disabled={currentPage === 1}
               className="p-2 rounded-xl border hover:bg-white disabled:opacity-40"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={16} />
             </button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               let page = currentPage;
@@ -436,7 +425,7 @@ function StudentList({
               disabled={currentPage === totalPages}
               className="p-2 rounded-xl border hover:bg-white disabled:opacity-40"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={16} />
             </button>
           </div>
           <div className="text-sm text-gray-500">
@@ -445,7 +434,6 @@ function StudentList({
         </div>
       )}
 
-      {/* Footer */}
       <div className="px-6 py-4 border-t bg-gray-50 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-gray-500">
           <span className="font-medium text-green-600">{present}</span> Present ·{" "}
@@ -455,15 +443,13 @@ function StudentList({
           onClick={handleSaveAttendance}
           className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-medium transition shadow-sm hover:shadow"
         >
-          <Save size={18} />
+          <Save size={16} />
           Save Attendance
         </button>
       </div>
     </div>
   );
 }
-
-// FACE MODAL
 
 function FaceModal({ onClose, onMark }) {
   const { videoRef, active, start, stop } = useCamera();
@@ -478,17 +464,17 @@ function FaceModal({ onClose, onMark }) {
       <div className="bg-white w-[95%] max-w-lg rounded-3xl p-6 shadow-2xl">
         <div className="flex justify-between items-center">
           <h3 className="font-bold text-xl text-gray-800 flex items-center gap-2">
-            <ScanFace className="text-green-600" size={24} /> Face Recognition
+            <ScanFace className="text-green-600" size={20} /> Face Recognition
           </h3>
           <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full">
-            <X size={20} />
+            <X size={16} />
           </button>
         </div>
 
         <div className="mt-4 relative rounded-2xl overflow-hidden bg-gray-900 aspect-video flex items-center justify-center">
           {!active ? (
             <div className="text-center p-6">
-              <ScanFace size={48} className="mx-auto text-gray-400 animate-pulse" />
+              <ScanFace size={40} className="mx-auto text-gray-400 animate-pulse" />
               <p className="text-white mt-2">Camera not started</p>
               <button
                 onClick={start}
@@ -517,7 +503,7 @@ function FaceModal({ onClose, onMark }) {
               }}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
             >
-              <Camera size={20} /> Capture & Submit
+              <Camera size={16} /> Capture & Submit
             </button>
           )}
           <button onClick={handleClose} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-xl font-semibold">
@@ -532,23 +518,21 @@ function FaceModal({ onClose, onMark }) {
   );
 }
 
-// FINGER MODAL
-
 function FingerModal({ onClose, onMark }) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white w-[95%] max-w-lg rounded-3xl p-6 shadow-2xl">
         <div className="flex justify-between items-center">
           <h3 className="font-bold text-xl text-gray-800 flex items-center gap-2">
-            <Fingerprint className="text-blue-600" size={24} /> Fingerprint Scan
+            <Fingerprint className="text-blue-600" size={20} /> Fingerprint Scan
           </h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
-            <X size={20} />
+            <X size={16} />
           </button>
         </div>
 
         <div className="mt-6 h-56 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-          <Fingerprint size={80} className="text-blue-600 animate-pulse" />
+          <Fingerprint size={72} className="text-blue-600 animate-pulse" />
         </div>
 
         <p className="text-center text-gray-500 text-sm mt-3">Place your finger on scanner...</p>
@@ -567,11 +551,8 @@ function FingerModal({ onClose, onMark }) {
   );
 }
 
-// MAIN COMPONENT
-
 export default function TeacherAttendance() {
-  // State
-  const [method, setMethod] = useState(null); // 'face' | 'finger' | null
+  const [method, setMethod] = useState(null);
   const [teacherMarked, setTeacherMarked] = useState(false);
   const [selectedClass, setSelectedClass] = useState("10-A");
   const [students, setStudents] = useState([]);
@@ -584,7 +565,6 @@ export default function TeacherAttendance() {
 
   const { toast, showToast } = useToast();
 
-  // Load students
   const loadStudents = (classValue) => {
     setLoading(true);
     setTimeout(() => {
@@ -597,7 +577,6 @@ export default function TeacherAttendance() {
     loadStudents(selectedClass);
   }, [selectedClass]);
 
-  // Handlers
   const changeClass = (value) => {
     setSelectedClass(value);
     setSearchQuery("");
@@ -627,25 +606,23 @@ export default function TeacherAttendance() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Toast */}
         {toast.visible && (
           <div
             className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-white transition-all duration-300 ${
               toast.type === "success" ? "bg-green-600" : "bg-red-600"
             }`}
           >
-            {toast.type === "success" ? <CheckCircle size={20} /> : <X size={20} />}
+            {toast.type === "success" ? <CheckCircle size={16} /> : <X size={16} />}
             <span className="font-medium">{toast.message}</span>
           </div>
         )}
 
-        {/* Header */}
         <header className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/20">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3">
-                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-2 rounded-2xl">
-                  <Users size={28} />
+              <h1 className="text-2xl font-bold text-gray-800 tracking-tight flex items-center gap-3">
+                <span className="bg-blue-100 text-blue-600 p-2 rounded-2xl">
+                  <Users size={24} />
                 </span>
                 Attendance Management
               </h1>
@@ -654,22 +631,16 @@ export default function TeacherAttendance() {
               </p>
             </div>
             <div className="mt-2 md:mt-0 flex items-center gap-3 bg-white/50 rounded-full px-4 py-2 shadow-inner">
-              <Calendar size={20} className="text-gray-400" />
+              <Calendar size={16} className="text-gray-400" />
               <span className="text-sm font-medium text-gray-600">{selectedDate}</span>
             </div>
           </div>
         </header>
 
-        {/* Teacher Card */}
         <TeacherCard teacherMarked={teacherMarked} setMethod={setMethod} />
-
-        {/* Summary Cards */}
         <SummaryCards total={total} present={present} absent={absent} />
-
-        {/* Progress Bar */}
         <ProgressBar percentage={percentage} />
 
-        {/* Filters */}
         <Filters
           selectedClass={selectedClass}
           setSelectedClass={changeClass}
@@ -681,7 +652,6 @@ export default function TeacherAttendance() {
           loading={loading}
         />
 
-        {/* Student List */}
         <StudentList
           selectedClass={selectedClass}
           students={students}
@@ -694,12 +664,9 @@ export default function TeacherAttendance() {
           handleSaveAttendance={handleSaveAttendance}
         />
 
-        {/* Modals */}
         {method === "face" && (
           <FaceModal
-            onClose={() => {
-              setMethod(null);
-            }}
+            onClose={() => setMethod(null)}
             onMark={markTeacherAttendance}
           />
         )}
