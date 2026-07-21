@@ -7,7 +7,7 @@ function LoginForm({ role }) {
   // 1. Inputs ke liye states banayein
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const roleStyles = {
     student: {
@@ -34,32 +34,69 @@ function LoginForm({ role }) {
 
   const style = roleStyles[role.id] || roleStyles.student;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+      const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    let isValid = false;
+        setLoading(true);
 
-    if (role.id === "admin" && email === "admin@school.com" && password === "admin123") {
-      isValid = true;
-      navigate("/admin");
-    } else if (role.id === "teacher" && email === "teacher@school.com" && password === "teacher123") {
-      isValid = true;
-      navigate("/teacher");
-    } else if (role.id === "student" && email === "student@school.com" && password === "student123") {
-      isValid = true;
-      navigate("/student");
-    } else if (role.id === "parent" && email === "parent@school.com" && password === "parent123") {
-      isValid = true;
-      navigate("/parent");
-    } else if (role.id === "principal" && email === "principal@school.com" && password === "principal123") {
-      isValid = true;
-      navigate("/principal");
-    }
+        try {
+          const response = await fetch(
+            "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/login.php",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email,
+                password,
+              }),
+            }
+          );
 
-    if (!isValid) {
-      alert(`Invalid credentials for ${role.title} portal! Please check your email or password.`);
-    }
-  };
+          const data = await response.json();
+
+          if (!data.status) {
+            alert(data.message);
+            setLoading(false);
+            return;
+          }
+
+          alert(data.message);
+
+          switch (data.role) {
+            case "admin":
+              navigate("/admin");
+              break;
+
+            case "teacher":
+              navigate("/teacher");
+              break;
+
+            case "student":
+              navigate("/student");
+              break;
+
+            case "parent":
+              navigate("/parent");
+              break;
+
+            case "principal":
+              navigate("/principal");
+              break;
+
+            default:
+              navigate("/");
+          }
+        } catch (error) {
+          console.log(error);
+          alert("Server Error");
+        }
+
+        setLoading(false);
+      };
+
+
 
   return (
     <div>
@@ -122,7 +159,7 @@ function LoginForm({ role }) {
           type="submit"
           className={`w-full h-12 rounded-2xl bg-gradient-to-r ${style.button} text-white font-semibold flex justify-center items-center gap-3 transition duration-300 hover:scale-[1.02]`}
         >
-          Continue as {role.title}
+          {loading ? "Logging In..." : `Continue as ${role.title}`}
           <ArrowRight size={18} />
         </button>
       </form>
