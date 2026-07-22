@@ -1,5 +1,4 @@
-
-
+import { useEffect, useState } from "react";
 import {
   CalendarCheck,
   ClipboardList,
@@ -8,6 +7,9 @@ import {
 } from "lucide-react";
 
 export default function StudentHome() {
+  const [student, setStudent] = useState(null);
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
   const stats = [
     {
       title: "Attendance",
@@ -58,15 +60,41 @@ export default function StudentHome() {
     },
   ];
 
+  useEffect(() => {
+
+  if (!user.id) return;
+
+  fetch(`http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/student/dashboard.php?user_id=${user.id}`)
+    .then((res) => res.json())
+    .then((data) => {
+
+      console.log(data);
+
+      if (data.status) {
+        setStudent(data.data);
+      }
+
+    });
+
+}, []);
+
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mt-4">
-          Student Dashboard
+          Welcome {student?.full_name || "Student"}
         </h2>
 
         <p className="text-sm text-gray-500 mt-2">
-          Welcome back to Future Academy.
+          Admission No : {student?.admission_no}
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Class : {student?.class} | Section : {student?.section} | Roll No : {student?.roll_no}
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Email : {student?.email}
         </p>
       </div>
 

@@ -7,7 +7,21 @@ import {
   CalendarCheck,
 } from "lucide-react";
 
+import { useEffect, useState } from "react";
+
 export default function AdminHome() {
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loggedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (loggedUser) {
+      setUser(loggedUser);
+    }
+  }, []);
+
+
   const stats = [
     {
       title: "Total Students",
@@ -93,11 +107,11 @@ export default function AdminHome() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">
-              Welcome Back, Admin 
+              Welcome Back, {user?.full_name}
             </h2>
 
             <p className="text-gray-500 mt-2">
-              Here's what's happening in Future Academy today.
+              Logged in as {user?.role}
             </p>
           </div>
 

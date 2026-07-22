@@ -69,6 +69,7 @@ function LoginForm({ role }) {
 
           alert(data.message);
           localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("role", data.role);
 
           switch (data.role) {
             case "admin":
