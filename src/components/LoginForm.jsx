@@ -9,6 +9,8 @@ function LoginForm({ role }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+    const navigate = useNavigate();
+
   const roleStyles = {
     student: {
       button: "from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600",
@@ -50,11 +52,14 @@ function LoginForm({ role }) {
               body: JSON.stringify({
                 email,
                 password,
+                role: role.id
               }),
             }
           );
 
           const data = await response.json();
+          console.log(data);
+          console.log(data.role);
 
           if (!data.status) {
             alert(data.message);
@@ -63,6 +68,7 @@ function LoginForm({ role }) {
           }
 
           alert(data.message);
+          localStorage.setItem("user", JSON.stringify(data.user));
 
           switch (data.role) {
             case "admin":
@@ -89,9 +95,9 @@ function LoginForm({ role }) {
               navigate("/");
           }
         } catch (error) {
-          console.log(error);
-          alert("Server Error");
-        }
+            console.error("Error:", error);
+            alert(error.message);
+          }
 
         setLoading(false);
       };

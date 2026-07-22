@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
@@ -18,6 +18,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 $email = $data["email"] ?? "";
 $password = $data["password"] ?? "";
+$role = $data["role"] ?? "";
 
 if(empty($email) || empty($password)){
     echo json_encode([
@@ -33,10 +34,23 @@ $result = mysqli_query($conn,$sql);
 
 if(mysqli_num_rows($result)==0){
 
-    echo json_encode([
-        "status"=>false,
-        "message"=>"User Not Found"
-    ]);
+    session_start();
+
+$_SESSION["user_id"] = $user["id"];
+$_SESSION["role"] = $user["role"];
+$_SESSION["name"] = $user["full_name"];
+
+echo json_encode([
+    "status" => true,
+    "message" => "Login Successful",
+    "role" => $user["role"],
+    "user" => [
+        "id" => $user["id"],
+        "name" => $user["full_name"],
+        "email" => $user["email"],
+        "role" => $user["role"]
+    ]
+]);
 
     exit;
 }
@@ -52,6 +66,16 @@ if($user["password"] != $password){
 
     exit;
 }
+if($user["role"] != $role){
+
+    echo json_encode([
+        "status"=>false,
+        "message"=>"You selected the wrong portal."
+    ]);
+
+    exit;
+}
+
 
 echo json_encode([
     "status"=>true,
