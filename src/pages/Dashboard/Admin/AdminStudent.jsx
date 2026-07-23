@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Search,
   Plus,
@@ -14,112 +14,64 @@ import {
   X,
 } from "lucide-react";
 
-// ---------- Generate a larger dataset (50 students) for real pagination ----------
-const generateStudents = () => {
-  const firstNames = ["Rahul", "Priya", "Ankit", "Neha", "Aman", "Kavya", "Arjun", "Sara", "Vikram", "Ananya", "Rohit", "Meera", "Karan", "Pooja", "Ajay"];
-  const lastNames = ["Sharma", "Singh", "Verma", "Gupta", "Yadav", "Nair", "Reddy", "Khan", "Patel", "Iyer", "Mehta", "Joshi", "Malhotra", "Kumar"];
-  const classes = ["10-A", "9-B", "8-C", "7-A", "6-B", "5-A", "4-C"];
-  const genders = ["Male", "Female"];
-  const statuses = ["Active", "Pending", "Inactive"];
-  const fatherNames = ["Rajesh", "Arvind", "Manoj", "Amit", "Suresh", "Vikram", "Ranjit", "Imran", "Dinesh", "Krishnan", "Ashok", "Sanjay", "Deepak"];
-  const motherNames = ["Indu", "Suman", "Kiran", "Sunita", "Meena", "Anita", "Rekha", "Sara", "Pooja", "Geeta", "Priya", "Neha", "Ritu"];
-  const occupations = ["Engineer", "Doctor", "Businessman", "Professor", "Nurse", "Architect", "Software Engineer", "Lawyer", "Farmer", "Banker", "CA", "Journalist", "Teacher", "Hotelier"];
 
-  const students = [];
-  const startDate = new Date(2023, 0, 1); 
-  const endDate = new Date(2026, 5, 30); 
 
-  for (let i = 1; i <= 50; i++) {
-    const name = `${firstNames[i % firstNames.length]} ${lastNames[i % lastNames.length]}`;
-    const cls = classes[i % classes.length];
-    const roll = String(100 + i);
-    const gender = genders[i % 2];
-    const status = statuses[i % 3];
-    const father = `Mr. ${fatherNames[i % fatherNames.length]} ${lastNames[i % lastNames.length]}`;
-    const mother = `Mrs. ${motherNames[i % motherNames.length]} ${lastNames[i % lastNames.length]}`;
-    const fatherOcc = occupations[i % occupations.length];
-    const motherOcc = occupations[(i + 3) % occupations.length];
 
-    // Random date between startDate and endDate
-    const randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
-    const joiningDate = randomDate.toISOString().slice(0, 10);
-
-    students.push({
-      id: i,
-      name,
-      class: cls,
-      roll,
-      gender,
-      status,
-      joiningDate,
-      parents: {
-        fatherName: father,
-        fatherOccupation: fatherOcc,
-        motherName: mother,
-        motherOccupation: motherOcc,
-      },
-    });
-  }
-  return students;
-};
-
-const ALL_STUDENTS = generateStudents();
 
 export default function AdminStudent() {
   // ---------- State ----------
+  const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedYear, setSelectedYear] = useState("All");
-  const [selectedMonth, setSelectedMonth] = useState("All");
+  // const [selectedYear, setSelectedYear] = useState("All");
+  // const [selectedMonth, setSelectedMonth] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  useEffect(() => {
+  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/students.php")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+
+      if (data.status) {
+        setStudents(data.data);
+      }
+    });
+}, []);
 
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   // ---------- Derived data: filtered students ----------
-  const filteredStudents = useMemo(() => {
-    let result = ALL_STUDENTS;
+  // ---------- Derived data: filtered students ----------
+const filteredStudents = useMemo(() => {
+  let result = students;
 
-    // Search filter
-    if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase().trim();
-      result = result.filter(
-        (s) =>
-          s.name.toLowerCase().includes(query) ||
-          s.roll.toLowerCase().includes(query)
-      );
-    }
+  if (searchQuery.trim() !== "") {
+    const query = searchQuery.toLowerCase().trim();
 
-    // Year filter (based on joiningDate)
-    if (selectedYear !== "All") {
-      result = result.filter((s) => {
-        const year = s.joiningDate.slice(0, 4);
-        return year === selectedYear;
-      });
-    }
+    result = result.filter(
+      (s) =>
+        s.full_name.toLowerCase().includes(query) ||
+        String(s.roll_no).toLowerCase().includes(query)
+    );
+  }
 
-    // Month filter (based on joiningDate)
-    if (selectedMonth !== "All") {
-      result = result.filter((s) => {
-        const month = s.joiningDate.slice(5, 7); // MM
-        return month === selectedMonth;
-      });
-    }
+  return result;
+}, [students, searchQuery]);
 
-    return result;
-  }, [searchQuery, selectedYear, selectedMonth]);
+// ---------- Pagination ----------
+const totalItems = filteredStudents.length;
+const totalPages = Math.ceil(totalItems / itemsPerPage);
+const startIndex = (currentPage - 1) * itemsPerPage;
+const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+const currentItems = filteredStudents.slice(startIndex, endIndex);
 
-  // ---------- Pagination ----------
-  const totalItems = filteredStudents.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  const currentItems = filteredStudents.slice(startIndex, endIndex);
+// Reset page when search changes
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchQuery]);
 
-  // Reset page when filters change
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedYear, selectedMonth]);
-
+ 
   // ---------- Handlers ----------
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -147,13 +99,9 @@ export default function AdminStudent() {
   };
 
   // ---------- Stats (computed from actual data) ----------
-  const totalStudents = ALL_STUDENTS.length;
-  const activeStudents = ALL_STUDENTS.filter(s => s.status === "Active").length;
-  const newAdmissions = ALL_STUDENTS.filter(s => {
-    const now = new Date();
-    const join = new Date(s.joiningDate);
-    return join.getMonth() === now.getMonth() && join.getFullYear() === now.getFullYear();
-  }).length;
+  const totalStudents = students.length;
+  const activeStudents = students.length;
+  const newAdmissions = students.length;
 
   const stats = [
     { title: "Total Students", value: totalStudents.toLocaleString(), icon: <Users size={18} />, color: "bg-blue-100 text-blue-600" },
@@ -161,12 +109,7 @@ export default function AdminStudent() {
     { title: "New Admissions", value: newAdmissions.toLocaleString(), icon: <UserPlus size={18} />, color: "bg-orange-100 text-orange-600" },
   ];
 
-  // ---------- Options for filters ----------
-  const years = ["All", ...new Set(ALL_STUDENTS.map(s => s.joiningDate.slice(0, 4)))].sort();
-  const months = [
-    "All", "01", "02", "03", "04", "05", "06",
-    "07", "08", "09", "10", "11", "12"
-  ];
+  
 
   return (
     <div className="space-y-7 max-w-[1600px] mx-auto p-1">
@@ -196,49 +139,22 @@ export default function AdminStudent() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
-        <div className="relative flex-1 max-w-md">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search student by name or roll no..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border border-gray-200 rounded-2xl py-2.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500 text-sm transition"
-          />
-        </div>
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+          <div className="relative max-w-md">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
 
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
-          <div className="flex items-center gap-2 border border-gray-200 rounded-2xl px-3 py-2 bg-gray-50/50 w-full sm:w-auto">
-            <Calendar size={16} className="text-gray-400" />
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="bg-transparent outline-none text-sm text-gray-600 font-medium cursor-pointer w-full"
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year === "All" ? "All Sessions" : `Session: ${year}`}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 border border-gray-200 rounded-2xl px-3 py-2 bg-gray-50/50 w-full sm:w-auto">
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent outline-none text-sm text-gray-600 font-medium cursor-pointer w-full"
-            >
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {month === "All" ? "All Months" : new Date(2000, parseInt(month) - 1).toLocaleString("default", { month: "long" })}
-                </option>
-              ))}
-            </select>
+            <input
+              type="text"
+              placeholder="Search student by name or roll no..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full border border-gray-200 rounded-2xl py-2.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500 text-sm transition"
+            />
           </div>
         </div>
-      </div>
 
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -257,7 +173,7 @@ export default function AdminStudent() {
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Class</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Roll No.</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Gender</th>
-                <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Admission Date</th>
+                <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Admission No</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -272,16 +188,21 @@ export default function AdminStudent() {
               ) : (
                 currentItems.map((student) => (
                   <tr key={student.id} className="hover:bg-gray-50/80 transition">
-                    <td className="px-6 py-4.5 font-semibold text-gray-800">{student.name}</td>
+                    <td className="px-6 py-4.5 font-semibold text-gray-800">{student.full_name}</td>
                     <td className="text-center text-gray-600 text-sm">{student.class}</td>
-                    <td className="text-center text-gray-600 text-sm">{student.roll}</td>
+                    <td className="text-center text-gray-600 text-sm">{student.roll_no}</td>
                     <td className="text-center text-gray-600 text-sm">{student.gender}</td>
-                    <td className="text-center text-gray-500 text-sm">{student.joiningDate}</td>
+                    <td className="text-center text-gray-500 text-sm">{student.admission_no}</td>
                     <td className="text-center">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        student.status === "Active" ? "bg-green-50 text-green-700" :
-                        student.status === "Pending" ? "bg-yellow-50 text-yellow-700" : "bg-red-50 text-red-700"
-                      }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          student.status === "Active"
+                            ? "bg-green-50 text-green-700"
+                            : student.status === "Pending"
+                            ? "bg-yellow-50 text-yellow-700"
+                            : "bg-red-50 text-red-700"
+                        }`}
+                      >
                         {student.status}
                       </span>
                     </td>
@@ -360,8 +281,8 @@ export default function AdminStudent() {
           <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-xl border border-gray-100 transition-all scale-100 duration-200">
             <div className="p-6 bg-gradient-to-r from-green-50/70 to-transparent flex justify-between items-center border-b border-gray-100">
               <div>
-                <h3 className="text-xl font-bold text-gray-800">{selectedStudent.name}</h3>
-                <p className="text-xs font-semibold text-gray-500 mt-0.5">Grade Level: {selectedStudent.class} • Register No: {selectedStudent.roll}</p>
+                <h3 className="text-xl font-bold text-gray-800">{selectedStudent.full_name}</h3>
+                <p className="text-xs font-semibold text-gray-500 mt-0.5">Grade Level: {selectedStudent.class} • Register No: {selectedStudent.roll_no}</p>
               </div>
               <button
                 onClick={() => setSelectedStudent(null)}
