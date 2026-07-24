@@ -40,6 +40,8 @@ export default function AdminStudent() {
 }, []);
 
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [viewStudent, setViewStudent] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // ---------- Derived data: filtered students ----------
   // ---------- Derived data: filtered students ----------
@@ -78,6 +80,22 @@ useEffect(() => {
       setCurrentPage(page);
     }
   };
+
+  const handleView = async (id) => {
+  setLoading(true);
+
+  const res = await fetch(
+    `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/student-view.php?id=${id}`
+  );
+
+  const data = await res.json();
+
+  if (data.status) {
+    setViewStudent(data.data);
+  }
+
+  setLoading(false);
+};
 
   // ---------- Generate page numbers with ellipsis ----------
   const getPageNumbers = () => {
@@ -209,15 +227,17 @@ useEffect(() => {
                     <td>
                       <div className="flex justify-center gap-2">
                         <button
-                          onClick={() => setSelectedStudent(student)}
+                          onClick={() => handleView(student.id)}
                           className="w-8 h-8 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition"
                           title="View Detailed Info"
                         >
                           <Eye size={15} />
                         </button>
+
                         <button className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition" title="Modify Record">
                           <Pencil size={15} />
                         </button>
+
                         <button className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition" title="Delete Record">
                           <Trash2 size={15} />
                         </button>
@@ -276,16 +296,16 @@ useEffect(() => {
       </div>
 
       {/* Modal */}
-      {selectedStudent && (
+      {viewStudent && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-xl border border-gray-100 transition-all scale-100 duration-200">
             <div className="p-6 bg-gradient-to-r from-green-50/70 to-transparent flex justify-between items-center border-b border-gray-100">
               <div>
-                <h3 className="text-xl font-bold text-gray-800">{selectedStudent.full_name}</h3>
-                <p className="text-xs font-semibold text-gray-500 mt-0.5">Grade Level: {selectedStudent.class} • Register No: {selectedStudent.roll_no}</p>
+                <h3 className="text-xl font-bold text-gray-800">{viewStudent.full_name}</h3>
+                <p className="text-xs font-semibold text-gray-500 mt-0.5">Grade Level: {viewStudent.class} • Register No: {viewStudent.roll_no}</p>
               </div>
               <button
-                onClick={() => setSelectedStudent(null)}
+                onClick={() => setViewStudent(null)}
                 className="p-1.5 rounded-xl hover:bg-gray-200/80 text-gray-400 hover:text-gray-600 transition"
               >
                 <X size={18} />
@@ -296,18 +316,18 @@ useEffect(() => {
               <div className="grid grid-cols-2 gap-4 bg-gray-50/80 p-4 rounded-2xl text-sm">
                 <div>
                   <span className="text-xs text-gray-400 block font-medium">Gender Info</span>
-                  <span className="font-semibold text-gray-700">{selectedStudent.gender}</span>
+                  <span className="font-semibold text-gray-700">{viewStudent.gender}</span>
                 </div>
                 <div>
                   <span className="text-xs text-gray-400 block font-medium">Admission Verified On</span>
-                  <span className="font-semibold text-gray-700">{selectedStudent.joiningDate}</span>
+                  <span className="font-semibold text-gray-700">{viewStudent.admission_no}</span>
                 </div>
               </div>
 
-              <div>
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Family Profile Architecture</h4>
-                <div className="space-y-3.5">
-                  <div className="flex justify-between items-center border-b border-gray-100/70 pb-3">
+              {/* <div> */}
+                {/* <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Family Profile Architecture</h4> */}
+                {/* <div className="space-y-3.5"> */}
+                  {/* <div className="flex justify-between items-center border-b border-gray-100/70 pb-3">
                     <div>
                       <span className="text-xs text-gray-400 block">Father's Full Name</span>
                       <span className="text-sm font-semibold text-gray-800">{selectedStudent.parents.fatherName}</span>
@@ -315,9 +335,9 @@ useEffect(() => {
                     <span className="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-xl font-medium">
                       {selectedStudent.parents.fatherOccupation}
                     </span>
-                  </div>
+                  </div> */}
 
-                  <div className="flex justify-between items-center pt-1">
+                  {/* <div className="flex justify-between items-center pt-1">
                     <div>
                       <span className="text-xs text-gray-400 block">Mother's Full Name</span>
                       <span className="text-sm font-semibold text-gray-800">{selectedStudent.parents.motherName}</span>
@@ -325,14 +345,14 @@ useEffect(() => {
                     <span className="bg-purple-50 text-purple-700 text-xs px-3 py-1 rounded-xl font-medium">
                       {selectedStudent.parents.motherOccupation}
                     </span>
-                  </div>
-                </div>
-              </div>
+                  </div> */}
+                {/* </div> */}
+              {/* </div> */}
             </div>
 
             <div className="p-4 bg-gray-50/50 flex justify-end border-t border-gray-100/60">
               <button
-                onClick={() => setSelectedStudent(null)}
+                onClick={() => setviewStudent(null)}
                 className="px-5 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition shadow-sm"
               >
                 Close View
