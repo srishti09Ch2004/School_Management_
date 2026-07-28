@@ -223,6 +223,35 @@ const handleUpdate = async () => {
   }
 };
 
+
+const handleDelete = async (id) => {
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this student?"
+  );
+
+  if (!confirmDelete) return;
+
+  const response = await fetch(
+    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (data.status) {
+    fetchStudents();
+  }
+};
+
   // ---------- Generate page numbers with ellipsis ----------
   const getPageNumbers = () => {
     const pages = [];
@@ -388,7 +417,11 @@ const handleUpdate = async () => {
                           <Pencil size={15} />
                         </button>
 
-                        <button className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition" title="Delete Record">
+                        <button
+                          onClick={() => handleDelete(student.user_id || student.id)}
+                          className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
+                          title="Delete Record"
+                        >
                           <Trash2 size={15} />
                         </button>
                       </div>
