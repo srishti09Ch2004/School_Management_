@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from "react";
 import {
   Search,
   Plus,
@@ -9,53 +10,48 @@ import {
 } from "lucide-react";
 
 export default function AdminTeacher() {
-  const stats = [
-    {
-      title: "Total Teachers",
-      value: "185",
-      icon: <Users size={18} />,
-      color: "bg-blue-100 text-blue-600",
-    },
-    {
-      title: "Departments",
-      value: "12",
-      icon: <BookOpen size={18} />,
-      color: "bg-green-100 text-green-600",
-    },
-    {
-      title: "Class Teachers",
-      value: "42",
-      icon: <GraduationCap size={18} />,
-      color: "bg-orange-100 text-orange-600",
-    },
-  ];
+  const [teachers, setTeachers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const teachers = [
-    {
-      id: 1,
-      name: "Amit Sharma",
-      subject: "Mathematics",
-      phone: "9876543210",
-      experience: "8 Years",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Neha Gupta",
-      subject: "Science",
-      phone: "9123456780",
-      experience: "6 Years",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Rakesh Verma",
-      subject: "English",
-      phone: "9988776655",
-      experience: "4 Years",
-      status: "Inactive",
-    },
-  ];
+  const itemsPerPage = 5;
+
+  const stats = [
+  {
+    title: "Total Teachers",
+    value: teachers.length,
+    icon: <Users size={18} />,
+    color: "bg-blue-100 text-blue-600",
+  },
+  {
+    title: "Departments",
+    value: new Set(teachers.map((t) => t.department)).size,
+    icon: <BookOpen size={18} />,
+    color: "bg-green-100 text-green-600",
+  },
+  {
+    title: "Qualified Teachers",
+    value: teachers.length,
+    icon: <GraduationCap size={18} />,
+    color: "bg-orange-100 text-orange-600",
+  },
+];
+
+
+  const fetchTeachers = () => {
+  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/teachers.php")
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        setTeachers(data.data);
+      }
+    });
+};
+
+useEffect(() => {
+  fetchTeachers();
+}, []);
+  
 
   return (
     <div className="space-y-7">
@@ -164,11 +160,11 @@ export default function AdminTeacher() {
                   className="border-t border-gray-100 hover:bg-gray-50 transition"
                 >
                   <td className="px-6 py-5 font-medium text-gray-800">
-                    {teacher.name}
+                    {teacher.full_name}
                   </td>
 
                   <td className="text-center text-gray-600">
-                    {teacher.subject}
+                    {teacher.department}
                   </td>
 
                   <td className="text-center text-gray-600">
@@ -176,19 +172,13 @@ export default function AdminTeacher() {
                   </td>
 
                   <td className="text-center text-gray-600">
-                    {teacher.experience}
+                    {teacher.qualification}
                   </td>
 
                   <td className="text-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        teacher.status === "Active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {teacher.status}
-                    </span>
+                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                        Active
+                      </span>
                   </td>
 
                   <td>
