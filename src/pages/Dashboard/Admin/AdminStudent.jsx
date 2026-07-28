@@ -14,20 +14,15 @@ import {
   X,
 } from "lucide-react";
 
-
-
-
-
 export default function AdminStudent() {
   // ---------- State ----------
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  // const [selectedYear, setSelectedYear] = useState("All");
-  // const [selectedMonth, setSelectedMonth] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
 const [formData, setFormData] = useState({
   full_name: "",
@@ -40,6 +35,7 @@ const [formData, setFormData] = useState({
   dob: "",
   phone: "",
   address: "",
+  status: "Active",
 });
 
 const fetchStudents = () => {
@@ -98,12 +94,12 @@ useEffect(() => {
     }
   };
 
-  const handleChange = (e) => {
+const handleChange = (e) => {
   setFormData({
     ...formData,
     [e.target.name]: e.target.value,
-    });
-  };
+  });
+};
 
   const handleSubmit = async () => {
 
@@ -152,6 +148,7 @@ useEffect(() => {
       dob: "",
       phone: "",
       address: "",
+      status: "Active",
     });
 
     fetchStudents();
@@ -173,6 +170,57 @@ useEffect(() => {
   }
 
   setLoading(false);
+};
+
+const handleUpdate = async () => {
+  if (
+    !formData.full_name ||
+    !formData.email ||
+    !formData.class ||
+    !formData.section ||
+    !formData.roll_no ||
+    !formData.gender ||
+    !formData.dob ||
+    !formData.phone ||
+    !formData.address
+  ) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  const response = await fetch(
+    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateStudent.php",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (data.status) {
+    setShowEditModal(false);
+
+    setFormData({
+      full_name: "",
+      email: "",
+      password: "",
+      class: "",
+      section: "",
+      roll_no: "",
+      gender: "",
+      dob: "",
+      phone: "",
+      address: "",
+    });
+
+    fetchStudents();
+  }
 };
 
   // ---------- Generate page numbers with ellipsis ----------
@@ -315,7 +363,28 @@ useEffect(() => {
                           <Eye size={15} />
                         </button>
 
-                        <button className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition" title="Modify Record">
+                        <button
+                          onClick={() => {
+                              setFormData({
+                                id: student.user_id || student.id,
+                                full_name: student.full_name,
+                                email: student.email,
+                                password: "",
+                                class: student.class,
+                                section: student.section,
+                                roll_no: student.roll_no,
+                                gender: student.gender,
+                                dob: student.dob,
+                                phone: student.phone,
+                                address: student.address,
+                                status: student.status,
+                              });
+
+                              setShowEditModal(true);
+
+                          }}
+                          className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
+                        >
                           <Pencil size={15} />
                         </button>
 
@@ -405,35 +474,11 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* <div> */}
-                {/* <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Family Profile Architecture</h4> */}
-                {/* <div className="space-y-3.5"> */}
-                  {/* <div className="flex justify-between items-center border-b border-gray-100/70 pb-3">
-                    <div>
-                      <span className="text-xs text-gray-400 block">Father's Full Name</span>
-                      <span className="text-sm font-semibold text-gray-800">{selectedStudent.parents.fatherName}</span>
-                    </div>
-                    <span className="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-xl font-medium">
-                      {selectedStudent.parents.fatherOccupation}
-                    </span>
-                  </div> */}
-
-                  {/* <div className="flex justify-between items-center pt-1">
-                    <div>
-                      <span className="text-xs text-gray-400 block">Mother's Full Name</span>
-                      <span className="text-sm font-semibold text-gray-800">{selectedStudent.parents.motherName}</span>
-                    </div>
-                    <span className="bg-purple-50 text-purple-700 text-xs px-3 py-1 rounded-xl font-medium">
-                      {selectedStudent.parents.motherOccupation}
-                    </span>
-                  </div> */}
-                {/* </div> */}
-              {/* </div> */}
             </div>
 
             <div className="p-4 bg-gray-50/50 flex justify-end border-t border-gray-100/60">
               <button
-                onClick={() => setviewStudent(null)}
+                onClick={() => setViewStudent(null)}
                 className="px-5 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition shadow-sm"
               >
                 Close View
@@ -457,7 +502,7 @@ useEffect(() => {
           onClick={() => setShowAddModal(false)}
           className="text-2xl"
         >
-          ×
+          x
         </button>
       </div>
 
@@ -553,6 +598,16 @@ useEffect(() => {
           className="border rounded-xl p-3 md:col-span-2"
           rows="3"
         />
+        <select
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          className="border rounded-xl p-3 md:col-span-2"
+        >
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Inactive">Inactive</option>
+        </select>
 
       </div>
 
@@ -577,6 +632,141 @@ useEffect(() => {
     </div>
   </div>
 )}
+
+{showEditModal && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white rounded-3xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto">
+
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">
+          Edit Student
+        </h2>
+
+        <button
+          onClick={() => setShowEditModal(false)}
+          className="text-2xl"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+
+        <input
+          type="text"
+          name="full_name"
+          placeholder="Full Name"
+          value={formData.full_name}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Leave blank to keep old password"
+          value={formData.password}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <input
+          type="text"
+          name="class"
+          placeholder="Class"
+          value={formData.class}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <input
+          type="text"
+          name="section"
+          placeholder="Section"
+          value={formData.section}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <input
+          type="text"
+          name="roll_no"
+          placeholder="Roll No"
+          value={formData.roll_no}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        >
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+
+        <input
+          type="date"
+          name="dob"
+          value={formData.dob}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone"
+          value={formData.phone}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+
+        <textarea
+          name="address"
+          placeholder="Address"
+          value={formData.address}
+          onChange={handleChange}
+          className="border rounded-xl p-3 md:col-span-2"
+          rows="3"
+        />
+
+      </div>
+
+      <div className="flex justify-end gap-3 mt-6">
+
+        <button
+          onClick={() => setShowEditModal(false)}
+          className="px-5 py-2 rounded-xl border"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleUpdate}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl"
+        >
+          Update Student
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
