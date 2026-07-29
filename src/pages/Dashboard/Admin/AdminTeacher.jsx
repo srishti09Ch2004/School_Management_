@@ -182,7 +182,7 @@ const handleSubmit = async () => {
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-2xl flex items-center gap-2 transition shadow-sm"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition shadow-sm font-medium text-sm"
         >
           <Plus size={18} />
           Add Teacher
@@ -213,8 +213,7 @@ const handleSubmit = async () => {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
-        <div className="relative max-w-md">
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center">        <div className="relative max-w-md">
           <Search
             size={18}
             className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -295,9 +294,9 @@ const handleSubmit = async () => {
                   </td>
 
                   <td className="text-center">
-                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                        Active
-                      </span>
+                    <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
+                      Active
+                    </span>
                   </td>
 
                   <td>
@@ -329,7 +328,7 @@ const handleSubmit = async () => {
 
       {showAddModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-3xl w-full max-w-3xl p-6">
+          <div className="bg-white rounded-3xl w-full max-w-4xl p-6">
 
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">
@@ -344,7 +343,7 @@ const handleSubmit = async () => {
               </button>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-5 mt-5">
 
             <input
               type="text"
@@ -352,7 +351,7 @@ const handleSubmit = async () => {
               placeholder="Full Name"
               value={formData.full_name}
               onChange={handleChange}
-              className="border rounded-xl p-3"
+              className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <input
@@ -361,7 +360,7 @@ const handleSubmit = async () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="border rounded-xl p-3"
+              className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <input
@@ -370,7 +369,7 @@ const handleSubmit = async () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="border rounded-xl p-3"
+              className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <input
@@ -379,7 +378,7 @@ const handleSubmit = async () => {
               placeholder="Employee ID"
               value={formData.employee_id}
               onChange={handleChange}
-              className="border rounded-xl p-3"
+              className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <input
@@ -388,7 +387,7 @@ const handleSubmit = async () => {
               placeholder="Department"
               value={formData.department}
               onChange={handleChange}
-              className="border rounded-xl p-3"
+              className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <input
@@ -397,7 +396,7 @@ const handleSubmit = async () => {
               placeholder="Qualification"
               value={formData.qualification}
               onChange={handleChange}
-              className="border rounded-xl p-3"
+              className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <input
@@ -406,7 +405,7 @@ const handleSubmit = async () => {
               placeholder="Phone"
               value={formData.phone}
               onChange={handleChange}
-              className="border rounded-xl p-3"
+              className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <textarea
@@ -433,7 +432,7 @@ const handleSubmit = async () => {
               onClick={handleSubmit}
               className="bg-green-600 text-white px-6 py-2 rounded-xl"
             >
-              Save Teacher
+              Add Teacher
             </button>
 
           </div>
@@ -450,13 +449,17 @@ const handleSubmit = async () => {
           <div className="flex justify-between items-center p-6 border-b">
 
             <div>
-              <h2 className="text-2xl font-bold">
+              <h2 className="text-2xl font-bold text-gray-800">
                 {viewTeacher.full_name}
               </h2>
 
               <p className="text-sm text-gray-500">
                 {viewTeacher.department}
               </p>
+
+              <span className="inline-block mt-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                Active Teacher
+              </span>
             </div>
 
             <button
@@ -467,37 +470,38 @@ const handleSubmit = async () => {
             </button>
 
           </div>
+            
 
-          <div className="p-6 space-y-4">
+           <div className="p-6 grid grid-cols-2 gap-5">
 
-            <div>
-              <span className="text-gray-500 text-sm">Email</span>
-              <p className="font-semibold">{viewTeacher.email}</p>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500">Email</p>
+              <p className="font-semibold mt-1">{viewTeacher.email}</p>
             </div>
 
-            <div>
-              <span className="text-gray-500 text-sm">Employee ID</span>
-              <p className="font-semibold">{viewTeacher.employee_id}</p>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500">Employee ID</p>
+              <p className="font-semibold mt-1">{viewTeacher.employee_id}</p>
             </div>
 
-            <div>
-              <span className="text-gray-500 text-sm">Department</span>
-              <p className="font-semibold">{viewTeacher.department}</p>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500">Department</p>
+              <p className="font-semibold mt-1">{viewTeacher.department}</p>
             </div>
 
-            <div>
-              <span className="text-gray-500 text-sm">Qualification</span>
-              <p className="font-semibold">{viewTeacher.qualification}</p>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500">Qualification</p>
+              <p className="font-semibold mt-1">{viewTeacher.qualification}</p>
             </div>
 
-            <div>
-              <span className="text-gray-500 text-sm">Phone</span>
-              <p className="font-semibold">{viewTeacher.phone}</p>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500">Phone</p>
+              <p className="font-semibold mt-1">{viewTeacher.phone}</p>
             </div>
 
-            <div>
-              <span className="text-gray-500 text-sm">Address</span>
-              <p className="font-semibold">{viewTeacher.address}</p>
+            <div className="bg-gray-50 rounded-xl p-4 col-span-2">
+              <p className="text-xs text-gray-500">Address</p>
+              <p className="font-semibold mt-1">{viewTeacher.address}</p>
             </div>
 
           </div>
