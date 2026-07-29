@@ -7,6 +7,7 @@ import {
   BookOpen,
   Pencil,
   Trash2,
+  Eye,
 } from "lucide-react";
 
 export default function AdminTeacher() {
@@ -16,6 +17,8 @@ export default function AdminTeacher() {
 
   const itemsPerPage = 5;
   const [showAddModal, setShowAddModal] = useState(false);
+  const [viewTeacher, setViewTeacher] = useState(null);
+  const [loading, setLoading] = useState(false);
 
 const [formData, setFormData] = useState({
   full_name: "",
@@ -64,11 +67,54 @@ useEffect(() => {
   fetchTeachers();
 }, []);
 
+const filteredTeachers = useMemo(() => {
+
+  let result = teachers;
+
+  if (searchQuery.trim() !== "") {
+
+    const query = searchQuery.toLowerCase();
+
+    result = teachers.filter(
+      (teacher) =>
+        teacher.full_name.toLowerCase().includes(query) ||
+        teacher.department.toLowerCase().includes(query) ||
+        teacher.employee_id.toLowerCase().includes(query)
+    );
+
+  }
+
+  return result;
+
+}, [teachers, searchQuery]);
+
 const handleChange = (e) => {
   setFormData({
     ...formData,
     [e.target.name]: e.target.value,
   });
+};
+
+
+const handleView = async (id) => {
+
+  console.log(id);
+
+  setLoading(true);
+
+  const res = await fetch(
+    `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/teacher-view.php?id=${id}`
+  );
+
+  const data = await res.json();
+
+  console.log(data);
+
+  if (data.status) {
+    setViewTeacher(data.data);
+  }
+
+  setLoading(false);
 };
 
 const handleSubmit = async () => {
@@ -124,7 +170,7 @@ const handleSubmit = async () => {
   return (
     <div className="space-y-7">
       {/* Header */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between gap-4">
+      <div className="bg-white rounded-3xl p-7 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
             Teacher Management
@@ -136,7 +182,7 @@ const handleSubmit = async () => {
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition shadow-sm"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-2xl flex items-center gap-2 transition shadow-sm"
         >
           <Plus size={18} />
           Add Teacher
@@ -177,6 +223,8 @@ const handleSubmit = async () => {
           <input
             type="text"
             placeholder="Search teacher..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full border border-gray-200 rounded-2xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
@@ -190,7 +238,7 @@ const handleSubmit = async () => {
           </h2>
 
           <span className="text-sm text-gray-500">
-            Total : {teachers.length}
+            Total : {filteredTeachers.length}
           </span>
         </div>
 
@@ -225,7 +273,7 @@ const handleSubmit = async () => {
             </thead>
 
             <tbody>
-              {teachers.map((teacher) => (
+              {filteredTeachers.map((teacher) => (
                 <tr
                   key={teacher.id}
                   className="border-t border-gray-100 hover:bg-gray-50 transition"
@@ -254,13 +302,22 @@ const handleSubmit = async () => {
 
                   <td>
                     <div className="flex justify-center gap-2">
-                      <button className="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition">
-                        <Pencil size={16} />
+
+                      <button
+                        onClick={() => handleView(teacher.id)}
+                        className="w-9 h-9 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200"
+                      >
+                        <Eye size={16}/>
                       </button>
 
-                      <button className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200 transition">
-                        <Trash2 size={16} />
+                      <button>
+                        <Pencil size={16}/>
                       </button>
+
+                      <button>
+                        <Trash2 size={16}/>
+                      </button>
+
                     </div>
                   </td>
                 </tr>
@@ -283,7 +340,7 @@ const handleSubmit = async () => {
                 onClick={() => setShowAddModal(false)}
                 className="text-3xl"
               >
-                ×
+                x
               </button>
             </div>
 
@@ -384,6 +441,82 @@ const handleSubmit = async () => {
           </div>
         </div>
       )}
+
+      {viewTeacher && (
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+        <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-xl">
+
+          <div className="flex justify-between items-center p-6 border-b">
+
+            <div>
+              <h2 className="text-2xl font-bold">
+                {viewTeacher.full_name}
+              </h2>
+
+              <p className="text-sm text-gray-500">
+                {viewTeacher.department}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setViewTeacher(null)}
+              className="text-2xl"
+            >
+              x
+            </button>
+
+          </div>
+
+          <div className="p-6 space-y-4">
+
+            <div>
+              <span className="text-gray-500 text-sm">Email</span>
+              <p className="font-semibold">{viewTeacher.email}</p>
+            </div>
+
+            <div>
+              <span className="text-gray-500 text-sm">Employee ID</span>
+              <p className="font-semibold">{viewTeacher.employee_id}</p>
+            </div>
+
+            <div>
+              <span className="text-gray-500 text-sm">Department</span>
+              <p className="font-semibold">{viewTeacher.department}</p>
+            </div>
+
+            <div>
+              <span className="text-gray-500 text-sm">Qualification</span>
+              <p className="font-semibold">{viewTeacher.qualification}</p>
+            </div>
+
+            <div>
+              <span className="text-gray-500 text-sm">Phone</span>
+              <p className="font-semibold">{viewTeacher.phone}</p>
+            </div>
+
+            <div>
+              <span className="text-gray-500 text-sm">Address</span>
+              <p className="font-semibold">{viewTeacher.address}</p>
+            </div>
+
+          </div>
+
+          <div className="p-5 border-t flex justify-end">
+
+            <button
+              onClick={() => setViewTeacher(null)}
+              className="px-5 py-2 rounded-xl border"
+            >
+              Close
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    )}
     </div>
   );
 }
