@@ -294,7 +294,7 @@ const handleDelete = async (id) => {
         </div>
         <button
             onClick={() => setShowAddModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition shadow-sm font-medium text-sm w-full sm:w-auto justify-center"
+            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition shadow-sm"
           >
             <Plus size={18} />
             Add Student

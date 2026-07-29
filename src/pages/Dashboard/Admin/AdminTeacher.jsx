@@ -15,6 +15,18 @@ export default function AdminTeacher() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 5;
+  const [showAddModal, setShowAddModal] = useState(false);
+
+const [formData, setFormData] = useState({
+  full_name: "",
+  email: "",
+  password: "",
+  employee_id: "",
+  department: "",
+  qualification: "",
+  phone: "",
+  address: "",
+});
 
   const stats = [
   {
@@ -51,7 +63,63 @@ export default function AdminTeacher() {
 useEffect(() => {
   fetchTeachers();
 }, []);
-  
+
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const handleSubmit = async () => {
+
+  if (
+    !formData.full_name ||
+    !formData.email ||
+    !formData.password ||
+    !formData.employee_id ||
+    !formData.department ||
+    !formData.qualification ||
+    !formData.phone ||
+    !formData.address
+  ) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  const response = await fetch(
+    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addTeacher.php",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (data.status) {
+
+    setShowAddModal(false);
+
+    setFormData({
+      full_name: "",
+      email: "",
+      password: "",
+      employee_id: "",
+      department: "",
+      qualification: "",
+      phone: "",
+      address: "",
+    });
+
+    fetchTeachers();
+  }
+};
 
   return (
     <div className="space-y-7">
@@ -66,7 +134,10 @@ useEffect(() => {
           </p>
         </div>
 
-        <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition shadow-sm">
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition shadow-sm"
+        >
           <Plus size={18} />
           Add Teacher
         </button>
@@ -198,6 +269,121 @@ useEffect(() => {
           </table>
         </div>
       </div>
+
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-3xl w-full max-w-3xl p-6">
+
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">
+                Add Teacher
+              </h2>
+
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-3xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+
+            <input
+              type="text"
+              name="full_name"
+              placeholder="Full Name"
+              value={formData.full_name}
+              onChange={handleChange}
+              className="border rounded-xl p-3"
+            />
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className="border rounded-xl p-3"
+            />
+
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="border rounded-xl p-3"
+            />
+
+            <input
+              type="text"
+              name="employee_id"
+              placeholder="Employee ID"
+              value={formData.employee_id}
+              onChange={handleChange}
+              className="border rounded-xl p-3"
+            />
+
+            <input
+              type="text"
+              name="department"
+              placeholder="Department"
+              value={formData.department}
+              onChange={handleChange}
+              className="border rounded-xl p-3"
+            />
+
+            <input
+              type="text"
+              name="qualification"
+              placeholder="Qualification"
+              value={formData.qualification}
+              onChange={handleChange}
+              className="border rounded-xl p-3"
+            />
+
+            <input
+              type="text"
+              name="phone"
+              placeholder="Phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="border rounded-xl p-3"
+            />
+
+            <textarea
+              name="address"
+              placeholder="Address"
+              value={formData.address}
+              onChange={handleChange}
+              className="border rounded-xl p-3 md:col-span-2"
+              rows="3"
+            />
+
+          </div>
+
+          <div className="flex justify-end gap-3 mt-6">
+
+            <button
+              onClick={() => setShowAddModal(false)}
+              className="px-5 py-2 rounded-xl border"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleSubmit}
+              className="bg-green-600 text-white px-6 py-2 rounded-xl"
+            >
+              Save Teacher
+            </button>
+
+          </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
