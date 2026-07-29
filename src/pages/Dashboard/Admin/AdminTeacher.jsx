@@ -17,6 +17,7 @@ export default function AdminTeacher() {
 
   const itemsPerPage = 5;
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [viewTeacher, setViewTeacher] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -167,6 +168,33 @@ const handleSubmit = async () => {
   }
 };
 
+const handleUpdate = async () => {
+
+  const response = await fetch(
+    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateTeacher.php",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (data.status) {
+
+    setShowEditModal(false);
+
+    fetchTeachers();
+
+  }
+
+};
+
   return (
     <div className="space-y-7">
       {/* Header */}
@@ -309,7 +337,24 @@ const handleSubmit = async () => {
                         <Eye size={16}/>
                       </button>
 
-                      <button>
+                      <button
+                        onClick={() => {
+                          setFormData({
+                            id: teacher.id,
+                            full_name: teacher.full_name,
+                            email: teacher.email,
+                            password: "",
+                            employee_id: teacher.employee_id,
+                            department: teacher.department,
+                            qualification: teacher.qualification,
+                            phone: teacher.phone,
+                            address: teacher.address,
+                          });
+
+                          setShowEditModal(true);
+                        }}
+                        className="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition"
+                      >
                         <Pencil size={16}/>
                       </button>
 
@@ -440,6 +485,121 @@ const handleSubmit = async () => {
           </div>
         </div>
       )}
+
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+            <div className="bg-white rounded-3xl w-full max-w-4xl p-6">
+
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">
+                  Edit Teacher
+                </h2>
+
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-3xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-5">
+
+                <input
+                  type="text"
+                  name="full_name"
+                  placeholder="Full Name"
+                  value={formData.full_name}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password change if needed.."
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                <input
+                  type="text"
+                  name="employee_id"
+                  placeholder="Employee ID"
+                  value={formData.employee_id}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                <input
+                  type="text"
+                  name="department"
+                  placeholder="Department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                <input
+                  type="text"
+                  name="qualification"
+                  placeholder="Qualification"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="Phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                <textarea
+                  name="address"
+                  placeholder="Address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  rows="3"
+                  className="border border-gray-200 rounded-xl px-4 py-3 md:col-span-2 focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="px-5 py-2 rounded-xl border"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleUpdate}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl"
+                >
+                  Update Teacher
+                </button>
+
+              </div>
+
+            </div>
+          </div>
+        )}
 
       {viewTeacher && (
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
