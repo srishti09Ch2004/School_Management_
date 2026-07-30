@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from "react";
 import {
   Search,
   Plus,
@@ -9,59 +10,158 @@ import {
 } from "lucide-react";
 
 export default function AdminFees() {
+const [fees, setFees] = useState([]);
+const [searchQuery, setSearchQuery] = useState("");
+const [showFeeModal, setShowFeeModal] = useState(false);
+const [viewFee, setViewFee] = useState(null);
+
+const [students, setStudents] = useState([]);
+
+const [feeForm, setFeeForm] = useState({
+  student_id: "",
+  total_fee: "",
+  paid_fee: "",
+  payment_date: "",
+});
+
+const fetchFees = () => {
+  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/fees.php")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+
+      if (data.status) {
+        setFees(data.data);
+      }
+    });
+};
+
+useEffect(() => {
+  fetchFees();
+  fetchStudents();
+}, []);
+
+const handleFeeChange = (e) => {
+  setFeeForm({
+    ...feeForm,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const handleFeeSubmit = async () => {
+  if (
+    !feeForm.student_id ||
+    !feeForm.total_fee ||
+    !feeForm.paid_fee ||
+    !feeForm.payment_date
+  ) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  if (Number(feeForm.paid_fee) > Number(feeForm.total_fee)) {
+    alert("Paid fee cannot be greater than total fee");
+    return;
+  }
+
+  const response = await fetch(
+    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addFee.php",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(feeForm),
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (data.status) {
+    setShowFeeModal(false);
+
+    setFeeForm({
+      student_id: "",
+      total_fee: "",
+      paid_fee: "",
+      payment_date: "",
+    });
+
+    fetchFees();
+  }
+};
+
+
+const handleViewFee = (fee) => {
+  setViewFee(fee);
+};
+
+const fetchStudents = () => {
+  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feeStudents.php")
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        setStudents(data.data);
+      }
+    });
+};
+
+
+const collectedFees = fees.reduce(
+  (sum, fee) => sum + Number(fee.paid_fee || 0),
+  0
+);
+
+const pendingFees = fees.reduce(
+  (sum, fee) => sum + Number(fee.due_fee || 0),
+  0
+);
+
+const today = new Date().toISOString().split("T")[0];
+
+const todaysCollection = fees
+  .filter((fee) => fee.payment_date === today)
+  .reduce(
+    (sum, fee) => sum + Number(fee.paid_fee || 0),
+    0
+  );
+
   const stats = [
   {
     title: "Collected Fees",
-    value: "₹12.4 L",
+    value: `₹${collectedFees.toLocaleString("en-IN")}`,
     icon: IndianRupee,
     bg: "bg-green-100",
     iconColor: "text-green-600",
   },
   {
     title: "Pending Fees",
-    value: "₹3.8 L",
+    value: `₹${pendingFees.toLocaleString("en-IN")}`,
     icon: Wallet,
     bg: "bg-red-100",
     iconColor: "text-red-600",
   },
   {
     title: "Today's Collection",
-    value: "₹45,000",
+    value: `₹${todaysCollection.toLocaleString("en-IN")}`,
     icon: CircleDollarSign,
     bg: "bg-blue-100",
     iconColor: "text-blue-600",
   },
 ];
-  const fees = [
-    {
-      id: 1,
-      student: "Rahul Sharma",
-      class: "10-A",
-      amount: "₹25,000",
-      status: "Paid",
-    },
-    {
-      id: 2,
-      student: "Priya Singh",
-      class: "9-B",
-      amount: "₹20,000",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      student: "Ankit Verma",
-      class: "8-C",
-      amount: "₹18,000",
-      status: "Paid",
-    },
-    {
-      id: 4,
-      student: "Sneha Gupta",
-      class: "11-A",
-      amount: "₹28,000",
-      status: "Pending",
-    },
-  ];
+  
+
+const filteredFees = useMemo(() => {
+  const query = searchQuery.toLowerCase().trim();
+
+  if (!query) return fees;
+
+  return fees.filter((fee) =>
+    fee.full_name.toLowerCase().includes(query)
+  );
+}, [fees, searchQuery]);
 
   return (
     <div className="space-y-7">
@@ -77,7 +177,10 @@ export default function AdminFees() {
           </p>
         </div>
 
-        <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition">
+        <button
+          onClick={() => setShowFeeModal(true)}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition"
+        >
           <Plus size={18} />
           Collect Fee
         </button>
@@ -129,6 +232,8 @@ export default function AdminFees() {
           <input
             type="text"
             placeholder="Search student..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
@@ -142,7 +247,7 @@ export default function AdminFees() {
           </h2>
 
           <span className="text-sm text-gray-500">
-            Total : {fees.length}
+            Total : {filteredFees.length}
           </span>
         </div>
 
@@ -173,21 +278,33 @@ export default function AdminFees() {
             </thead>
 
             <tbody>
-              {fees.map((fee) => (
+              {filteredFees.map((fee) => (
                 <tr
                   key={fee.id}
                   className="border-t hover:bg-gray-50 transition"
                 >
                   <td className="px-6 py-5 font-medium text-gray-800">
-                    {fee.student}
+                    {fee.full_name}
                   </td>
 
                   <td className="px-6 py-5 text-center text-gray-600">
                     {fee.class}
                   </td>
 
-                  <td className="px-6 py-5 text-center font-semibold text-gray-700">
-                    {fee.amount}
+                 <td className="px-6 py-5 text-center">
+                    <div className="font-semibold text-gray-800">
+                      ₹{Number(fee.paid_fee).toLocaleString("en-IN")}
+                    </div>
+
+                    <div className="text-xs text-gray-400 mt-1">
+                      Total: ₹{Number(fee.total_fee).toLocaleString("en-IN")}
+                    </div>
+
+                    {Number(fee.due_fee) > 0 && (
+                      <div className="text-xs text-red-500 mt-1">
+                        Due: ₹{Number(fee.due_fee).toLocaleString("en-IN")}
+                      </div>
+                    )}
                   </td>
 
                   <td className="px-6 py-5 text-center">
@@ -204,7 +321,11 @@ export default function AdminFees() {
 
                   <td className="px-6 py-5">
                     <div className="flex justify-center gap-2">
-                      <button className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
+                      <button
+                        onClick={() => handleViewFee(fee)}
+                        className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
+                        title="View Fee Details"
+                      >
                         <Eye size={16} />
                       </button>
 
@@ -219,6 +340,195 @@ export default function AdminFees() {
           </table>
         </div>
       </div>
+
+      {showFeeModal && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+
+    <div className="bg-white rounded-3xl w-full max-w-2xl p-6">
+
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Collect Fee
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Add a new student fee payment record.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowFeeModal(false)}
+          className="text-2xl text-gray-400 hover:text-gray-700"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-5">
+
+        <select
+          name="student_id"
+          value={feeForm.student_id}
+          onChange={handleFeeChange}
+          className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="">Select Student</option>
+
+          {students.map((student) => (
+            <option key={student.id} value={student.id}>
+              {student.full_name} — Class {student.class}
+            </option>
+          ))}
+        </select>
+
+        <input
+          type="number"
+          name="total_fee"
+          placeholder="Total Fee"
+          value={feeForm.total_fee}
+          onChange={handleFeeChange}
+          className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <input
+          type="number"
+          name="paid_fee"
+          placeholder="Paid Fee"
+          value={feeForm.paid_fee}
+          onChange={handleFeeChange}
+          className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <input
+          type="date"
+          name="payment_date"
+          value={feeForm.payment_date}
+          onChange={handleFeeChange}
+          className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+      </div>
+
+      <div className="mt-5 bg-gray-50 rounded-2xl p-4">
+        <p className="text-sm text-gray-500">
+          Due Fee
+        </p>
+
+        <p className="text-xl font-bold text-gray-800 mt-1">
+          ₹
+          {Math.max(
+            0,
+            Number(feeForm.total_fee || 0) -
+            Number(feeForm.paid_fee || 0)
+          )}
+        </p>
+      </div>
+
+      <div className="flex justify-end gap-3 mt-6">
+
+        <button
+          onClick={() => setShowFeeModal(false)}
+          className="px-5 py-2 rounded-xl border border-gray-200"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleFeeSubmit}
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl"
+        >
+          Save Fee
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
+{viewFee && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+
+    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-xl">
+
+      <div className="p-6 border-b flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {viewFee.full_name}
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Class {viewFee.class} - {viewFee.section}
+          </p>
+        </div>
+
+        <button
+          onClick={() => setViewFee(null)}
+          className="text-2xl text-gray-400 hover:text-gray-700"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="p-6 grid grid-cols-2 gap-4">
+
+        <div className="bg-gray-50 rounded-xl p-4">
+          <p className="text-xs text-gray-500">Total Fee</p>
+          <p className="font-bold mt-1">
+            ₹{Number(viewFee.total_fee).toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        <div className="bg-gray-50 rounded-xl p-4">
+          <p className="text-xs text-gray-500">Paid Fee</p>
+          <p className="font-bold mt-1 text-green-600">
+            ₹{Number(viewFee.paid_fee).toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        <div className="bg-gray-50 rounded-xl p-4">
+          <p className="text-xs text-gray-500">Due Fee</p>
+          <p className="font-bold mt-1 text-red-600">
+            ₹{Number(viewFee.due_fee).toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        <div className="bg-gray-50 rounded-xl p-4">
+          <p className="text-xs text-gray-500">Payment Date</p>
+          <p className="font-semibold mt-1">
+            {viewFee.payment_date || "—"}
+          </p>
+        </div>
+
+        <div className="col-span-2 bg-gray-50 rounded-xl p-4">
+          <p className="text-xs text-gray-500">Status</p>
+
+          <span
+            className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${
+              viewFee.status === "Paid"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {viewFee.status}
+          </span>
+        </div>
+
+      </div>
+
+      <div className="p-5 border-t flex justify-end">
+        <button
+          onClick={() => setViewFee(null)}
+          className="px-5 py-2 rounded-xl border hover:bg-gray-50"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

@@ -7,22 +7,14 @@ include("../../config/db.php");
 
 $sql = "
 SELECT
-    fees.id,
-    fees.student_id,
+    students.id,
     users.full_name,
     students.class,
-    students.section,
-    fees.total_fee,
-    fees.paid_fee,
-    fees.due_fee,
-    fees.payment_date,
-    fees.status
-FROM fees
-INNER JOIN students
-    ON fees.student_id = students.id
+    students.section
+FROM students
 INNER JOIN users
     ON students.user_id = users.id
-ORDER BY fees.id DESC
+ORDER BY students.id DESC
 ";
 
 $result = mysqli_query($conn, $sql);
@@ -35,15 +27,14 @@ if (!$result) {
     exit;
 }
 
-$fees = [];
+$students = [];
 
 while ($row = mysqli_fetch_assoc($result)) {
-    $fees[] = $row;
+    $students[] = $row;
 }
 
 echo json_encode([
     "status" => true,
-    "data" => $fees
+    "data" => $students
 ]);
-
 ?>
