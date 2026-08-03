@@ -1,3 +1,5 @@
+import { useState, useEffect, useMemo } from "react";
+
 import {
   Search,
   Plus,
@@ -9,6 +11,111 @@ import {
 } from "lucide-react";
 
 export default function AdminExam() {
+  const [exams, setExams] = useState([]);
+const [searchQuery, setSearchQuery] = useState("");
+
+const [showAddModal, setShowAddModal] = useState(false);
+const [showEditModal, setShowEditModal] = useState(false);
+
+const [examForm, setExamForm] = useState({
+  exam_name: "",
+  class: "",
+  section: "",
+  subject: "",
+  exam_date: "",
+  start_time: "",
+  end_time: "",
+  total_marks: "",
+  passing_marks: "",
+  status: "Scheduled",
+});
+
+const [editExam, setEditExam] = useState(null);
+
+const fetchExams = () => {
+
+  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/exams.php")
+
+    .then((res) => res.json())
+
+    .then((data) => {
+
+      if (data.status) {
+
+        setExams(data.data);
+
+      }
+
+    });
+
+};
+
+useEffect(() => {
+
+    fetchExams();
+
+}, []);
+
+const handleChange = (e) => {
+
+    setExamForm({
+
+        ...examForm,
+
+        [e.target.name]: e.target.value
+
+    });
+
+};
+
+
+const handleSubmit = async () => {
+
+    const response = await fetch(
+        "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addExam.php",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify(examForm),
+        }
+    );
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    if (data.status) {
+
+        setShowAddModal(false);
+
+        setExamForm({
+            exam_name: "",
+            class_name: "",
+            exam_date: "",
+            status: "Upcoming",
+        });
+
+        fetchExams();
+    }
+};
+
+
+const filteredExams = useMemo(() => {
+
+  if (!searchQuery.trim()) return exams;
+
+  return exams.filter((exam) =>
+    exam.exam_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    exam.class_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+}, [exams, searchQuery]);
+
+
   const stats = [
   {
     title: "Total Exams",
@@ -33,29 +140,7 @@ export default function AdminExam() {
   },
 ];
 
-  const exams = [
-    {
-      id: 1,
-      exam: "Mid Term",
-      class: "10-A",
-      date: "15 Aug 2026",
-      status: "Upcoming",
-    },
-    {
-      id: 2,
-      exam: "Unit Test",
-      class: "9-B",
-      date: "20 Jul 2026",
-      status: "Completed",
-    },
-    {
-      id: 3,
-      exam: "Final Exam",
-      class: "8-C",
-      date: "10 Dec 2026",
-      status: "Scheduled",
-    },
-  ];
+
 
   return (
     <div className="space-y-7">
@@ -71,10 +156,13 @@ export default function AdminExam() {
           </p>
         </div>
 
-        <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition">
-          <Plus size={18} />
-          Add Exam
-        </button>
+        <button
+            onClick={() => setShowAddModal(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition"
+          >
+            <Plus size={18} />
+            Add Exam
+          </button>
       </div>
 
       {/* Stats */}
@@ -123,6 +211,8 @@ export default function AdminExam() {
           <input
             type="text"
             placeholder="Search exam..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
@@ -136,7 +226,7 @@ export default function AdminExam() {
           </h2>
 
           <span className="text-sm text-gray-500">
-            Total : {exams.length}
+            Total : {filteredExams.length}
           </span>
         </div>
 
@@ -167,7 +257,7 @@ export default function AdminExam() {
             </thead>
 
             <tbody>
-              {exams.map((exam) => (
+              {filteredExams.map((exam) => (
                 <tr
                   key={exam.id}
                   className="border-t hover:bg-gray-50 transition"

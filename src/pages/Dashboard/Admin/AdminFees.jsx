@@ -81,7 +81,14 @@ const handleFeeSubmit = async () => {
     }
   );
 
+const handlePayFee = (fee) => {
+  setPayFeeData(fee);
 
+  setPaymentForm({
+    payment_amount: "",
+    payment_date: new Date().toISOString().split("T")[0],
+  });
+};
 
   const data = await response.json();
 
