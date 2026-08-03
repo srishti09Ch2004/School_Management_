@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export default function AdminExam() {
-  const [exams, setExams] = useState([]);
+const [exams, setExams] = useState([]);
 const [searchQuery, setSearchQuery] = useState("");
 
 const [showAddModal, setShowAddModal] = useState(false);
@@ -108,6 +108,43 @@ const handleSubmit = async () => {
     }
 };
 
+const handleUpdate = async () => {
+
+  const response = await fetch(
+    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateExam.php",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      
+      body: JSON.stringify({
+        id: editExam.id,
+        ...examForm,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (data.status) {
+
+    setShowEditModal(false);
+
+    setEditExam(null);
+      console.log({
+      id: editExam.id,
+      ...examForm,
+      });
+    fetchExams();
+
+  }
+
+};
 
 const filteredExams = useMemo(() => {
 
@@ -318,9 +355,27 @@ const stats = [
                 <td className="px-6 py-5">
                   <div className="flex justify-center gap-2">
                     <button
-                      className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
+                    onClick={() => {
+                    setEditExam(exam);
+                    setExamForm({
+                    exam_name: exam.exam_name,
+                    class: exam.class,
+                    section: exam.section,
+                    subject: exam.subject,
+                    exam_date: exam.exam_date,
+                    start_time: exam.start_time,
+                    end_time: exam.end_time,
+                    total_marks: exam.total_marks,
+                    passing_marks: exam.passing_marks,
+                    status: exam.status,
+
+                    });
+                    setShowEditModal(true);
+
+                    }}
+                    className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
                     >
-                      <Pencil size={16} />
+                    <Pencil size={16}/>
                     </button>
 
                     <button
@@ -337,15 +392,15 @@ const stats = [
         </div>
       </div>
       {
-    showAddModal && (
+    (showAddModal || showEditModal) && (
 
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
     <div className="bg-white rounded-3xl shadow-2xl p-8 w-[700px] max-h-[90vh] overflow-y-auto">
 
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">
-              Add New Exam
+          <h2 className="text-2xl font-bold mb-6">
+            {editExam ? "Edit Exam" : "Add Exam"}
           </h2>
 
           <p className="text-gray-500 mt-2">
@@ -468,17 +523,34 @@ const stats = [
     <div className="flex justify-end gap-4 mt-8 border-t pt-6">
 
             <button
-            onClick={()=>setShowAddModal(false)}
+            onClick={() => {
+              setShowAddModal(false);
+              setShowEditModal(false);
+              setEditExam(null);
+
+              setExamForm({
+                exam_name: "",
+                class: "",
+                section: "",
+                subject: "",
+                exam_date: "",
+                start_time: "",
+                end_time: "",
+                total_marks: "",
+                passing_marks: "",
+                status: "Scheduled",
+              });
+            }}
             className="px-6 py-3 rounded-xl border border-gray-300 hover:bg-gray-100 transition"
             >
             Cancel
             </button>
 
             <button
-            onClick={handleSubmit}
-            className="bg-green-600 hover:bg-green-700 text-white px-7 py-3 rounded-xl shadow-lg transition"
-            >
-            Save Exam
+              onClick={editExam ? handleUpdate : handleSubmit}
+              className="bg-green-600 text-white px-5 py-2 rounded-xl"
+              >
+              {editExam ? "Update Exam" : "Save Exam"}
             </button>
 
     </div>
