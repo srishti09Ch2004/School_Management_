@@ -146,6 +146,40 @@ const handleUpdate = async () => {
 
 };
 
+
+const handleDelete = async (id) => {
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this exam?"
+  );
+
+  if (!confirmDelete) return;
+
+  const response = await fetch(
+    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteExam.php",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        id,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (data.status) {
+    fetchExams();
+  }
+
+};
+
 const filteredExams = useMemo(() => {
 
   if (!searchQuery.trim()) return exams;
@@ -379,9 +413,10 @@ const stats = [
                     </button>
 
                     <button
-                      className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
+                    onClick={() => handleDelete(exam.id)}
+                    className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
                     >
-                      <Trash2 size={16} />
+                    <Trash2 size={16}/>
                     </button>
                   </div>
                 </td>
