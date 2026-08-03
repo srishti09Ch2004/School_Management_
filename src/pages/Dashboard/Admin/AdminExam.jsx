@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-
 import {
   Search,
   Plus,
@@ -94,9 +93,15 @@ const handleSubmit = async () => {
 
         setExamForm({
             exam_name: "",
-            class_name: "",
+            class: "",
+            section: "",
+            subject: "",
             exam_date: "",
-            status: "Upcoming",
+            start_time: "",
+            end_time: "",
+            total_marks: "",
+            passing_marks: "",
+            status: "Scheduled",
         });
 
         fetchExams();
@@ -110,30 +115,36 @@ const filteredExams = useMemo(() => {
 
   return exams.filter((exam) =>
     exam.exam_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    exam.class_name.toLowerCase().includes(searchQuery.toLowerCase())
+    exam.class.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
 }, [exams, searchQuery]);
 
 
-  const stats = [
+const stats = [
   {
     title: "Total Exams",
-    value: "18",
+    value: exams.length,
     icon: ClipboardCheck,
     bg: "bg-red-100",
     iconColor: "text-red-600",
   },
+
   {
     title: "Upcoming Exams",
-    value: "5",
+    value: exams.filter(
+      (item) => item.status === "Upcoming"
+    ).length,
     icon: CalendarDays,
     bg: "bg-green-100",
     iconColor: "text-green-600",
   },
+
   {
     title: "Results Published",
-    value: "13",
+    value: exams.filter(
+      (item) => item.status === "Completed"
+    ).length,
     icon: Award,
     bg: "bg-blue-100",
     iconColor: "text-blue-600",
@@ -157,11 +168,11 @@ const filteredExams = useMemo(() => {
         </div>
 
         <button
-            onClick={() => setShowAddModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition"
+          onClick={() => setShowAddModal(true)}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition"
           >
-            <Plus size={18} />
-            Add Exam
+              <Plus size={18}/>
+              Add Exam
           </button>
       </div>
 
@@ -232,79 +243,252 @@ const filteredExams = useMemo(() => {
 
         <div className="overflow-x-auto">
           <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr className="text-sm text-gray-600">
-                <th className="px-6 py-4 text-left">
-                  Exam Name
-                </th>
+          <thead className="bg-gray-50">
+            <tr className="text-sm text-gray-600">
+              <th className="px-6 py-4 text-left">Exam</th>
 
-                <th className="px-6 py-4 text-center">
-                  Class
-                </th>
+              <th className="px-6 py-4 text-center">Subject</th>
 
-                <th className="px-6 py-4 text-center">
-                  Date
-                </th>
+              <th className="px-6 py-4 text-center">Class</th>
 
-                <th className="px-6 py-4 text-center">
-                  Status
-                </th>
+              <th className="px-6 py-4 text-center">Date</th>
 
-                <th className="px-6 py-4 text-center">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+              <th className="px-6 py-4 text-center">Time</th>
 
-            <tbody>
-              {filteredExams.map((exam) => (
-                <tr
-                  key={exam.id}
-                  className="border-t hover:bg-gray-50 transition"
-                >
-                  <td className="px-6 py-5 font-medium text-gray-800">
-                    {exam.exam}
-                  </td>
+              <th className="px-6 py-4 text-center">Marks</th>
 
-                  <td className="px-6 py-5 text-center text-gray-600">
-                    {exam.class}
-                  </td>
+              <th className="px-6 py-4 text-center">Status</th>
 
-                  <td className="px-6 py-5 text-center text-gray-600">
-                    {exam.date}
-                  </td>
+              <th className="px-6 py-4 text-center">Actions</th>
+            </tr>
+          </thead>
 
-                  <td className="px-6 py-5 text-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        exam.status === "Completed"
-                          ? "bg-green-100 text-green-700"
-                          : exam.status === "Upcoming"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
+          <tbody>
+            {filteredExams.map((exam) => (
+              <tr
+                key={exam.id}
+                className="border-t hover:bg-gray-50 transition"
+              >
+                {/* Exam Name */}
+                <td className="px-6 py-5 font-medium text-gray-800">
+                  {exam.exam_name}
+                </td>
+
+                {/* Subject */}
+                <td className="px-6 py-5 text-center text-gray-600">
+                  {exam.subject}
+                </td>
+
+                {/* Class */}
+                <td className="px-6 py-5 text-center text-gray-600">
+                  {exam.class}-{exam.section}
+                </td>
+
+                {/* Date */}
+                <td className="px-6 py-5 text-center text-gray-600">
+                  {exam.exam_date}
+                </td>
+
+                {/* Time */}
+                <td className="px-6 py-5 text-center text-gray-600">
+                  {exam.start_time} - {exam.end_time}
+                </td>
+
+                {/* Marks */}
+                <td className="px-6 py-5 text-center text-gray-600">
+                  {exam.total_marks}
+                </td>
+
+                {/* Status */}
+                <td className="px-6 py-5 text-center">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      exam.status === "Completed"
+                        ? "bg-green-100 text-green-700"
+                        : exam.status === "Upcoming"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-blue-100 text-blue-700"
+                    }`}
+                  >
+                    {exam.status}
+                  </span>
+                </td>
+
+                {/* Actions */}
+                <td className="px-6 py-5">
+                  <div className="flex justify-center gap-2">
+                    <button
+                      className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
                     >
-                      {exam.status}
-                    </span>
-                  </td>
+                      <Pencil size={16} />
+                    </button>
 
-                  <td className="px-6 py-5">
-                    <div className="flex justify-center gap-2">
-                      <button className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
-                        <Pencil size={16} />
-                      </button>
-
-                      <button className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <button
+                      className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         </div>
       </div>
+      {
+    showAddModal && (
+
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+    <div className="bg-white rounded-3xl shadow-2xl p-8 w-[700px] max-h-[90vh] overflow-y-auto">
+
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">
+              Add New Exam
+          </h2>
+
+          <p className="text-gray-500 mt-2">
+              Fill all exam information below.
+          </p>
+      </div>
+
+    <div className="grid grid-cols-2 gap-5">
+              
+            <input
+              name="exam_name"
+              placeholder="Exam Name"
+              value={examForm.exam_name}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+            />
+
+            <input
+              name="class"
+              placeholder="Class"
+              value={examForm.class}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              />
+
+            <input
+                name="section"
+                placeholder="Section"
+                value={examForm.section}
+                onChange={handleChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              />
+
+              <input
+                  name="subject"
+                  placeholder="Subject"
+                  value={examForm.subject}
+                  onChange={handleChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                />
+
+           <div>
+                <label className="text-sm text-gray-600 mb-1 block">
+                Exam Date
+                </label>
+
+                <input
+                type="date"
+                name="exam_date"
+                value={examForm.exam_date}
+                onChange={handleChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3"
+                />
+                </div>
+
+                <div>
+                <label className="text-sm text-gray-600 mb-1 block">
+                Start Time
+                </label>
+
+                <input
+                type="time"
+                name="start_time"
+                value={examForm.start_time}
+                onChange={handleChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3"
+                />
+                </div>
+
+                <div>
+                <label className="text-sm text-gray-600 mb-1 block">
+                End Time
+                </label>
+
+                <input
+                type="time"
+                name="end_time"
+                
+                value={examForm.end_time}
+                onChange={handleChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3"
+                />
+                </div>
+
+              <input
+                  type="number"
+                  name="total_marks"
+                  placeholder="Total Marks"
+                  value={examForm.total_marks}
+                  onChange={handleChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                />
+
+                <input
+                    type="number"
+                    name="passing_marks"
+                    placeholder="Passing Marks"
+                    value={examForm.passing_marks}
+                    onChange={handleChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                />
+
+            <select
+            name="status"
+            value={examForm.status}
+            onChange={handleChange}
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+            >
+
+            <option>Upcoming</option>
+
+            <option>Scheduled</option>
+
+            <option>Completed</option>
+
+            </select>
+
+    </div>
+
+    <div className="flex justify-end gap-4 mt-8 border-t pt-6">
+
+            <button
+            onClick={()=>setShowAddModal(false)}
+            className="px-6 py-3 rounded-xl border border-gray-300 hover:bg-gray-100 transition"
+            >
+            Cancel
+            </button>
+
+            <button
+            onClick={handleSubmit}
+            className="bg-green-600 hover:bg-green-700 text-white px-7 py-3 rounded-xl shadow-lg transition"
+            >
+            Save Exam
+            </button>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    )
+    }
     </div>
   );
 }
