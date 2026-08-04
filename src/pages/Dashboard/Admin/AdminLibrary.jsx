@@ -17,6 +17,8 @@ export default function AdminLibrary() {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingBook, setEditingBook] = useState(null);
 
   const [bookForm, setBookForm] = useState({
     title: "",
@@ -122,7 +124,60 @@ const handleAddBook = async () => {
 
   }
 };
-  const filteredBooks = useMemo(() => {
+
+const handleUpdateBook = async () => {
+
+  if (
+    !editingBook.title ||
+    !editingBook.author ||
+    !editingBook.category ||
+    !editingBook.isbn ||
+    !editingBook.total_copies
+  ) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateBook.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editingBook),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.status) {
+
+      alert(data.message);
+
+      setShowEditModal(false);
+      setEditingBook(null);
+
+      fetchBooks();
+
+    } else {
+
+      alert(data.message);
+
+    }
+
+  } catch (error) {
+
+    console.error("Update Book Error:", error);
+
+    alert("Something went wrong while updating the book.");
+
+  }
+};
+
+const filteredBooks = useMemo(() => {
 
   return books.filter((book) => {
 
@@ -396,7 +451,20 @@ const stats = [
 
                   <td className="px-6 py-5">
                     <div className="flex justify-center gap-2">
-                      <button className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
+                      <button
+                        onClick={() => {
+                          setEditingBook({
+                            ...book,
+                            price: book.price || "",
+                            total_copies: book.total_copies || "",
+                            description: book.description || "",
+                          });
+
+                          setShowEditModal(true);
+                        }}
+                        className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
+                        title="Edit Book"
+                      >
                         <Pencil size={16} />
                       </button>
 
@@ -693,6 +761,277 @@ const stats = [
                 className="px-6 py-2.5 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition"
               >
                 Save Book
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* Edit Book Modal */}
+
+      {showEditModal && editingBook && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+          <div className="bg-white w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl">
+
+            {/* Header */}
+
+            <div className="flex justify-between items-center px-7 py-5 border-b">
+
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Edit Book
+                </h2>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  Update the book information.
+                </p>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingBook(null);
+                }}
+                className="w-9 h-9 rounded-full hover:bg-gray-100 text-gray-500 text-xl"
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            {/* Form */}
+
+            <div className="p-7">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                {/* Title */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Book Title *
+                  </label>
+
+                  <input
+                    type="text"
+                    value={editingBook.title}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        title: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Author */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Author *
+                  </label>
+
+                  <input
+                    type="text"
+                    value={editingBook.author}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        author: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Category */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category *
+                  </label>
+
+                  <select
+                    value={editingBook.category}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        category: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="Academic">Academic</option>
+                    <option value="Science">Science</option>
+                    <option value="Language">Language</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Literature">Literature</option>
+                    <option value="General">General</option>
+                  </select>
+                </div>
+
+
+                {/* ISBN */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    ISBN *
+                  </label>
+
+                  <input
+                    type="text"
+                    value={editingBook.isbn}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        isbn: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Publisher */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Publisher
+                  </label>
+
+                  <input
+                    type="text"
+                    value={editingBook.publisher || ""}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        publisher: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Price */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Price
+                  </label>
+
+                  <input
+                    type="number"
+                    min="0"
+                    value={editingBook.price || ""}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        price: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Total Copies */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Total Copies *
+                  </label>
+
+                  <input
+                    type="number"
+                    min="1"
+                    value={editingBook.total_copies || ""}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        total_copies: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Shelf */}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Shelf Location
+                  </label>
+
+                  <input
+                    type="text"
+                    value={editingBook.shelf_location || ""}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        shelf_location: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+              </div>
+
+
+              {/* Description */}
+
+              <div className="mt-5">
+
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description / Summary
+                </label>
+
+                <textarea
+                  rows="4"
+                  value={editingBook.description || ""}
+                  onChange={(e) =>
+                    setEditingBook({
+                      ...editingBook,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-green-500"
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* Footer */}
+
+            <div className="flex justify-end gap-3 px-7 py-5 border-t bg-gray-50">
+
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingBook(null);
+                }}
+                className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-white transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleUpdateBook}
+                className="px-6 py-2.5 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition"
+              >
+                Update Book
               </button>
 
             </div>
