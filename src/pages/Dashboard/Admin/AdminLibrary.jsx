@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from "react";
+
 import {
   Search,
   Plus,
@@ -6,62 +8,118 @@ import {
   BookCheck,
   Pencil,
   Trash2,
+  IndianRupee,
+  Package,
 } from "lucide-react";
 
 export default function AdminLibrary() {
-  const stats = [
+
+  const [books, setBooks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+
+  const fetchBooks = () => {
+
+    fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/libraryBooks.php"
+    )
+      .then((res) => res.json())
+      .then((data) => {
+
+        if (data.status) {
+          setBooks(data.data);
+        }
+
+      })
+      .catch((error) => {
+        console.error("Error fetching books:", error);
+      });
+
+  };
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+
+  const filteredBooks = useMemo(() => {
+
+  return books.filter((book) => {
+
+    const matchesSearch =
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.isbn.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory =
+      categoryFilter === "All" ||
+      book.category === categoryFilter;
+
+    const matchesStatus =
+      statusFilter === "All" ||
+      book.status === statusFilter;
+
+    return matchesSearch && matchesCategory && matchesStatus;
+
+  });
+
+}, [books, searchQuery, categoryFilter, statusFilter]);
+
+const categories = [
+  "All",
+  ...new Set(books.map((book) => book.category))
+];
+
+const totalBooks = books.reduce(
+  (total, book) => total + Number(book.total_copies || 0),
+  0
+);
+
+const availableBooks = books.reduce(
+  (total, book) => total + Number(book.available_copies || 0),
+  0
+);
+
+const issuedBooks = totalBooks - availableBooks;
+
+const totalValue = books.reduce(
+  (total, book) =>
+    total +
+    Number(book.price || 0) * Number(book.total_copies || 0),
+  0
+);
+
+const stats = [
   {
     title: "Total Books",
-    value: "4,530",
+    value: totalBooks,
     icon: Library,
     bg: "bg-red-100",
     iconColor: "text-red-600",
   },
   {
     title: "Issued Books",
-    value: "1,245",
+    value: issuedBooks,
     icon: BookCheck,
     bg: "bg-green-100",
     iconColor: "text-green-600",
   },
   {
     title: "Available Books",
-    value: "3,285",
+    value: availableBooks,
     icon: BookOpen,
     bg: "bg-blue-100",
     iconColor: "text-blue-600",
   },
+  {
+    title: "Library Value",
+    value: `₹${totalValue.toLocaleString("en-IN")}`,
+    icon: IndianRupee,
+    bg: "bg-purple-100",
+    iconColor: "text-purple-600",
+  },
 ];
-  const books = [
-    {
-      id: 1,
-      title: "Mathematics",
-      author: "R.D. Sharma",
-      category: "Academic",
-      status: "Available",
-    },
-    {
-      id: 2,
-      title: "Physics",
-      author: "H.C. Verma",
-      category: "Science",
-      status: "Issued",
-    },
-    {
-      id: 3,
-      title: "English Grammar",
-      author: "Wren & Martin",
-      category: "Language",
-      status: "Available",
-    },
-    {
-      id: 4,
-      title: "Computer Science",
-      author: "Sumita Arora",
-      category: "Technology",
-      status: "Issued",
-    },
-  ];
 
   return (
     <div className="space-y-7">
@@ -128,7 +186,9 @@ export default function AdminLibrary() {
 
           <input
             type="text"
-            placeholder="Search book..."
+            placeholder="Search by book name, author or ISBN..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
@@ -142,7 +202,7 @@ export default function AdminLibrary() {
           </h2>
 
           <span className="text-sm text-gray-500">
-            Total : {books.length}
+           Total : {filteredBooks.length}
           </span>
         </div>
 
@@ -151,9 +211,8 @@ export default function AdminLibrary() {
             <thead className="bg-gray-50">
               <tr className="text-sm text-gray-600">
                 <th className="px-6 py-4 text-left">
-                  Book Name
+                  Book
                 </th>
-
                 <th className="px-6 py-4 text-center">
                   Author
                 </th>
@@ -163,31 +222,82 @@ export default function AdminLibrary() {
                 </th>
 
                 <th className="px-6 py-4 text-center">
+                  Price
+                </th>
+
+                <th className="px-6 py-4 text-center">
+                  Copies
+                </th>
+
+                <th className="px-6 py-4 text-center">
+                  Shelf
+                </th>
+
+                <th className="px-6 py-4 text-center">
                   Status
                 </th>
 
                 <th className="px-6 py-4 text-center">
                   Actions
                 </th>
+
+               
               </tr>
             </thead>
 
             <tbody>
-              {books.map((book) => (
+              {filteredBooks.map((book) => (
                 <tr
                   key={book.id}
                   className="border-t hover:bg-gray-50 transition"
                 >
-                  <td className="px-6 py-5 font-medium text-gray-800">
-                    {book.title}
+                                  
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+
+                      <img
+                        src={book.cover_image}
+                        alt={book.title}
+                        className="w-12 h-16 object-cover rounded-lg border"
+                      />
+
+                      <div>
+                        <p className="font-semibold text-gray-800">
+                          {book.title}
+                        </p>
+
+                        <p className="text-xs text-gray-400 mt-1">
+                          ISBN: {book.isbn}
+                        </p>
+                      </div>
+
+                    </div>
                   </td>
 
                   <td className="px-6 py-5 text-center text-gray-600">
                     {book.author}
                   </td>
 
+                  <td className="px-6 py-5 text-center">
+                    <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs">
+                      {book.category}
+                    </span>
+                  </td>
+
+                  <td className="px-6 py-5 text-center font-medium text-gray-700">
+                    ₹{Number(book.price).toLocaleString("en-IN")}
+                  </td>
+
                   <td className="px-6 py-5 text-center text-gray-600">
-                    {book.category}
+                    <span className="font-medium">
+                      {book.available_copies}
+                    </span>
+                    {" / "}
+                    {book.total_copies}
+                  </td>
+
+                  <td className="px-6 py-5 text-center text-gray-600">
+                    {book.shelf_location}
                   </td>
 
                   <td className="px-6 py-5 text-center">
