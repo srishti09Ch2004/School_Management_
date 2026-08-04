@@ -125,6 +125,54 @@ const handleAddBook = async () => {
   }
 };
 
+const handleDeleteBook = async (id) => {
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this book?"
+  );
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteBook.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.status) {
+
+      alert(data.message);
+
+      fetchBooks();
+
+    } else {
+
+      alert(data.message);
+
+    }
+
+  } catch (error) {
+
+    console.error("Delete Book Error:", error);
+
+    alert("Something went wrong while deleting the book.");
+
+  }
+};
+
 const handleUpdateBook = async () => {
 
   if (
@@ -468,7 +516,11 @@ const stats = [
                         <Pencil size={16} />
                       </button>
 
-                      <button className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
+                      <button
+                        onClick={() => handleDeleteBook(book.id)}
+                        className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
+                        title="Delete Book"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
