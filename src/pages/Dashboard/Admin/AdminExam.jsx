@@ -15,6 +15,8 @@ const [searchQuery, setSearchQuery] = useState("");
 
 const [showAddModal, setShowAddModal] = useState(false);
 const [showEditModal, setShowEditModal] = useState(false);
+const [statusFilter,setStatusFilter]=useState("");
+const [classFilter,setClassFilter]=useState("");
 
 const [examForm, setExamForm] = useState({
   exam_name: "",
@@ -182,16 +184,45 @@ const handleDelete = async (id) => {
 
 const filteredExams = useMemo(() => {
 
-  if (!searchQuery.trim()) return exams;
+  let data = [...exams];
 
-  return exams.filter((exam) =>
-    exam.exam_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    exam.class.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  if (searchQuery.trim()) {
 
-}, [exams, searchQuery]);
+    data = data.filter((item) =>
+      item.exam_name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
 
+      item.subject
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    );
 
+  }
+
+  if (statusFilter) {
+
+    data = data.filter(
+      (item) => item.status === statusFilter
+    );
+
+  }
+
+  if (classFilter) {
+
+    data = data.filter(
+      (item) => item.class === classFilter
+    );
+
+  }
+  return data;
+}, [
+  exams,
+  searchQuery,
+  statusFilter,
+  classFilter
+]);
+  
 const stats = [
   {
     title: "Total Exams",
@@ -283,22 +314,92 @@ const stats = [
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5">
-        <div className="relative max-w-md">
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-          />
+     {/* Search & Filters */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5">
 
-          <input
-            type="text"
-            placeholder="Search exam..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="flex flex-col md:flex-row gap-4">
+
+            {/* Search */}
+            <div className="relative flex-1">
+
+              <Search
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+
+              <input
+                type="text"
+                placeholder="Search exam or subject..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
+              />
+
+            </div>
+
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500 md:w-48"
+            >
+
+              <option value="">All Status</option>
+
+              <option value="Scheduled">
+                Scheduled
+              </option>
+
+              <option value="Upcoming">
+                Upcoming
+              </option>
+
+              <option value="Completed">
+                Completed
+              </option>
+
+            </select>
+
+            {/* Class Filter */}
+            <select
+              value={classFilter}
+              onChange={(e) => setClassFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500 md:w-40"
+            >
+
+              <option value="">
+                All Classes
+              </option>
+
+              <option value="6">Class 6</option>
+              <option value="7">Class 7</option>
+              <option value="8">Class 8</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+
+            </select>
+
+            {/* Clear Filters */}
+            {(searchQuery || statusFilter || classFilter) && (
+
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("");
+                  setClassFilter("");
+                }}
+                className="px-5 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
+              >
+                Clear
+              </button>
+
+            )}
+
+          </div>
+
         </div>
-      </div>
 
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -539,19 +640,32 @@ const stats = [
                 />
 
             <select
-            name="status"
-            value={examForm.status}
-            onChange={handleChange}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-            >
+              value={statusFilter}
+              onChange={(e)=>setStatusFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-4 py-3"
+              >
+              <option value="">All Status</option>
+              <option value="Upcoming">Upcoming</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Completed">Completed</option>
+              </select>
 
-            <option>Upcoming</option>
 
-            <option>Scheduled</option>
+              <select
+                value={classFilter}
+                onChange={(e)=>setClassFilter(e.target.value)}
+                className="border border-gray-200 rounded-xl px-4 py-3"
+                >
 
-            <option>Completed</option>
-
-            </select>
+                <option value="">All Class</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+              </select>
 
     </div>
 
