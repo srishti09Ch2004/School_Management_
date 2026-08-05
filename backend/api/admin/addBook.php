@@ -46,18 +46,11 @@ if (
     exit;
 }
 
-/*
-  New book add hone par:
-  available copies = total copies
-  status = Available
-*/
+
 
 $available_copies = $total_copies;
 $status = "Available";
 
-/*
-  ISBN se automatically Open Library ka cover URL banega
-*/
 
 $cover_image = "https://covers.openlibrary.org/b/isbn/" . $isbn . "-L.jpg";
 
