@@ -8,6 +8,7 @@ import {
   Pencil,
   Trash2,
   IndianRupee,
+  Eye,
 } from "lucide-react";
 
 export default function AdminLibrary() {
@@ -19,6 +20,8 @@ export default function AdminLibrary() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   const [bookForm, setBookForm] = useState({
     title: "",
@@ -361,23 +364,94 @@ const stats = [
         })}
       </div>
 
-      {/* Search */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5">
-        <div className="relative max-w-md">
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-          />
+    
+      
+      {/* Search & Filters */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5">
 
-          <input
-            type="text"
-            placeholder="Search by book name, author or ISBN..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="flex flex-col lg:flex-row gap-4">
+
+            {/* Search */}
+            <div className="relative flex-1">
+
+              <Search
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+
+              <input
+                type="text"
+                placeholder="Search by book name, author or ISBN..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-green-500"
+              />
+
+            </div>
+
+            {/* Category Filter */}
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            >
+
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category === "All"
+                    ? "All Categories"
+                    : category}
+                </option>
+              ))}
+
+            </select>
+
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            >
+
+              <option value="All">
+                All Status
+              </option>
+
+              <option value="Available">
+                Available
+              </option>
+
+              <option value="Out of Stock">
+                Out of Stock
+              </option>
+
+            </select>
+
+          </div>
+
+          {/* Result Information */}
+          <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+
+            <span>
+              Showing <b className="text-gray-700">{filteredBooks.length}</b> books
+            </span>
+
+            {(searchQuery || categoryFilter !== "All" || statusFilter !== "All") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setCategoryFilter("All");
+                  setStatusFilter("All");
+                }}
+                className="text-green-600 hover:text-green-700 font-medium"
+              >
+                Clear Filters
+              </button>
+            )}
+
+          </div>
+
         </div>
-      </div>
 
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -499,31 +573,47 @@ const stats = [
 
                   <td className="px-6 py-5">
                     <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingBook({
-                            ...book,
-                            price: book.price || "",
-                            total_copies: book.total_copies || "",
-                            description: book.description || "",
-                          });
 
-                          setShowEditModal(true);
-                        }}
-                        className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
-                        title="Edit Book"
-                      >
-                        <Pencil size={16} />
-                      </button>
+                    {/* View Book */}
+                    <button
+                      onClick={() => {
+                        setSelectedBook(book);
+                        setShowViewModal(true);
+                      }}
+                      className="w-9 h-9 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition"
+                      title="View Book"
+                    >
+                      <Eye size={16} />
+                    </button>
 
-                      <button
-                        onClick={() => handleDeleteBook(book.id)}
-                        className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
-                        title="Delete Book"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                    {/* Edit Book */}
+                    <button
+                      onClick={() => {
+                        setEditingBook({
+                          ...book,
+                          price: book.price || "",
+                          total_copies: book.total_copies || "",
+                          description: book.description || "",
+                        });
+
+                        setShowEditModal(true);
+                      }}
+                      className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
+                      title="Edit Book"
+                    >
+                      <Pencil size={16} />
+                    </button>
+
+                    {/* Delete Book */}
+                    <button
+                      onClick={() => handleDeleteBook(book.id)}
+                      className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
+                      title="Delete Book"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+
+                  </div>
                   </td>
                 </tr>
               ))}
@@ -1092,6 +1182,267 @@ const stats = [
 
         </div>
       )}
+
+
+      {/* View Book Details Modal */}
+
+{showViewModal && selectedBook && (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+    <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl">
+
+      {/* Header */}
+      <div className="flex justify-between items-center px-7 py-5 border-b">
+
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Book Details
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Complete information about this book
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            setShowViewModal(false);
+            setSelectedBook(null);
+          }}
+          className="w-10 h-10 rounded-full hover:bg-gray-100 text-gray-500 text-2xl transition"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      {/* Main Book Information */}
+      <div className="p-7">
+
+        <div className="grid md:grid-cols-3 gap-8">
+
+          {/* Book Cover */}
+          <div className="flex flex-col items-center">
+
+            <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+              <img
+                src={selectedBook.cover_image}
+                alt={selectedBook.title}
+                className="w-48 h-64 object-cover rounded-xl shadow-md"
+              />
+            </div>
+
+            {/* Status */}
+            <span
+              className={`mt-4 px-4 py-2 rounded-full text-sm font-medium ${
+                selectedBook.status === "Available"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {selectedBook.status}
+            </span>
+
+          </div>
+
+
+          {/* Book Basic Information */}
+          <div className="md:col-span-2">
+
+            <div className="mb-6">
+
+              <span className="inline-block px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium mb-3">
+                {selectedBook.category}
+              </span>
+
+              <h1 className="text-3xl font-bold text-gray-800">
+                {selectedBook.title}
+              </h1>
+
+              <p className="text-gray-500 mt-2 text-base">
+                Written by{" "}
+                <span className="font-semibold text-gray-700">
+                  {selectedBook.author}
+                </span>
+              </p>
+
+            </div>
+
+
+            {/* Information Grid */}
+            <div className="grid sm:grid-cols-2 gap-4">
+
+              {/* Publisher */}
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <p className="text-xs text-gray-400">
+                  Publisher
+                </p>
+
+                <p className="font-semibold text-gray-800 mt-1">
+                  {selectedBook.publisher || "Not available"}
+                </p>
+              </div>
+
+
+              {/* ISBN */}
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <p className="text-xs text-gray-400">
+                  ISBN
+                </p>
+
+                <p className="font-semibold text-gray-800 mt-1">
+                  {selectedBook.isbn}
+                </p>
+              </div>
+
+
+              {/* Price */}
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <p className="text-xs text-gray-400">
+                  Book Price
+                </p>
+
+                <p className="font-semibold text-green-600 text-lg mt-1">
+                  ₹{Number(selectedBook.price || 0).toLocaleString("en-IN")}
+                </p>
+              </div>
+
+
+              {/* Shelf */}
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <p className="text-xs text-gray-400">
+                  Shelf Location
+                </p>
+
+                <p className="font-semibold text-gray-800 mt-1">
+                  {selectedBook.shelf_location || "Not assigned"}
+                </p>
+              </div>
+
+            </div>
+
+
+            {/* Copies */}
+            <div className="mt-4 grid sm:grid-cols-2 gap-4">
+
+              <div className="bg-blue-50 rounded-2xl p-4">
+
+                <p className="text-xs text-blue-500">
+                  Total Copies
+                </p>
+
+                <p className="text-2xl font-bold text-blue-700 mt-1">
+                  {selectedBook.total_copies}
+                </p>
+
+              </div>
+
+
+              <div className="bg-green-50 rounded-2xl p-4">
+
+                <p className="text-xs text-green-500">
+                  Available Copies
+                </p>
+
+                <p className="text-2xl font-bold text-green-700 mt-1">
+                  {selectedBook.available_copies}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* Description */}
+        <div className="mt-8 border-t pt-7">
+
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            About This Book
+          </h3>
+
+          <div className="bg-gray-50 rounded-2xl p-5">
+
+            <p className="text-gray-600 leading-7">
+              {selectedBook.description ||
+                "No description is available for this book."}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        {/* Availability Summary */}
+        <div className="mt-6">
+
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            Availability
+          </h3>
+
+          <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+
+            <div className="flex justify-between items-center mb-3">
+
+              <span className="text-sm text-gray-500">
+                Available Copies
+              </span>
+
+              <span className="font-semibold text-gray-800">
+                {selectedBook.available_copies} /{" "}
+                {selectedBook.total_copies}
+              </span>
+
+            </div>
+
+
+            <div className="w-full bg-gray-200 rounded-full h-2">
+
+              <div
+                className="bg-green-500 h-2 rounded-full transition-all"
+                style={{
+                  width: `${
+                    selectedBook.total_copies > 0
+                      ? (Number(selectedBook.available_copies) /
+                          Number(selectedBook.total_copies)) *
+                        100
+                      : 0
+                  }%`,
+                }}
+              />
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* Footer */}
+      <div className="flex justify-end px-7 py-5 border-t bg-gray-50">
+
+        <button
+          onClick={() => {
+            setShowViewModal(false);
+            setSelectedBook(null);
+          }}
+          className="px-6 py-2.5 rounded-xl bg-gray-800 text-white hover:bg-gray-900 transition"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
     </div>
   );
