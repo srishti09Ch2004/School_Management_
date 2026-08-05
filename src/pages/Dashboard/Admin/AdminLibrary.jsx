@@ -23,6 +23,16 @@ export default function AdminLibrary() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
 
+  const [showIssueModal, setShowIssueModal] = useState(false);
+
+  const [issueForm, setIssueForm] = useState({
+    book_id: "",
+    student_id: "",
+    student_name: "",
+    issue_date: new Date().toISOString().split("T")[0],
+    due_date: "",
+  });
+
   const [bookForm, setBookForm] = useState({
     title: "",
     author: "",
@@ -64,6 +74,71 @@ export default function AdminLibrary() {
     [e.target.name]: e.target.value,
   });
 };
+
+const handleIssueChange = (e) => {
+  setIssueForm({
+    ...issueForm,
+    [e.target.name]: e.target.value,
+  });
+};
+const handleIssueBook = async () => {
+
+  if (
+    !issueForm.book_id ||
+    !issueForm.student_name ||
+    !issueForm.issue_date ||
+    !issueForm.due_date
+  ) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/issueBook.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(issueForm),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.status) {
+
+      alert(data.message);
+
+      setShowIssueModal(false);
+
+      setIssueForm({
+        book_id: "",
+        student_id: "",
+        student_name: "",
+        issue_date: new Date().toISOString().split("T")[0],
+        due_date: "",
+      });
+
+      fetchBooks();
+
+    } else {
+
+      alert(data.message);
+
+    }
+
+  } catch (error) {
+
+    console.error("Issue Book Error:", error);
+
+    alert("Something went wrong while issuing the book.");
+
+  }
+};
+
 
 const handleAddBook = async () => {
 
@@ -613,6 +688,33 @@ const stats = [
                       <Trash2 size={16} />
                     </button>
 
+                    <button
+                      onClick={() => {
+                        setIssueForm({
+                          book_id: book.id,
+                          student_id: "",
+                          student_name: "",
+                          issue_date: new Date().toISOString().split("T")[0],
+                          due_date: "",
+                        });
+
+                        setShowIssueModal(true);
+                      }}
+                      disabled={Number(book.available_copies) <= 0}
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition ${
+                        Number(book.available_copies) > 0
+                          ? "bg-green-50 text-green-600 hover:bg-green-100"
+                          : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      }`}
+                      title={
+                        Number(book.available_copies) > 0
+                          ? "Issue Book"
+                          : "No Copies Available"
+                      }
+                    >
+                      <BookCheck size={16} />
+                    </button>
+
                   </div>
                   </td>
                 </tr>
@@ -909,8 +1011,360 @@ const stats = [
 
           </div>
 
-        </div>
+          </div>
       )}
+
+        {/* Issue Book Modal */}
+
+
+          {showIssueModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
+
+              <div className="w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-white rounded-3xl shadow-2xl">
+
+                <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-7 py-5">
+
+                  <div className="flex items-center justify-between">
+
+                    <div className="flex items-center gap-4">
+
+                      <div className="w-10 h-10 rounded-2xl bg-green-100 flex items-center justify-center">
+                        <BookCheck
+                          size={22}
+                          className="text-green-600"
+                        />
+                      </div>
+
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-800">
+                          Issue Book
+                        </h2>
+
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          Create a new library issue record
+                        </p>
+                      </div>
+
+                    </div>
+
+                    <button
+                      onClick={() => setShowIssueModal(false)}
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+                    >
+                      x
+                    </button>
+
+                  </div>
+
+                </div>
+
+               <div className="p-7 space-y-6">
+
+                 {issueForm.book_id && (() => {
+
+                    const selectedIssueBook = books.find(
+                      (book) =>
+                        String(book.id) === String(issueForm.book_id)
+                    );
+
+                    if (!selectedIssueBook) return null;
+
+                    return (
+
+                      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+
+                        <div className="flex items-center gap-4">
+
+                          {/* Cover */}
+
+                          <img
+                            src={selectedIssueBook.cover_image}
+                            alt={selectedIssueBook.title}
+                            className="w-16 h-20 rounded-xl object-cover border border-gray-200 shadow-sm"
+                          />
+
+                          {/* Book Details */}
+
+                          <div className="flex-1 min-w-0">
+
+                            <div className="flex items-start justify-between gap-3">
+
+                              <div>
+
+                                <p className="text-xs font-medium text-green-600 uppercase tracking-wide">
+                                  Selected Book
+                                </p>
+
+                                <h3 className="text-base font-bold text-gray-800 mt-1 truncate">
+                                  {selectedIssueBook.title}
+                                </h3>
+
+                                <p className="text-sm text-gray-500 mt-1">
+                                  by {selectedIssueBook.author}
+                                </p>
+
+                              </div>
+
+                              {/* Available */}
+
+                              <div className="shrink-0 text-right">
+
+                                <p className="text-xs text-gray-400">
+                                  Available
+                                </p>
+
+                                <p className="text-xl font-bold text-green-600">
+                                  {selectedIssueBook.available_copies}
+                                </p>
+
+                              </div>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    );
+
+                  })()}
+
+
+                  <div>
+
+                    <div className="flex items-center justify-between mb-2">
+
+                      <label className="text-sm font-semibold text-gray-700">
+                        Book
+                      </label>
+
+                      <span className="text-xs text-gray-400">
+                        Required
+                      </span>
+
+                    </div>
+
+                    <select
+                      name="book_id"
+                      value={issueForm.book_id}
+                      onChange={handleIssueChange}
+                      className="w-full h-12 border border-gray-200 rounded-xl px-4 bg-white text-sm text-gray-700 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-50"
+                    >
+
+                      <option value="">
+                        Select a book to issue
+                      </option>
+
+                      {books
+                        .filter(
+                          (book) =>
+                            Number(book.available_copies) > 0
+                        )
+                        .map((book) => (
+
+                          <option
+                            key={book.id}
+                            value={book.id}
+                          >
+                            {book.title} — {book.available_copies} copies available
+                          </option>
+
+                        ))}
+
+                    </select>
+
+                  </div>
+
+
+                  <div>
+
+                    <div className="flex items-center gap-2 mb-4">
+
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+
+                      <h3 className="text-sm font-bold text-gray-800">
+                        Student Information
+                      </h3>
+
+                    </div>
+
+
+                    <div className="rounded-2xl border border-gray-200 p-5 bg-white">
+
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Student Name
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+
+                      <input
+                        type="text"
+                        name="student_name"
+                        value={issueForm.student_name}
+                        onChange={handleIssueChange}
+                        placeholder="Enter student's full name"
+                        className="w-full h-12 border border-gray-200 rounded-xl px-4 text-sm outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-50"
+                      />
+
+                      <p className="text-xs text-gray-400 mt-2">
+                        Enter the name of the student receiving this book.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div>
+
+                    <div className="flex items-center gap-2 mb-4">
+
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+
+                      <h3 className="text-sm font-bold text-gray-800">
+                        Issue Details
+                      </h3>
+
+                    </div>
+
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+
+                      {/* Issue Date */}
+
+                      <div className="rounded-2xl border border-gray-200 p-5">
+
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Issue Date
+                          <span className="text-red-500 ml-1">*</span>
+                        </label>
+
+                        <input
+                          type="date"
+                          name="issue_date"
+                          value={issueForm.issue_date}
+                          onChange={handleIssueChange}
+                          className="w-full h-11 border border-gray-200 rounded-xl px-3 text-sm outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-50"
+                        />
+
+                        <p className="text-xs text-gray-400 mt-2">
+                          Date the book is issued.
+                        </p>
+
+                      </div>
+
+
+                      {/* Due Date */}
+
+                      <div className="rounded-2xl border border-gray-200 p-5">
+
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Return Due Date
+                          <span className="text-red-500 ml-1">*</span>
+                        </label>
+
+                        <input
+                          type="date"
+                          name="due_date"
+                          value={issueForm.due_date}
+                          min={issueForm.issue_date}
+                          onChange={handleIssueChange}
+                          className="w-full h-11 border border-gray-200 rounded-xl px-3 text-sm outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-50"
+                        />
+
+                        <p className="text-xs text-gray-400 mt-2">
+                          Last date for returning the book.
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  {issueForm.book_id && (
+
+                    <div className="rounded-2xl bg-green-50 border border-green-100 p-5">
+
+                      <div className="flex items-center justify-between">
+
+                        <div>
+
+                          <p className="text-xs font-medium text-green-700 uppercase tracking-wide">
+                            Library Availability
+                          </p>
+
+                          <p className="text-sm text-gray-600 mt-1">
+                            Copies available after issue
+                          </p>
+
+                        </div>
+
+                        <div className="text-right">
+
+                          <p className="text-2xl font-bold text-green-700">
+
+                            {Math.max(
+                              0,
+                              Number(
+                                books.find(
+                                  (book) =>
+                                    String(book.id) ===
+                                    String(issueForm.book_id)
+                                )?.available_copies || 0
+                              ) - 1
+                            )}
+
+                          </p>
+
+                          <p className="text-xs text-green-600">
+                            remaining
+
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  )}
+
+                </div>
+
+
+                {/* FOOTER  */}
+
+                <div className="sticky bottom-0 bg-gray-50 border-t border-gray-100 px-7 py-5">
+
+                  <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
+
+                    <button
+                      onClick={() => setShowIssueModal(false)}
+                      className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:bg-gray-100 transition"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      onClick={handleIssueBook}
+                      className="px-6 py-2.5 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <BookCheck size={17} />
+                      Issue Book
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+          )}
 
       {/* Edit Book Modal */}
 
