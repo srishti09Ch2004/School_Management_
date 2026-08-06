@@ -10,12 +10,14 @@ import {
   Trash2,
 } from "lucide-react";
 
-
 export default function AdminTransport() {
 
   const [buses, setBuses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingBus, setEditingBus] = useState(null);
+
   const [busForm, setBusForm] = useState({
     bus_number: "",
     bus_type: "School Bus",
@@ -150,6 +152,55 @@ const handleAddBus = async () => {
     console.error("Add Bus Error:", error);
 
     alert("Something went wrong while adding the bus.");
+
+  }
+};
+
+const handleUpdateBus = async () => {
+
+  if (
+    !editingBus.bus_number ||
+    !editingBus.driver_name ||
+    !editingBus.route_name ||
+    !editingBus.capacity
+  ) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updatebus.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editingBus),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.status) {
+
+      alert(data.message);
+
+      setShowEditModal(false);
+      setEditingBus(null);
+
+      fetchBuses();
+
+    } else {
+      alert(data.message);
+    }
+
+  } catch (error) {
+
+    console.error("Update Bus Error:", error);
+
+    alert("Something went wrong while updating the bus.");
 
   }
 };
@@ -308,9 +359,25 @@ const handleAddBus = async () => {
 
                   <td className="px-6 py-5">
                     <div className="flex justify-center gap-2">
-                      <button className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
-                        <Pencil size={16} />
-                      </button>
+                      <button onClick={() => {
+                        setEditingBus({
+                          ...bus,
+                          bus_number: bus.bus_number || "",
+                          bus_type: bus.bus_type || "School Bus",
+                          driver_name: bus.driver_name || "",
+                          driver_phone: bus.driver_phone || "",
+                          route_name: bus.route_name || "",
+                          capacity: bus.capacity || "",
+                          status: bus.status || "Running",
+                        });
+
+                    setShowEditModal(true);
+                  }}
+                  className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
+                  title="Edit Bus"
+                >
+                  <Pencil size={16} />
+                </button>
 
                       <button className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
                         <Trash2 size={16} />
@@ -529,6 +596,220 @@ const handleAddBus = async () => {
 
         </div>
       </div>
+
+{/* Edit Bus Modal */}
+
+{showEditModal && editingBus && (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+    <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl">
+
+      {/* Header */}
+      <div className="flex justify-between items-center px-7 py-5 border-b">
+
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Edit Bus
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Update bus and driver information.
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            setShowEditModal(false);
+            setEditingBus(null);
+          }}
+          className="w-9 h-9 rounded-full hover:bg-gray-100 text-gray-500 text-xl"
+        >
+          ×
+        </button>
+
+      </div>
+
+      {/* Form */}
+      <div className="p-7">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          {/* Bus Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Bus Number *
+            </label>
+
+            <input
+              type="text"
+              value={editingBus.bus_number || ""}
+              onChange={(e) =>
+                setEditingBus({
+                  ...editingBus,
+                  bus_number: e.target.value,
+                })
+              }
+              placeholder="Example: UP32 AB 1234"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          {/* Bus Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Bus Type
+            </label>
+
+            <select
+              value={editingBus.bus_type || "School Bus"}
+              onChange={(e) =>
+                setEditingBus({
+                  ...editingBus,
+                  bus_type: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="School Bus">School Bus</option>
+              <option value="Mini Bus">Mini Bus</option>
+              <option value="Van">Van</option>
+            </select>
+          </div>
+
+          {/* Driver */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Driver Name *
+            </label>
+
+            <input
+              type="text"
+              value={editingBus.driver_name || ""}
+              onChange={(e) =>
+                setEditingBus({
+                  ...editingBus,
+                  driver_name: e.target.value,
+                })
+              }
+              placeholder="Enter driver name"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          {/* Driver Phone */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Driver Phone
+            </label>
+
+            <input
+              type="tel"
+              value={editingBus.driver_phone || ""}
+              onChange={(e) =>
+                setEditingBus({
+                  ...editingBus,
+                  driver_phone: e.target.value,
+                })
+              }
+              placeholder="Enter phone number"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          {/* Route */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Route Name *
+            </label>
+
+            <input
+              type="text"
+              value={editingBus.route_name || ""}
+              onChange={(e) =>
+                setEditingBus({
+                  ...editingBus,
+                  route_name: e.target.value,
+                })
+              }
+              placeholder="Example: Route A"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          {/* Capacity */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Capacity *
+            </label>
+
+            <input
+              type="number"
+              min="1"
+              value={editingBus.capacity || ""}
+              onChange={(e) =>
+                setEditingBus({
+                  ...editingBus,
+                  capacity: e.target.value,
+                })
+              }
+              placeholder="Enter bus capacity"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
+
+            <select
+              value={editingBus.status || "Running"}
+              onChange={(e) =>
+                setEditingBus({
+                  ...editingBus,
+                  status: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="Running">Running</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end gap-3 px-7 py-5 border-t bg-gray-50">
+
+        <button
+          onClick={() => {
+            setShowEditModal(false);
+            setEditingBus(null);
+          }}
+          className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-white transition"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleUpdateBus}
+          className="px-6 py-2.5 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition"
+        >
+          Update Bus
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
     </div>
   );
 }
