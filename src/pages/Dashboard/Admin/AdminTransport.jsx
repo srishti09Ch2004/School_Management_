@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-
 import {
   Search,
   Plus,
@@ -17,6 +16,8 @@ export default function AdminTransport() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingBus, setEditingBus] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedBus, setSelectedBus] = useState(null);
 
   const [busForm, setBusForm] = useState({
     bus_number: "",
@@ -374,9 +375,13 @@ const handleDeleteBus = async (id) => {
             <tbody>
               {filteredBuses.map((bus) => (
                 <tr
-                  key={bus.id}
-                  className="border-t hover:bg-gray-50 transition"
-                >
+                    key={bus.id}
+                    onClick={() => {
+                      setSelectedBus(bus);
+                      setShowViewModal(true);
+                    }}
+                    className="border-t hover:bg-green-50 transition cursor-pointer"
+                  >
                   <td className="px-6 py-5 font-medium text-gray-800">
                     {bus.bus_number}
                   </td>
@@ -862,6 +867,191 @@ const handleDeleteBus = async (id) => {
   </div>
 )}
 
+
+{/* View Bus Details Modal */}
+
+{showViewModal && selectedBus && (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">
+
+      {/* Header */}
+      <div className="flex justify-between items-center px-7 py-5 border-b">
+
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Bus Details
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Complete information about this vehicle
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            setShowViewModal(false);
+            setSelectedBus(null);
+          }}
+          className="w-10 h-10 rounded-full hover:bg-gray-100 text-gray-500 text-2xl"
+        >
+          ×
+        </button>
+
+      </div>
+
+      {/* Content */}
+      <div className="p-7">
+
+        {/* Bus Header */}
+        <div className="bg-green-50 rounded-2xl p-5 flex items-center gap-4">
+
+          <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
+            <Bus className="text-green-600" size={28} />
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold text-gray-800">
+              {selectedBus.bus_number}
+            </h3>
+
+            <p className="text-sm text-gray-500">
+              {selectedBus.bus_type || "School Bus"}
+            </p>
+          </div>
+
+          <span
+            className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
+              selectedBus.status === "Running"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {selectedBus.status}
+          </span>
+
+        </div>
+
+        {/* Details */}
+        <div className="grid sm:grid-cols-2 gap-4 mt-6">
+
+          {/* Driver */}
+          <div className="bg-gray-50 rounded-2xl p-4">
+            <p className="text-xs text-gray-400">
+              Driver Name
+            </p>
+
+            <p className="font-semibold text-gray-800 mt-1">
+              {selectedBus.driver_name || "Not assigned"}
+            </p>
+          </div>
+
+          {/* Driver Phone */}
+          <div className="bg-gray-50 rounded-2xl p-4">
+            <p className="text-xs text-gray-400">
+              Driver Contact
+            </p>
+
+            <p className="font-semibold text-gray-800 mt-1">
+              {selectedBus.driver_phone || "Not available"}
+            </p>
+          </div>
+
+          {/* Route */}
+          <div className="bg-gray-50 rounded-2xl p-4">
+            <p className="text-xs text-gray-400">
+              Route
+            </p>
+
+            <p className="font-semibold text-gray-800 mt-1">
+              {selectedBus.route_name || "Not assigned"}
+            </p>
+          </div>
+
+          {/* Capacity */}
+          <div className="bg-gray-50 rounded-2xl p-4">
+            <p className="text-xs text-gray-400">
+              Bus Capacity
+            </p>
+
+            <p className="font-semibold text-gray-800 mt-1">
+              {selectedBus.capacity || 0} Students
+            </p>
+          </div>
+
+        </div>
+
+        {/* Students */}
+        <div className="mt-5 bg-blue-50 rounded-2xl p-5">
+
+          <div className="flex justify-between items-center mb-3">
+
+            <div>
+              <p className="text-sm text-blue-600">
+                Students Using This Bus
+              </p>
+
+              <p className="text-2xl font-bold text-blue-700 mt-1">
+                {selectedBus.students_count || 0}
+              </p>
+            </div>
+
+            <Users
+              size={28}
+              className="text-blue-500"
+            />
+
+          </div>
+
+          {/* Capacity Progress */}
+          <div className="w-full bg-blue-100 rounded-full h-2">
+
+            <div
+              className="bg-blue-500 h-2 rounded-full"
+              style={{
+                width: `${
+                  Number(selectedBus.capacity) > 0
+                    ? Math.min(
+                        (Number(selectedBus.students_count || 0) /
+                          Number(selectedBus.capacity)) *
+                          100,
+                        100
+                      )
+                    : 0
+                }%`,
+              }}
+            />
+
+          </div>
+
+          <p className="text-xs text-blue-500 mt-2">
+            {selectedBus.students_count || 0} /{" "}
+            {selectedBus.capacity || 0} seats occupied
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end px-7 py-5 border-t bg-gray-50">
+
+        <button
+          onClick={() => {
+            setShowViewModal(false);
+            setSelectedBus(null);
+          }}
+          className="px-6 py-2.5 rounded-xl bg-gray-800 text-white hover:bg-gray-900 transition"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
     </div>
   );
 }
