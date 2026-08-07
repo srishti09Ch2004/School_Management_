@@ -74,6 +74,8 @@ export default function AdminReports() {
   }
 };
 
+
+
 const filteredStudentReports = studentReports.filter((student) => {
   const search = studentSearch.toLowerCase();
 
@@ -377,193 +379,193 @@ const availableClasses = [
       </div>
 
           {showStudentReport && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-    <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden">
 
-      {/* Modal Header */}
-      <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800">
-            Student Report
-          </h2>
+            {/* Modal Header */}
+            <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Student Report
+                </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
-            Complete student information from the school database.
-          </p>
-        </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Complete student information from the school database.
+                </p>
+              </div>
 
-        <button
-          onClick={() => setShowStudentReport(false)}
-          className="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
-        >
-          Close
-        </button>
-      </div>
+              <button
+                onClick={() => setShowStudentReport(false)}
+                className="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+              >
+                Close
+              </button>
+            </div>
 
-      {/* Filters */}
-      <div className="p-5 border-b border-gray-100 bg-gray-50">
-        <div className="flex flex-col md:flex-row gap-3">
+            {/* Filters */}
+            <div className="p-5 border-b border-gray-100 bg-gray-50">
+              <div className="flex flex-col md:flex-row gap-3">
 
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search by name, admission no. or roll no..."
-              value={studentSearch}
-              onChange={(e) => setStudentSearch(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
-            />
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search by name, admission no. or roll no..."
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                <select
+                  value={studentClass}
+                  onChange={(e) => setStudentClass(e.target.value)}
+                  className="border border-gray-200 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="All">All Classes</option>
+
+                  {availableClasses.map((className) => (
+                    <option key={className} value={className}>
+                      Class {className}
+                    </option>
+                  ))}
+                </select>
+
+              </div>
+            </div>
+
+            {/* Report Count */}
+            <div className="px-6 py-4 flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                Showing{" "}
+                <span className="font-semibold text-gray-800">
+                  {filteredStudentReports.length}
+                </span>{" "}
+                students
+              </p>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-auto max-h-[55vh]">
+
+              <table className="min-w-full">
+
+                <thead className="bg-gray-50 sticky top-0">
+                  <tr className="text-xs uppercase text-gray-500">
+
+                    <th className="px-5 py-4 text-left">
+                      Admission No.
+                    </th>
+
+                    <th className="px-5 py-4 text-left">
+                      Student
+                    </th>
+
+                    <th className="px-5 py-4 text-center">
+                      Class
+                    </th>
+
+                    <th className="px-5 py-4 text-center">
+                      Section
+                    </th>
+
+                    <th className="px-5 py-4 text-center">
+                      Roll No.
+                    </th>
+
+                    <th className="px-5 py-4 text-center">
+                      Gender
+                    </th>
+
+                    <th className="px-5 py-4 text-left">
+                      Phone
+                    </th>
+
+                    <th className="px-5 py-4 text-center">
+                      Status
+                    </th>
+
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {filteredStudentReports.length > 0 ? (
+                    filteredStudentReports.map((student) => (
+                      <tr
+                        key={student.id}
+                        className="border-t border-gray-100 hover:bg-gray-50 transition"
+                      >
+
+                        <td className="px-5 py-4 font-medium text-gray-800">
+                          {student.admission_no || "-"}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <div>
+                            <p className="font-medium text-gray-800">
+                              {student.full_name || "Unknown Student"}
+                            </p>
+
+                            <p className="text-xs text-gray-400">
+                              ID: {student.user_id || "-"}
+                            </p>
+                          </div>
+                        </td>
+
+                        <td className="px-5 py-4 text-center text-gray-600">
+                          {student.class || "-"}
+                        </td>
+
+                        <td className="px-5 py-4 text-center text-gray-600">
+                          {student.section || "-"}
+                        </td>
+
+                        <td className="px-5 py-4 text-center text-gray-600">
+                          {student.roll_no || "-"}
+                        </td>
+
+                        <td className="px-5 py-4 text-center text-gray-600">
+                          {student.gender || "-"}
+                        </td>
+
+                        <td className="px-5 py-4 text-gray-600">
+                          {student.phone || "-"}
+                        </td>
+
+                        <td className="px-5 py-4 text-center">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              student.status === "Active"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {student.status || "Unknown"}
+                          </span>
+                        </td>
+
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="8"
+                        className="px-6 py-12 text-center text-gray-500"
+                      >
+                        No students found.
+                      </td>
+                    </tr>
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
           </div>
-
-          <select
-            value={studentClass}
-            onChange={(e) => setStudentClass(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="All">All Classes</option>
-
-            {availableClasses.map((className) => (
-              <option key={className} value={className}>
-                Class {className}
-              </option>
-            ))}
-          </select>
-
         </div>
-      </div>
-
-      {/* Report Count */}
-      <div className="px-6 py-4 flex justify-between items-center">
-        <p className="text-sm text-gray-500">
-          Showing{" "}
-          <span className="font-semibold text-gray-800">
-            {filteredStudentReports.length}
-          </span>{" "}
-          students
-        </p>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-auto max-h-[55vh]">
-
-        <table className="min-w-full">
-
-          <thead className="bg-gray-50 sticky top-0">
-            <tr className="text-xs uppercase text-gray-500">
-
-              <th className="px-5 py-4 text-left">
-                Admission No.
-              </th>
-
-              <th className="px-5 py-4 text-left">
-                Student
-              </th>
-
-              <th className="px-5 py-4 text-center">
-                Class
-              </th>
-
-              <th className="px-5 py-4 text-center">
-                Section
-              </th>
-
-              <th className="px-5 py-4 text-center">
-                Roll No.
-              </th>
-
-              <th className="px-5 py-4 text-center">
-                Gender
-              </th>
-
-              <th className="px-5 py-4 text-left">
-                Phone
-              </th>
-
-              <th className="px-5 py-4 text-center">
-                Status
-              </th>
-
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {filteredStudentReports.length > 0 ? (
-              filteredStudentReports.map((student) => (
-                <tr
-                  key={student.id}
-                  className="border-t border-gray-100 hover:bg-gray-50 transition"
-                >
-
-                  <td className="px-5 py-4 font-medium text-gray-800">
-                    {student.admission_no || "-"}
-                  </td>
-
-                  <td className="px-5 py-4">
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        {student.full_name || "Unknown Student"}
-                      </p>
-
-                      <p className="text-xs text-gray-400">
-                        ID: {student.user_id || "-"}
-                      </p>
-                    </div>
-                  </td>
-
-                  <td className="px-5 py-4 text-center text-gray-600">
-                    {student.class || "-"}
-                  </td>
-
-                  <td className="px-5 py-4 text-center text-gray-600">
-                    {student.section || "-"}
-                  </td>
-
-                  <td className="px-5 py-4 text-center text-gray-600">
-                    {student.roll_no || "-"}
-                  </td>
-
-                  <td className="px-5 py-4 text-center text-gray-600">
-                    {student.gender || "-"}
-                  </td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    {student.phone || "-"}
-                  </td>
-
-                  <td className="px-5 py-4 text-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        student.status === "Active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {student.status || "Unknown"}
-                    </span>
-                  </td>
-
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="8"
-                  className="px-6 py-12 text-center text-gray-500"
-                >
-                  No students found.
-                </td>
-              </tr>
-            )}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-  </div>
-)}
+      )}
 
     </div>
   );
