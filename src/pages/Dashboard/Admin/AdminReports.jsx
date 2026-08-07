@@ -28,6 +28,10 @@ export default function AdminReports() {
   const [showAttendanceReport, setShowAttendanceReport] = useState(false);
   const [attendanceReports, setAttendanceReports] = useState([]);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [feeReports, setFeeReports] = useState([]);
+  const [showFeeReport, setShowFeeReport] = useState(false);
+  const [loadingFees, setLoadingFees] = useState(false);
+  
   
   // Fetch report statistics
   useEffect(() => {
@@ -99,6 +103,30 @@ const fetchAttendanceReport = async () => {
     alert("Unable to load attendance report.");
   } finally {
     setLoadingAttendance(false);
+  }
+};
+
+const fetchFeeReports = async () => {
+  setLoadingFees(true);
+
+  try {
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feereport.php"
+    );
+
+    const data = await response.json();
+
+    if (data.status) {
+      setFeeReports(data.data);
+      setShowFeeReport(true);
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error("Fee Report Error:", error);
+    alert("Unable to fetch fee report.");
+  } finally {
+    setLoadingFees(false);
   }
 };
 
@@ -316,27 +344,34 @@ const availableClasses = [
                 <div className="flex gap-3 mt-6">
 
                   <button
-                      onClick={() => {
-                        if (item.title === "Student Report") {
-                          fetchStudentReport();
-                        }
-
-                        if (item.title === "Attendance Report") {
-                          fetchAttendanceReport();
-                        }
-                      }}
-                      disabled={
-                        (item.title === "Student Report" && loadingStudents) ||
-                        (item.title === "Attendance Report" && loadingAttendance)
+                    onClick={() => {
+                      if (item.title === "Student Report") {
+                        fetchStudentReport();
                       }
-                      className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium disabled:opacity-50"
-                    >
-                      {item.title === "Student Report" && loadingStudents
-                        ? "Loading..."
-                        : item.title === "Attendance Report" && loadingAttendance
-                        ? "Loading..."
-                        : "Generate"}
-                    </button>
+
+                      if (item.title === "Attendance Report") {
+                        fetchAttendanceReport();
+                      }
+
+                      if (item.title === "Fee Report") {
+                        fetchFeeReports();
+                      }
+                    }}
+                    disabled={
+                      (item.title === "Student Report" && loadingStudents) ||
+                      (item.title === "Attendance Report" && loadingAttendance) ||
+                      (item.title === "Fee Report" && loadingFees)
+                    }
+                    className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium disabled:opacity-50"
+                  >
+                    {item.title === "Student Report" && loadingStudents
+                      ? "Loading..."
+                      : item.title === "Attendance Report" && loadingAttendance
+                      ? "Loading..."
+                      : item.title === "Fee Report" && loadingFees
+                      ? "Loading..."
+                      : "Generate"}
+                  </button>
 
                   <button className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition">
                     <Eye
@@ -806,6 +841,139 @@ const availableClasses = [
           Close
         </button>
 
+      </div>
+
+    </div>
+  </div>
+)}
+
+{showFeeReport && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-white w-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden">
+
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5 border-b">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Fee Report
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Student fee payment and pending fee details
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowFeeReport(false)}
+          className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="p-6 overflow-x-auto">
+        <table className="min-w-full">
+
+          <thead>
+            <tr className="bg-gray-50 text-sm text-gray-600">
+              <th className="px-5 py-4 text-left">
+                Student
+              </th>
+
+              <th className="px-5 py-4 text-right">
+                Total Fee
+              </th>
+
+              <th className="px-5 py-4 text-right">
+                Paid Fee
+              </th>
+
+              <th className="px-5 py-4 text-right">
+                Due Fee
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Payment Date
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Status
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {feeReports.map((fee) => (
+              <tr
+                key={fee.id}
+                className="border-t hover:bg-gray-50 transition"
+              >
+
+                <td className="px-5 py-4">
+                  <div>
+                    <p className="font-medium text-gray-800">
+                      {fee.full_name || "Unknown Student"}
+                    </p>
+
+                    <p className="text-xs text-gray-400">
+                      ID: {fee.student_id || "-"}
+                    </p>
+                  </div>
+                </td>
+
+                <td className="px-5 py-4 text-right text-gray-700">
+                  ₹{Number(fee.total_fee).toLocaleString("en-IN")}
+                </td>
+
+                <td className="px-5 py-4 text-right text-green-600 font-medium">
+                  ₹{Number(fee.paid_fee).toLocaleString("en-IN")}
+                </td>
+
+                <td className="px-5 py-4 text-right text-red-600 font-medium">
+                  ₹{Number(fee.due_fee).toLocaleString("en-IN")}
+                </td>
+
+                <td className="px-5 py-4 text-center text-gray-600">
+                  {fee.payment_date}
+                </td>
+
+                <td className="px-5 py-4 text-center">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      fee.status === "Paid"
+                        ? "bg-green-100 text-green-700"
+                        : fee.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {fee.status}
+                  </span>
+                </td>
+
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
+
+        {/* No Records */}
+        {feeReports.length === 0 && (
+          <div className="text-center py-10 text-gray-500">
+            No fee records found.
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t bg-gray-50 flex justify-end">
+        <button
+          onClick={() => setShowFeeReport(false)}
+          className="px-5 py-2 rounded-xl bg-gray-800 text-white hover:bg-gray-900 transition"
+        >
+          Close
+        </button>
       </div>
 
     </div>
