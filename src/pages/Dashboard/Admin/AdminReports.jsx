@@ -31,6 +31,9 @@ export default function AdminReports() {
   const [feeReports, setFeeReports] = useState([]);
   const [showFeeReport, setShowFeeReport] = useState(false);
   const [loadingFees, setLoadingFees] = useState(false);
+  const [examReports, setExamReports] = useState([]);
+const [showExamReport, setShowExamReport] = useState(false);
+const [loadingExam, setLoadingExam] = useState(false);
   
   
   // Fetch report statistics
@@ -127,6 +130,30 @@ const fetchFeeReports = async () => {
     alert("Unable to fetch fee report.");
   } finally {
     setLoadingFees(false);
+  }
+};
+
+const fetchExamReport = async () => {
+  setLoadingExam(true);
+
+  try {
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/examreport.php"
+    );
+
+    const data = await response.json();
+
+    if (data.status) {
+      setExamReports(data.data);
+      setShowExamReport(true);
+    } else {
+      alert(data.message || "Failed to load exam report.");
+    }
+  } catch (error) {
+    console.error("Exam Report Error:", error);
+    alert("Unable to load exam report.");
+  } finally {
+    setLoadingExam(false);
   }
 };
 
@@ -344,34 +371,41 @@ const availableClasses = [
                 <div className="flex gap-3 mt-6">
 
                   <button
-                    onClick={() => {
-                      if (item.title === "Student Report") {
-                        fetchStudentReport();
-                      }
+  onClick={() => {
+    if (item.title === "Student Report") {
+      fetchStudentReport();
+    }
 
-                      if (item.title === "Attendance Report") {
-                        fetchAttendanceReport();
-                      }
+    if (item.title === "Attendance Report") {
+      fetchAttendanceReport();
+    }
 
-                      if (item.title === "Fee Report") {
-                        fetchFeeReports();
-                      }
-                    }}
-                    disabled={
-                      (item.title === "Student Report" && loadingStudents) ||
-                      (item.title === "Attendance Report" && loadingAttendance) ||
-                      (item.title === "Fee Report" && loadingFees)
-                    }
-                    className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium disabled:opacity-50"
-                  >
-                    {item.title === "Student Report" && loadingStudents
-                      ? "Loading..."
-                      : item.title === "Attendance Report" && loadingAttendance
-                      ? "Loading..."
-                      : item.title === "Fee Report" && loadingFees
-                      ? "Loading..."
-                      : "Generate"}
-                  </button>
+    if (item.title === "Fee Report") {
+      fetchFeeReports();
+    }
+
+    if (item.title === "Exam Report") {
+      fetchExamReport();
+    }
+  }}
+  disabled={
+    (item.title === "Student Report" && loadingStudents) ||
+    (item.title === "Attendance Report" && loadingAttendance) ||
+    (item.title === "Fee Report" && loadingFees) ||
+    (item.title === "Exam Report" && loadingExam)
+  }
+  className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium disabled:opacity-50"
+>
+  {item.title === "Student Report" && loadingStudents
+    ? "Loading..."
+    : item.title === "Attendance Report" && loadingAttendance
+    ? "Loading..."
+    : item.title === "Fee Report" && loadingFees
+    ? "Loading..."
+    : item.title === "Exam Report" && loadingExam
+    ? "Loading..."
+    : "Generate"}
+</button>
 
                   <button className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition">
                     <Eye
@@ -977,6 +1011,206 @@ const availableClasses = [
       </div>
 
     </div>
+  </div>
+)}
+
+{showExamReport && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+    <div className="bg-white w-full max-w-7xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden">
+
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5 border-b">
+
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Exam Report
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Exam schedule and examination details from the school database.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowExamReport(false)}
+          className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      {/* Table */}
+      <div className="overflow-auto max-h-[65vh]">
+
+        <table className="min-w-full">
+
+          <thead className="bg-gray-50 sticky top-0">
+            <tr className="text-xs uppercase text-gray-500">
+
+              <th className="px-5 py-4 text-left">
+                Exam Name
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Class
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Section
+              </th>
+
+              <th className="px-5 py-4 text-left">
+                Subject
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Exam Date
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Start Time
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                End Time
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Total Marks
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Passing Marks
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Status
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Created At
+              </th>
+
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {examReports.length > 0 ? (
+
+              examReports.map((exam) => (
+
+                <tr
+                  key={exam.id}
+                  className="border-t border-gray-100 hover:bg-gray-50 transition"
+                >
+
+                  <td className="px-5 py-4 font-medium text-gray-800">
+                    {exam.exam_name || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {exam.class || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {exam.section || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    {exam.subject || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {exam.exam_date || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {exam.start_time || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {exam.end_time || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {exam.total_marks || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {exam.passing_marks || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center">
+
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        exam.status === "Completed"
+                          ? "bg-green-100 text-green-700"
+                          : exam.status === "Scheduled"
+                          ? "bg-blue-100 text-blue-700"
+                          : exam.status === "Cancelled"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {exam.status || "-"}
+                    </span>
+
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-500 text-sm">
+                    {exam.created_at || "-"}
+                  </td>
+
+                </tr>
+
+              ))
+
+            ) : (
+
+              <tr>
+
+                <td
+                  colSpan="11"
+                  className="px-6 py-12 text-center text-gray-500"
+                >
+                  No exam records found.
+                </td>
+
+              </tr>
+
+            )}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t bg-gray-50 flex justify-between items-center">
+
+        <p className="text-sm text-gray-500">
+          Total Exams:{" "}
+          <span className="font-semibold text-gray-800">
+            {examReports.length}
+          </span>
+        </p>
+
+        <button
+          onClick={() => setShowExamReport(false)}
+          className="px-5 py-2 rounded-xl bg-gray-800 text-white hover:bg-gray-900 transition"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
 )}
 
