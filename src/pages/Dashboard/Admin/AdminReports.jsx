@@ -25,6 +25,9 @@ export default function AdminReports() {
   const [studentSearch, setStudentSearch] = useState("");
   const [studentClass, setStudentClass] = useState("All");
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [showAttendanceReport, setShowAttendanceReport] = useState(false);
+  const [attendanceReports, setAttendanceReports] = useState([]);
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
   
   // Fetch report statistics
   useEffect(() => {
@@ -75,6 +78,29 @@ export default function AdminReports() {
 };
 
 
+const fetchAttendanceReport = async () => {
+  setLoadingAttendance(true);
+
+  try {
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/attendancereport.php"
+    );
+
+    const data = await response.json();
+
+    if (data.status) {
+      setAttendanceReports(data.data);
+      setShowAttendanceReport(true);
+    } else {
+      alert(data.message || "Failed to load attendance report.");
+    }
+  } catch (error) {
+    console.error("Attendance Report Error:", error);
+    alert("Unable to load attendance report.");
+  } finally {
+    setLoadingAttendance(false);
+  }
+};
 
 const filteredStudentReports = studentReports.filter((student) => {
   const search = studentSearch.toLowerCase();
@@ -290,17 +316,27 @@ const availableClasses = [
                 <div className="flex gap-3 mt-6">
 
                   <button
-                    onClick={() => {
-                      if (item.title === "Student Report") {
-                        fetchStudentReport();
+                      onClick={() => {
+                        if (item.title === "Student Report") {
+                          fetchStudentReport();
+                        }
+
+                        if (item.title === "Attendance Report") {
+                          fetchAttendanceReport();
+                        }
+                      }}
+                      disabled={
+                        (item.title === "Student Report" && loadingStudents) ||
+                        (item.title === "Attendance Report" && loadingAttendance)
                       }
-                    }}
-                    className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium"
-                  >
-                    {item.title === "Student Report" && loadingStudents
-                      ? "Loading..."
-                      : "Generate"}
-                  </button>
+                      className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium disabled:opacity-50"
+                    >
+                      {item.title === "Student Report" && loadingStudents
+                        ? "Loading..."
+                        : item.title === "Attendance Report" && loadingAttendance
+                        ? "Loading..."
+                        : "Generate"}
+                    </button>
 
                   <button className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition">
                     <Eye
@@ -566,6 +602,215 @@ const availableClasses = [
           </div>
         </div>
       )}
+
+      {showAttendanceReport && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[85vh] overflow-hidden">
+
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5 border-b">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Attendance Report
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Attendance records from the school database.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowAttendanceReport(false)}
+          className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-gray-50">
+
+        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+          <p className="text-xs text-gray-500">
+            Total Records
+          </p>
+
+          <h3 className="text-xl font-bold text-gray-800 mt-1">
+            {attendanceReports.length}
+          </h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+          <p className="text-xs text-gray-500">
+            Present
+          </p>
+
+          <h3 className="text-xl font-bold text-green-600 mt-1">
+            {
+              attendanceReports.filter(
+                (item) => item.status === "Present"
+              ).length
+            }
+          </h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+          <p className="text-xs text-gray-500">
+            Absent
+          </p>
+
+          <h3 className="text-xl font-bold text-red-600 mt-1">
+            {
+              attendanceReports.filter(
+                (item) => item.status === "Absent"
+              ).length
+            }
+          </h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+          <p className="text-xs text-gray-500">
+            Leave
+          </p>
+
+          <h3 className="text-xl font-bold text-orange-600 mt-1">
+            {
+              attendanceReports.filter(
+                (item) => item.status === "Leave"
+              ).length
+            }
+          </h3>
+        </div>
+
+      </div>
+
+      {/* Table */}
+      <div className="overflow-auto max-h-[55vh]">
+
+        <table className="min-w-full">
+
+          <thead className="bg-gray-50 sticky top-0">
+            <tr className="text-sm text-gray-600">
+
+              <th className="px-5 py-4 text-left">
+                Student
+              </th>
+
+              <th className="px-5 py-4 text-left">
+                Admission No.
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Class
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Section
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Date
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Status
+              </th>
+
+              <th className="px-5 py-4 text-center">
+                Attendance Type
+              </th>
+
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {attendanceReports.length > 0 ? (
+              attendanceReports.map((record) => (
+                <tr
+                  key={record.id}
+                  className="border-t hover:bg-gray-50 transition"
+                >
+
+                  <td className="px-5 py-4 font-medium text-gray-800">
+                    {record.full_name || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    {record.admission_no || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {record.class || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {record.section || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {record.attendance_date || "-"}
+                  </td>
+
+                  <td className="px-5 py-4 text-center">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        record.status === "Present"
+                          ? "bg-green-100 text-green-700"
+                          : record.status === "Absent"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
+                      {record.status || "-"}
+                    </span>
+                  </td>
+
+                  <td className="px-5 py-4 text-center text-gray-600">
+                    {record.attendance_type || "-"}
+                  </td>
+
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="7"
+                  className="px-6 py-12 text-center text-gray-500"
+                >
+                  No attendance records found.
+                </td>
+              </tr>
+            )}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t flex justify-between items-center">
+
+        <p className="text-sm text-gray-500">
+          Total Records:{" "}
+          <span className="font-semibold text-gray-800">
+            {attendanceReports.length}
+          </span>
+        </p>
+
+        <button
+          onClick={() => setShowAttendanceReport(false)}
+          className="px-5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
 
     </div>
   );
