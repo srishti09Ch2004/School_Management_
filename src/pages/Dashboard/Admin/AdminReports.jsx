@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import {
   FileText,
   Users,
@@ -35,6 +34,29 @@ export default function AdminReports() {
 const [showExamReport, setShowExamReport] = useState(false);
 const [loadingExam, setLoadingExam] = useState(false);
   
+
+useEffect(() => {
+  const isAnyReportOpen =
+    showStudentReport ||
+    showAttendanceReport ||
+    showFeeReport ||
+    showExamReport;
+
+  if (isAnyReportOpen) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [
+  showStudentReport,
+  showAttendanceReport,
+  showFeeReport,
+  showExamReport,
+]);
   
   // Fetch report statistics
   useEffect(() => {
@@ -371,43 +393,63 @@ const availableClasses = [
                 <div className="flex gap-3 mt-6">
 
                   <button
-  onClick={() => {
-    if (item.title === "Student Report") {
-      fetchStudentReport();
-    }
+                    onClick={() => {
+                      if (item.title === "Student Report") {
+                        fetchStudentReport();
+                      }
 
-    if (item.title === "Attendance Report") {
-      fetchAttendanceReport();
-    }
+                      if (item.title === "Attendance Report") {
+                        fetchAttendanceReport();
+                      }
 
-    if (item.title === "Fee Report") {
-      fetchFeeReports();
-    }
+                      if (item.title === "Fee Report") {
+                        fetchFeeReports();
+                      }
 
-    if (item.title === "Exam Report") {
-      fetchExamReport();
-    }
-  }}
-  disabled={
-    (item.title === "Student Report" && loadingStudents) ||
-    (item.title === "Attendance Report" && loadingAttendance) ||
-    (item.title === "Fee Report" && loadingFees) ||
-    (item.title === "Exam Report" && loadingExam)
-  }
-  className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium disabled:opacity-50"
->
-  {item.title === "Student Report" && loadingStudents
-    ? "Loading..."
-    : item.title === "Attendance Report" && loadingAttendance
-    ? "Loading..."
-    : item.title === "Fee Report" && loadingFees
-    ? "Loading..."
-    : item.title === "Exam Report" && loadingExam
-    ? "Loading..."
-    : "Generate"}
-</button>
+                      if (item.title === "Exam Report") {
+                        fetchExamReport();
+                      }
+                    }}
+                    disabled={
+                      (item.title === "Student Report" && loadingStudents) ||
+                      (item.title === "Attendance Report" && loadingAttendance) ||
+                      (item.title === "Fee Report" && loadingFees) ||
+                      (item.title === "Exam Report" && loadingExam)
+                    }
+                    className="flex-1 bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition font-medium disabled:opacity-50"
+                  >
+                    {item.title === "Student Report" && loadingStudents
+                      ? "Loading..."
+                      : item.title === "Attendance Report" && loadingAttendance
+                      ? "Loading..."
+                      : item.title === "Fee Report" && loadingFees
+                      ? "Loading..."
+                      : item.title === "Exam Report" && loadingExam
+                      ? "Loading..."
+                      : "Generate"}
+                  </button>
 
-                  <button className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition">
+                  <button
+                    onClick={() => {
+                      if (item.title === "Student Report") {
+                        fetchStudentReport();
+                      }
+
+                      if (item.title === "Attendance Report") {
+                        fetchAttendanceReport();
+                      }
+
+                      if (item.title === "Fee Report") {
+                        fetchFeeReports();
+                      }
+
+                      if (item.title === "Exam Report") {
+                        fetchExamReport();
+                      }
+                    }}
+                    className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition"
+                    title={`View ${item.title}`}
+                  >
                     <Eye
                       size={18}
                       className="text-gray-600"
@@ -484,8 +526,7 @@ const availableClasses = [
       </div>
 
           {showStudentReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">          <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden">
 
             {/* Modal Header */}
             <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -882,7 +923,7 @@ const availableClasses = [
 )}
 
 {showFeeReport && (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
     <div className="bg-white w-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden">
 
       {/* Header */}
@@ -1015,7 +1056,7 @@ const availableClasses = [
 )}
 
 {showExamReport && (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
 
     <div className="bg-white w-full max-w-7xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden">
 
