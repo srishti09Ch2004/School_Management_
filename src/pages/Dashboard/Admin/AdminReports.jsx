@@ -31,8 +31,10 @@ export default function AdminReports() {
   const [showFeeReport, setShowFeeReport] = useState(false);
   const [loadingFees, setLoadingFees] = useState(false);
   const [examReports, setExamReports] = useState([]);
-const [showExamReport, setShowExamReport] = useState(false);
-const [loadingExam, setLoadingExam] = useState(false);
+  const [showExamReport, setShowExamReport] = useState(false);
+  const [loadingExam, setLoadingExam] = useState(false);
+  const [recentReports, setRecentReports] = useState([]);
+  const [loadingRecentReports, setLoadingRecentReports] = useState(true);
   
 
 useEffect(() => {
@@ -179,6 +181,154 @@ const fetchExamReport = async () => {
   }
 };
 
+// LIVE RECENT REPORTS
+
+useEffect(() => {
+  const fetchRecentReports = async () => {
+    try {
+      setLoadingRecentReports(true);
+
+      const [
+        studentResponse,
+        attendanceResponse,
+        feeResponse,
+        examResponse,
+      ] = await Promise.all([
+        fetch(
+          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/studentreport.php"
+        ),
+        fetch(
+          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/attendancereport.php"
+        ),
+        fetch(
+          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feereport.php"
+        ),
+        fetch(
+          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/examreport.php"
+        ),
+      ]);
+
+      const studentData = await studentResponse.json();
+      const attendanceData = await attendanceResponse.json();
+      const feeData = await feeResponse.json();
+      const examData = await examResponse.json();
+
+      setRecentReports([
+        {
+          id: "student",
+          name: "Student Report",
+          type: "Student",
+          count: studentData.status
+            ? studentData.data.length
+            : 0,
+          data: studentData.status ? studentData.data : [],
+        },
+        {
+          id: "attendance",
+          name: "Attendance Report",
+          type: "Attendance",
+          count: attendanceData.status
+            ? attendanceData.data.length
+            : 0,
+          data: attendanceData.status ? attendanceData.data : [],
+        },
+        {
+          id: "fee",
+          name: "Fee Report",
+          type: "Fee",
+          count: feeData.status
+            ? feeData.data.length
+            : 0,
+          data: feeData.status ? feeData.data : [],
+        },
+        {
+          id: "exam",
+          name: "Exam Report",
+          type: "Exam",
+          count: examData.status
+            ? examData.data.length
+            : 0,
+          data: examData.status ? examData.data : [],
+        },
+      ]);
+    } catch (error) {
+      console.error("Recent Reports Error:", error);
+      setRecentReports([]);
+    } finally {
+      setLoadingRecentReports(false);
+    }
+  };
+
+  fetchRecentReports();
+}, []);
+
+// DOWNLOAD LIVE REPORT AS CSV
+
+const downloadReport = (report) => {
+  if (!report || !report.data || report.data.length === 0) {
+    alert(`No ${report?.type || "report"} data available to download.`);
+    return;
+  }
+
+  const data = report.data;
+
+  // Get all unique column names
+  const headers = [
+    ...new Set(
+      data.flatMap((row) => Object.keys(row))
+    ),
+  ];
+
+  const csvRows = [];
+
+  // Header row
+  csvRows.push(
+    headers
+      .map((header) => `"${String(header).replace(/"/g, '""')}"`)
+      .join(",")
+  );
+
+  // Data rows
+  data.forEach((row) => {
+    const values = headers.map((header) => {
+      const value = row[header] ?? "";
+
+      return `"${String(value).replace(/"/g, '""')}"`;
+    });
+
+    csvRows.push(values.join(","));
+  });
+
+  const csvContent = csvRows.join("\n");
+
+  const blob = new Blob(
+    [csvContent],
+    {
+      type: "text/csv;charset=utf-8;",
+    }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+
+  link.download = `${report.name
+    .replace(/\s+/g, "_")
+    .toLowerCase()}_${new Date()
+    .toISOString()
+    .slice(0, 10)}.csv`;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+};
+
 const filteredStudentReports = studentReports.filter((student) => {
   const search = studentSearch.toLowerCase();
 
@@ -276,21 +426,7 @@ const availableClasses = [
     },
   ];
 
-  // Recent reports
-  const recentReports = [
-    {
-      name: "Annual Report.pdf",
-      date: "15 Jan 2026",
-    },
-    {
-      name: "Fee Collection.xlsx",
-      date: "12 Jan 2026",
-    },
-    {
-      name: "Attendance Report.pdf",
-      date: "10 Jan 2026",
-    },
-  ];
+  
 
   return (
     <div className="space-y-7">
@@ -467,63 +603,87 @@ const availableClasses = [
       </div>
 
       {/* Recent Reports */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-5">
 
-        <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">
+                Recent Reports
+              </h2>
 
-          <h2 className="text-xl font-bold text-gray-800">
-            Recent Reports
-          </h2>
-
-          <button className="text-sm text-green-600 font-medium hover:text-green-700">
-            View All
-          </button>
-
-        </div>
-
-        <div className="space-y-4">
-
-          {recentReports.map((item) => (
-            <div
-              key={item.name}
-              className="flex items-center justify-between border border-gray-100 rounded-2xl p-4 hover:bg-gray-50 transition"
-            >
-
-              <div className="flex items-center gap-3">
-
-                <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
-
-                  <FileText
-                    size={18}
-                    className="text-green-600"
-                  />
-
-                </div>
-
-                <div>
-
-                  <p className="font-medium text-gray-800">
-                    {item.name}
-                  </p>
-
-                  <p className="text-sm text-gray-500">
-                    {item.date}
-                  </p>
-
-                </div>
-
-              </div>
-
-              <button className="text-green-600 text-sm font-medium hover:text-green-700">
-                Download
-              </button>
-
+              <p className="text-sm text-gray-500 mt-1">
+                Live reports generated from the school database.
+              </p>
             </div>
-          ))}
 
+            <span className="text-xs font-medium bg-green-50 text-green-600 px-3 py-2 rounded-xl">
+              Live Data
+            </span>
+
+          </div>
+
+          {loadingRecentReports ? (
+            <div className="py-10 text-center text-gray-500">
+              Loading live reports...
+            </div>
+
+          ) : recentReports.length > 0 ? (
+
+            <div className="space-y-4">
+
+              {recentReports.map((report) => (
+
+                <div
+                  key={report.id}
+                  className="flex items-center justify-between border border-gray-100 rounded-2xl p-4 hover:bg-gray-50 transition"
+                >
+
+                  <div className="flex items-center gap-3">
+
+                    <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
+
+                      <FileText
+                        size={18}
+                        className="text-green-600"
+                      />
+
+                    </div>
+                    <div>
+
+                      <p className="font-medium text-gray-800">
+                        {report.name}
+                      </p>
+
+                      <p className="text-sm text-gray-500">
+                        {report.count} record
+                        {report.count !== 1 ? "s" : ""} available
+                      </p>
+                    </div>
+
+                  </div>
+                  <button
+                    onClick={() => downloadReport(report)}
+                    disabled={report.count === 0}
+                    className="flex items-center gap-2 text-green-600 text-sm font-medium hover:text-green-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  >
+
+                    <Download size={16} />
+                    {report.count === 0
+                      ? "No Data"
+                      : "Download"}
+
+                  </button>
+                </div>
+              ))}
+            </div>
+
+          ) : (
+
+            <div className="py-10 text-center text-gray-500">
+              No reports available.
+            </div>
+          )}
         </div>
-
-      </div>
 
           {showStudentReport && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">          <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden">
