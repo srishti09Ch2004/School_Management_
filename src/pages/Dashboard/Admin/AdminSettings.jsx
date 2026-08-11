@@ -803,16 +803,14 @@ export default function AdminSettings() {
           <button
             type="button"
             onClick={() => {
-
               window.open(
                 `${API}/downloadbackup.php?file=${encodeURIComponent(
                   backup.file_name
                 )}`,
                 "_blank"
               );
-
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition"
           >
             Download
           </button>
