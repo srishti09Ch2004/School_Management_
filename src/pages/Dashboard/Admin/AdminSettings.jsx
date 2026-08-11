@@ -315,6 +315,71 @@ export default function AdminSettings() {
     }
   };
 
+const deleteBackup = async (backup) => {
+  if (!backup || !backup.file_name) {
+    alert("Invalid backup file.");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `Are you sure you want to delete this backup?\n\n${backup.file_name}`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    const formData = new URLSearchParams();
+
+    formData.append(
+      "file_name",
+      backup.file_name
+    );
+
+    const response = await fetch(
+      `${API}/deletebackup.php`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(
+      "Delete Backup Response:",
+      data
+    );
+
+    if (!data.status) {
+      alert(
+        data.message ||
+          "Unable to delete backup."
+      );
+
+      return;
+    }
+
+    alert(
+      "Backup deleted successfully."
+    );
+
+    // Refresh backup list
+    await fetchBackups();
+
+  } catch (error) {
+    console.error(
+      "Delete Backup Error:",
+      error
+    );
+
+    alert(
+      "Unable to delete backup."
+    );
+  }
+};
+
   // RENDER CONTENT
 
   const renderContent = () => {
@@ -813,6 +878,14 @@ export default function AdminSettings() {
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition"
           >
             Download
+          </button>
+
+          <button
+            type="button"
+            onClick={() => deleteBackup(backup)}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl"
+          >
+            Delete
           </button>
 
         </div>
