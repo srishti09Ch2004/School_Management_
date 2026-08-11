@@ -686,14 +686,16 @@ const deleteBackup = async (backup) => {
                       data.data?.file_name || "Backup file"
                     }\nSize: ${data.data?.file_size || "Unknown"}`
                   );
+
+                  await fetchBackups();
+
                 } catch (error) {
                   console.error("Backup Error:", error);
                   alert("Unable to create database backup.");
                 }
               }}
               disabled={restoringDatabase}
-              className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl transition disabled:opacity-50"
-            >
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl font-medium flex items-center gap-2 transition shadow-sm"            >
               Create Backup
             </button>
 
@@ -834,9 +836,9 @@ const deleteBackup = async (backup) => {
       {backupList.map((backup) => (
 
         <div
-          key={backup.file_name}
-          className="border border-gray-100 rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 hover:bg-gray-50 transition"
-        >
+            key={backup.file_name}
+            className="border border-gray-200 rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 hover:border-green-200 hover:bg-gray-50 transition"
+          >
 
           {/* FILE INFORMATION */}
 
@@ -849,14 +851,14 @@ const deleteBackup = async (backup) => {
             <div>
 
               <p className="font-semibold text-gray-800 break-all">
-                {backup.file_name}
-              </p>
+                  {backup.file_name}
+                </p>
 
-              <p className="text-sm text-gray-500 mt-1">
-                {backup.file_size_kb} KB
-                {" • "}
-                {backup.created_at}
-              </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {backup.file_size_kb} KB
+                  <span className="mx-2">•</span>
+                  {backup.created_at}
+                </p>
 
             </div>
 
@@ -875,7 +877,7 @@ const deleteBackup = async (backup) => {
                 "_blank"
               );
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
           >
             Download
           </button>
@@ -883,7 +885,7 @@ const deleteBackup = async (backup) => {
           <button
             type="button"
             onClick={() => deleteBackup(backup)}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl"
+            className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-medium transition"
           >
             Delete
           </button>
@@ -916,15 +918,18 @@ const deleteBackup = async (backup) => {
             Manage your school configuration.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={saveSettings}
-          disabled={savingSettings || loadingSettings}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Save size={18} />
-          {savingSettings ? "Saving..." : "Save Changes"}
-        </button>
+        {activeTab !== "backup" && (
+          <button
+            type="button"
+            onClick={saveSettings}
+            disabled={savingSettings || loadingSettings}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Save size={18} />
+            {savingSettings ? "Saving..." : "Save Changes"}
+          </button>
+        )}
+
       </div>
 
       {/* CONTENT */}
