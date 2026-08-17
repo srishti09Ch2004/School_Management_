@@ -1,11 +1,11 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+// header("Access-Control-Allow-Origin: *");
+// header("Content-Type: application/json");
 
-include("../../config/db.php");
+// include("../../config/db.php");
 
-$id = $_GET["id"] ?? 0;
+// $id = $_GET["id"] ?? 0;
 
 $sql = "SELECT
 users.full_name,

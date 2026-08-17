@@ -84,9 +84,8 @@ function Login() {
             </h1>
 
             <p className="mt-5 text-2lg text-gray-600 leading-8 max-w-xl">
-              Choose your role to continue securely. Every dashboard is
-              designed specifically for your responsibilities inside your
-              institution.
+              Choose a portal to continue. Your dashboard will be
+              automatically determined from your registered account.
             </p>
 
             {/* Role Cards */}
@@ -126,11 +125,9 @@ function Login() {
 
                   <p className="mt-3 text-center text-gray-500 leading-7">
 
-                    Please choose your role from the left panel.
-
-                    <br />
-
-                    The login form will appear here.
+                    Select any portal to open the login form.
+                    Your account role will determine which dashboard
+                    you are redirected to after login.
 
                   </p>
 

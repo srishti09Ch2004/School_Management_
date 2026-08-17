@@ -13,12 +13,14 @@ import About from "./components/About";
 import Modules from "./components/Modules";
 import Contact from "./components/Contact";
 import Pricing from "./components/Pricing";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
 import TeacherDashboard from "./pages/Dashboard/Teacher/TeacherDashboard";
 import StudentDashboard from "./pages/Dashboard/Student/StudentDashboard";
 import ParentDashboard from "./pages/Dashboard/Parent/ParentDashboard";
 import PrincipalDashboard from "./pages/Dashboard/Principal/PrincipalDashboard";
+
 
 function App() {
   const location = useLocation();
@@ -55,11 +57,50 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
 
-        <Route path="/teacher" element={<TeacherDashboard />} />
-        <Route path="/student" element={<StudentDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/parent" element={<ParentDashboard />} />
-        <Route path="/principal" element={<PrincipalDashboard />} />
+        <Route
+  path="/teacher"
+  element={
+    <ProtectedRoute allowedRole="teacher">
+      <TeacherDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/student"
+  element={
+    <ProtectedRoute allowedRole="student">
+      <StudentDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/parent"
+  element={
+    <ProtectedRoute allowedRole="parent">
+      <ParentDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/principal"
+  element={
+    <ProtectedRoute allowedRole="principal">
+      <PrincipalDashboard />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
 
       {!hideLayout && <Footer />}
