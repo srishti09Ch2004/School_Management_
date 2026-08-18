@@ -36,6 +36,15 @@ const [formData, setFormData] = useState({
   phone: "",
   address: "",
   status: "Active",
+
+   // Family / Parent Information
+  father_name: "",
+  mother_name: "",
+  parent_email: "",
+  parent_password: "",
+  parent_phone: "",
+  parent_occupation: "",
+  parent_address: "",
 });
 
 const fetchStudents = () => {
@@ -52,9 +61,24 @@ useEffect(() => {
   fetchStudents();
 }, []);
 
+
+
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [viewStudent, setViewStudent] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+  if (showAddModal || showEditModal || viewStudent) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [showAddModal, showEditModal, viewStudent]);
+
 
   // ---------- Derived data: filtered students ----------
   // ---------- Derived data: filtered students ----------
@@ -101,7 +125,63 @@ const handleChange = (e) => {
   });
 };
 
-  const handleSubmit = async () => {
+//   const handleSubmit = async () => {
+
+//   if (
+//     !formData.full_name ||
+//     !formData.email ||
+//     !formData.password ||
+//     !formData.class ||
+//     !formData.section ||
+//     !formData.roll_no ||
+//     !formData.gender ||
+//     !formData.dob ||
+//     !formData.phone ||
+//     !formData.address
+//   ) {
+//     alert("Please fill all fields");
+//     return;
+//   }
+
+//   const response = await fetch(
+//     "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addStudent.php",
+//     {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(formData),
+//     }
+//   );
+
+//   const data = await response.json();
+
+//   alert(data.message);
+
+//   if (data.status) {
+//     setShowAddModal(false);
+
+//     setFormData({
+//       full_name: "",
+//       email: "",
+//       password: "",
+//       class: "",
+//       section: "",
+//       roll_no: "",
+//       gender: "",
+//       dob: "",
+//       phone: "",
+//       address: "",
+//       status: "Active",
+//     });
+
+//     fetchStudents();
+//     setCurrentPage(1);
+//   }
+// };
+
+
+const handleSubmit = async () => {
 
   if (
     !formData.full_name ||
@@ -113,48 +193,76 @@ const handleChange = (e) => {
     !formData.gender ||
     !formData.dob ||
     !formData.phone ||
-    !formData.address
+    !formData.address ||
+    !formData.father_name ||
+    !formData.mother_name ||
+    !formData.parent_email ||
+    !formData.parent_password ||
+    !formData.parent_phone ||
+    !formData.parent_occupation ||
+    !formData.parent_address
   ) {
-    alert("Please fill all fields");
+    alert("Please fill all student and family fields");
     return;
   }
 
-  const response = await fetch(
-    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addStudent.php",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+  try {
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addStudent.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    if (data.status) {
+
+      setShowAddModal(false);
+
+      setFormData({
+        full_name: "",
+        email: "",
+        password: "",
+        class: "",
+        section: "",
+        roll_no: "",
+        gender: "",
+        dob: "",
+        phone: "",
+        address: "",
+        status: "Active",
+
+        father_name: "",
+        mother_name: "",
+        parent_email: "",
+        parent_password: "",
+        parent_phone: "",
+        parent_occupation: "",
+        parent_address: "",
+      });
+
+      fetchStudents();
+      setCurrentPage(1);
     }
-  );
 
-  const data = await response.json();
+  } catch (error) {
 
-  alert(data.message);
+    console.error("Add Student Error:", error);
 
-  if (data.status) {
-    setShowAddModal(false);
+    alert("Unable to connect with server");
 
-    setFormData({
-      full_name: "",
-      email: "",
-      password: "",
-      class: "",
-      section: "",
-      roll_no: "",
-      gender: "",
-      dob: "",
-      phone: "",
-      address: "",
-      status: "Active",
-    });
-
-    fetchStudents();
-    setCurrentPage(1);
   }
 };
+
+
 
 const handleView = async (id) => {
   try {
@@ -821,6 +929,86 @@ const handleDelete = async (id) => {
           className="border rounded-xl p-3 md:col-span-2"
           rows="3"
         />
+
+
+{/* ================= FAMILY INFORMATION ================= */}
+
+<div className="md:col-span-2 mt-4">
+
+  <h3 className="text-lg font-bold text-gray-800 mb-1">
+    Family Information
+  </h3>
+
+  <p className="text-sm text-gray-500 mb-4">
+    Enter basic parent/guardian information. This will automatically
+    be linked with the student.
+  </p>
+
+</div>
+
+<input
+  type="text"
+  name="father_name"
+  placeholder="Father Name"
+  value={formData.father_name}
+  onChange={handleChange}
+  className="border rounded-xl p-3"
+/>
+
+<input
+  type="text"
+  name="mother_name"
+  placeholder="Mother Name"
+  value={formData.mother_name}
+  onChange={handleChange}
+  className="border rounded-xl p-3"
+/>
+
+<input
+  type="email"
+  name="parent_email"
+  placeholder="Parent Email"
+  value={formData.parent_email}
+  onChange={handleChange}
+  className="border rounded-xl p-3"
+/>
+
+<input
+  type="password"
+  name="parent_password"
+  placeholder="Parent Password"
+  value={formData.parent_password}
+  onChange={handleChange}
+  className="border rounded-xl p-3"
+/>
+
+<input
+  type="text"
+  name="parent_phone"
+  placeholder="Parent Phone"
+  value={formData.parent_phone}
+  onChange={handleChange}
+  className="border rounded-xl p-3"
+/>
+
+<input
+  type="text"
+  name="parent_occupation"
+  placeholder="Parent Occupation"
+  value={formData.parent_occupation}
+  onChange={handleChange}
+  className="border rounded-xl p-3"
+/>
+
+<textarea
+  name="parent_address"
+  placeholder="Parent Address"
+  value={formData.parent_address}
+  onChange={handleChange}
+  className="border rounded-xl p-3 md:col-span-2"
+  rows="3"
+/>
+
         <select
           name="status"
           value={formData.status}

@@ -21,6 +21,19 @@ export default function AdminTeacher() {
   const [viewTeacher, setViewTeacher] = useState(null);
   const [loading, setLoading] = useState(false);
 
+
+    useEffect(() => {
+  if (showAddModal || showEditModal || viewTeacher) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [showAddModal, showEditModal, viewTeacher]);
+
 const [formData, setFormData] = useState({
   full_name: "",
   email: "",
