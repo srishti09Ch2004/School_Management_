@@ -241,7 +241,6 @@
 
 
 
-
 import { useEffect, useState } from "react";
 import {
   Search,
@@ -251,6 +250,8 @@ import {
   HeartHandshake,
   Pencil,
   Trash2,
+  Eye,
+  X,
 } from "lucide-react";
 
 export default function AdminParent() {
@@ -258,6 +259,7 @@ export default function AdminParent() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [viewParent, setViewParent] = useState(null);
 
   /* API URL */
   const API_URL =
@@ -539,14 +541,35 @@ export default function AdminParent() {
 
                     <td className="px-6 py-5">
                       <div className="flex justify-center gap-2">
-                        <button className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
-                          <Pencil size={16} />
-                        </button>
 
-                        <button className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                          {/* View */}
+                          <button
+                            onClick={() => setViewParent(parent)}
+                            className="w-9 h-9 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition"
+                            title="View Parent Details"
+                          >
+                            <Eye size={16} />
+                          </button>
+
+
+                          {/* Edit - abhi sirf UI */}
+                          <button
+                            className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
+                            title="Edit Parent"
+                          >
+                            <Pencil size={16} />
+                          </button>
+
+
+                          {/* Delete - abhi sirf UI */}
+                          <button
+                            className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
+                            title="Delete Parent"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+
+                        </div>
                     </td>
                   </tr>
                 ))}
@@ -554,6 +577,336 @@ export default function AdminParent() {
           </table>
         </div>
       </div>
+
+{/* ================= VIEW PARENT MODAL ================= */}
+
+{viewParent && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+
+    <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-gray-100">
+
+      {/* Header */}
+      <div className="p-6 bg-gradient-to-r from-green-50 to-transparent flex justify-between items-center border-b border-gray-100">
+
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Parent & Student Details
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Complete family and linked student information
+          </p>
+        </div>
+
+        <button
+          onClick={() => setViewParent(null)}
+          className="p-2 rounded-xl hover:bg-gray-200 text-gray-500 transition"
+        >
+          <X size={20} />
+        </button>
+
+      </div>
+
+
+      {/* Content */}
+      <div className="p-6 space-y-6">
+
+
+        {/* ================= PARENT INFORMATION ================= */}
+
+        <div>
+
+          <h3 className="text-sm font-bold text-gray-800 mb-3">
+            Parent Information
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-2xl">
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Parent Name
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.name || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Email
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.email || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Relation
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.relation || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Phone
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.phone || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Father Name
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.father_name || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Mother Name
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.mother_name || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Occupation
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.occupation || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Parent Status
+              </span>
+
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                  viewParent.status === "Active"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-yellow-100 text-yellow-700"
+                }`}
+              >
+                {viewParent.status || "N/A"}
+              </span>
+            </div>
+
+
+            <div className="md:col-span-2">
+
+              <span className="text-xs text-gray-400 block">
+                Address
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.address || "N/A"}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        {/* ================= STUDENT INFORMATION ================= */}
+
+        <div>
+
+          <h3 className="text-sm font-bold text-gray-800 mb-3">
+            Linked Student Information
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-2xl">
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Student Name
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student || "Not Linked"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Student Email
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_email || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Admission No
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_admission || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Class
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_class || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Section
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_section || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Roll No
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_roll_no || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Gender
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_gender || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Date of Birth
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_dob || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Student Phone
+              </span>
+
+              <span className="font-semibold text-gray-700">
+                {viewParent.student_phone || "N/A"}
+              </span>
+            </div>
+
+
+            <div>
+              <span className="text-xs text-gray-400 block">
+                Student Status
+              </span>
+
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                  viewParent.student_status === "Active"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {viewParent.student_status || "N/A"}
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        {/* ================= STUDENT ADDRESS ================= */}
+
+        <div>
+
+          <h3 className="text-sm font-bold text-gray-800 mb-3">
+            Student Address
+          </h3>
+
+          <div className="bg-gray-50 p-5 rounded-2xl">
+
+            <span className="text-xs text-gray-400 block">
+              Address
+            </span>
+
+            <span className="font-semibold text-gray-700">
+              {viewParent.student_address || "N/A"}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* Footer */}
+      <div className="p-5 bg-gray-50/50 border-t border-gray-100 flex justify-end">
+
+        <button
+          onClick={() => setViewParent(null)}
+          className="px-5 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
     </div>
   );
 }
