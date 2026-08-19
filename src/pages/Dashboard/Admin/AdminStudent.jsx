@@ -346,111 +346,156 @@ const handleUpdate = async () => {
 
 const handleDelete = async (id) => {
 
-  const confirmDelete = window.confirm(
+  console.log("Deleting Student ID:", id);
+
+  const confirmStudent = window.confirm(
     "Are you sure you want to delete this student?"
   );
 
-  if (!confirmDelete) {
+  if (!confirmStudent) {
     return;
   }
-
 
   try {
 
     /*
-     * First check whether this student
-     * has a linked parent
+     * STEP 1
+     * Check linked parent
      */
 
-    const checkResponse = await fetch(
-      `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/student-view.php?id=${id}`
-    );
-
-    const studentData = await checkResponse.json();
-
-
-    /*
-     * Parent information
-     *
-     * student-view.php mein parent data
-     * available ho to yahan detect hoga.
-     */
-
-    const hasParent =
-      studentData.status &&
-      studentData.data &&
-      studentData.data.parent &&
-      studentData.data.parent.id;
-
-
-    let deleteParent = false;
-
-
-    /*
-     * If parent exists
-     */
-
-    if (hasParent) {
-
-      const parentConfirm = window.confirm(
-        "This student has a linked parent.\n\n" +
-        "Do you also want to delete the linked parent?\n\n" +
-        "OK = Delete Student + Parent\n" +
-        "Cancel = Delete Student Only"
-      );
-
-
-      deleteParent = parentConfirm;
-    }
-
-
-    /*
-     * Delete request
-     */
-
-    const response = await fetch(
+    let response = await fetch(
       "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
-
           id: id,
-
-          delete_parent: deleteParent
-
+          delete_parent: false,
+          force_delete_student: false,
         }),
       }
     );
 
+    let data = await response.json();
 
-    const data = await response.json();
-
-
-    console.log(
-      "Delete Student Response:",
-      data
-    );
+    console.log("Delete Check Response:", data);
 
 
-    alert(data.message);
+    /*
+     * Student has linked parent
+     */
 
+    if (data.requires_parent_confirmation) {
 
-    if (data.status) {
+      const deleteParent = window.confirm(
+        "This student has a linked parent. Do you also want to delete the parent?"
+      );
 
-      fetchStudents();
 
       /*
-       * Parent section ko bhi update karna ho
-       * to parent page par dobara open/fetch hoga.
+       * YES
+       * Delete Student + Parent
        */
+
+      if (deleteParent) {
+
+        response = await fetch(
+          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: id,
+              delete_parent: true,
+              force_delete_student: false,
+            }),
+          }
+        );
+
+        data = await response.json();
+
+        console.log(
+          "Delete Student + Parent Response:",
+          data
+        );
+
+        alert(data.message);
+
+        if (data.status) {
+          fetchStudents();
+        }
+
+      }
+
+
+      /*
+       * NO
+       * Delete Student only
+       */
+
+      else {
+
+        response = await fetch(
+          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: id,
+              delete_parent: false,
+              force_delete_student: true,
+            }),
+          }
+        );
+
+        data = await response.json();
+
+        console.log(
+          "Delete Student Only Response:",
+          data
+        );
+
+        alert(data.message);
+
+        if (data.status) {
+          fetchStudents();
+        }
+      }
 
     }
 
+
+    /*
+     * No parent linked
+     */
+
+    else if (data.status) {
+
+      alert(data.message);
+
+      fetchStudents();
+
+    }
+
+
+    /*
+     * Error
+     */
+
+    else {
+
+      alert(
+        data.message ||
+        "Unable to delete student"
+      );
+
+    }
 
   } catch (error) {
 
@@ -464,10 +509,10 @@ const handleDelete = async (id) => {
     );
 
   }
-
-}; 
-
+};
   
+ 
+
 
   // ---------- Generate page numbers with ellipsis ----------
   const getPageNumbers = () => {
@@ -634,13 +679,13 @@ const handleDelete = async (id) => {
                           <Pencil size={15} />
                         </button>
 
-                        <button
-                          onClick={() => handleDelete(student.user_id || student.id)}
-                          className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
-                          title="Delete Record"
-                        >
-                          <Trash2 size={15} />
-                        </button>
+                       <button
+                        onClick={() => handleDelete(student.id)}
+                        className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
+                        title="Delete Record"
+                      >
+                        <Trash2 size={15} />
+                      </button>
                       </div>
                     </td>
                   </tr>
