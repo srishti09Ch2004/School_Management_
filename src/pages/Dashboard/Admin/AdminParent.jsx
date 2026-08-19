@@ -448,6 +448,45 @@ export default function AdminParent() {
     },
   ];
 
+const handleDeleteParent = async (id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this parent? The parent account and parent information will be permanently deleted. The student will NOT be deleted."
+  );
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteParent.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("Delete Parent Response:", data);
+
+    alert(data.message);
+
+    if (data.status) {
+      fetchParents();
+    }
+  } catch (error) {
+    console.error("Delete Parent Error:", error);
+
+    alert("Unable to delete parent");
+  }
+};
+
   return (
     <div className="space-y-7">
       {/* Header */}
@@ -668,6 +707,7 @@ export default function AdminParent() {
 
                           {/* Delete - abhi sirf UI */}
                           <button
+                            onClick={() => handleDeleteParent(parent.id)}
                             className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition"
                             title="Delete Parent"
                           >
@@ -1012,6 +1052,8 @@ export default function AdminParent() {
   </div>
 )}
 
+{/* ================= EDIT PARENT MODAL ================= */}
+
 {showEditModal && editParent && (
   <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
 
@@ -1185,16 +1227,21 @@ export default function AdminParent() {
               className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="Father">Father</option>
+
               <option value="Mother">Mother</option>
+
               <option value="Father & Mother">
                 Father & Mother
               </option>
-              <option value="Guardian">Guardian</option>
+
+              <option value="Guardian">
+                Guardian
+              </option>
             </select>
           </div>
 
 
-          {/* Student */}
+          {/* Linked Student */}
           <div>
             <label className="text-sm font-medium text-gray-600">
               Linked Student
@@ -1203,6 +1250,36 @@ export default function AdminParent() {
             <input
               type="text"
               value={editParent.student || "Not Linked"}
+              disabled
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 bg-gray-100 text-gray-500"
+            />
+          </div>
+
+
+          {/* Student Class */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Student Class
+            </label>
+
+            <input
+              type="text"
+              value={editParent.student_class || "N/A"}
+              disabled
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 bg-gray-100 text-gray-500"
+            />
+          </div>
+
+
+          {/* Student Section */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Student Section
+            </label>
+
+            <input
+              type="text"
+              value={editParent.student_section || "N/A"}
               disabled
               className="w-full border border-gray-200 rounded-xl p-3 mt-1 bg-gray-100 text-gray-500"
             />
@@ -1246,6 +1323,7 @@ export default function AdminParent() {
             Cancel
           </button>
 
+
           <button
             onClick={handleUpdateParent}
             className="px-6 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium"
@@ -1262,6 +1340,6 @@ export default function AdminParent() {
   </div>
 )}
 
-    </div>
+  </div>
   );
 }
