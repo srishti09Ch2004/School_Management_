@@ -350,27 +350,124 @@ const handleDelete = async (id) => {
     "Are you sure you want to delete this student?"
   );
 
-  if (!confirmDelete) return;
-
-  const response = await fetch(
-    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id }),
-    }
-  );
-
-  const data = await response.json();
-
-  alert(data.message);
-
-  if (data.status) {
-    fetchStudents();
+  if (!confirmDelete) {
+    return;
   }
-};
+
+
+  try {
+
+    /*
+     * First check whether this student
+     * has a linked parent
+     */
+
+    const checkResponse = await fetch(
+      `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/student-view.php?id=${id}`
+    );
+
+    const studentData = await checkResponse.json();
+
+
+    /*
+     * Parent information
+     *
+     * student-view.php mein parent data
+     * available ho to yahan detect hoga.
+     */
+
+    const hasParent =
+      studentData.status &&
+      studentData.data &&
+      studentData.data.parent &&
+      studentData.data.parent.id;
+
+
+    let deleteParent = false;
+
+
+    /*
+     * If parent exists
+     */
+
+    if (hasParent) {
+
+      const parentConfirm = window.confirm(
+        "This student has a linked parent.\n\n" +
+        "Do you also want to delete the linked parent?\n\n" +
+        "OK = Delete Student + Parent\n" +
+        "Cancel = Delete Student Only"
+      );
+
+
+      deleteParent = parentConfirm;
+    }
+
+
+    /*
+     * Delete request
+     */
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+
+          id: id,
+
+          delete_parent: deleteParent
+
+        }),
+      }
+    );
+
+
+    const data = await response.json();
+
+
+    console.log(
+      "Delete Student Response:",
+      data
+    );
+
+
+    alert(data.message);
+
+
+    if (data.status) {
+
+      fetchStudents();
+
+      /*
+       * Parent section ko bhi update karna ho
+       * to parent page par dobara open/fetch hoga.
+       */
+
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      "Delete Student Error:",
+      error
+    );
+
+    alert(
+      "Unable to delete student"
+    );
+
+  }
+
+}; 
+
+  
 
   // ---------- Generate page numbers with ellipsis ----------
   const getPageNumbers = () => {
@@ -598,225 +695,493 @@ const handleDelete = async (id) => {
         </div>
       </div>
 
-      {/* Modal */}
-     {viewStudent && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
 
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-gray-100">
 
-            {/* Header */}
-            <div className="p-6 bg-gradient-to-r from-green-50 to-transparent flex justify-between items-center border-b border-gray-100">
 
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">
-                  {viewStudent.full_name || "Student Details"}
-                </h3>
 
-                <p className="text-xs font-semibold text-gray-500 mt-1">
-                  Class: {viewStudent.class || "N/A"} • Roll No: {viewStudent.roll_no || "N/A"}
-                </p>
-              </div>
 
-              <button
-                onClick={() => setViewStudent(null)}
-                className="p-2 rounded-xl hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition"
-              >
-                <X size={18} />
-              </button>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     {/* Student View Modal */}
+{viewStudent && (
+  <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+
+    <div className="bg-white w-full max-w-3xl max-h-[92vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+
+      {/* ================= HEADER ================= */}
+      <div className="shrink-0 bg-gradient-to-r from-green-50 via-white to-green-50 border-b border-gray-100 px-6 sm:px-8 py-5">
+
+        <div className="flex items-center justify-between gap-4">
+
+          <div className="flex items-center gap-4">
+
+            {/* Student Avatar */}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center text-lg font-bold shadow-sm">
+              {(viewStudent.full_name || "S").charAt(0).toUpperCase()}
             </div>
 
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
+                {viewStudent.full_name || "Student Details"}
+              </h3>
 
-            {/* Student Details */}
-            <div className="p-6 space-y-6">
+              <div className="flex flex-wrap items-center gap-2 mt-1.5">
 
-              {/* Basic Information */}
-              <div>
+                <span className="text-xs font-medium text-gray-500">
+                  Class {viewStudent.class || "N/A"}
+                </span>
 
-                <h4 className="text-sm font-bold text-gray-800 mb-3">
-                  Basic Information
-                </h4>
+                <span className="text-gray-300">
+                  •
+                </span>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-2xl">
+                <span className="text-xs font-medium text-gray-500">
+                  Section {viewStudent.section || "N/A"}
+                </span>
 
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Full Name
-                    </span>
+                <span className="text-gray-300">
+                  •
+                </span>
 
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.full_name || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Email
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.email || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Gender
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.gender || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Date of Birth
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.dob || "N/A"}
-                    </span>
-                  </div>
-
-                </div>
+                <span className="text-xs font-medium text-gray-500">
+                  Roll No. {viewStudent.roll_no || "N/A"}
+                </span>
 
               </div>
-
-
-              {/* Academic Information */}
-              <div>
-
-                <h4 className="text-sm font-bold text-gray-800 mb-3">
-                  Academic Information
-                </h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-2xl">
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Class
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.class || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Section
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.section || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Roll No
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.roll_no || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Admission No
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.admission_no || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Status
-                    </span>
-
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                        viewStudent.status === "Active"
-                          ? "bg-green-50 text-green-700"
-                          : viewStudent.status === "Pending"
-                          ? "bg-yellow-50 text-yellow-700"
-                          : "bg-red-50 text-red-700"
-                      }`}
-                    >
-                      {viewStudent.status || "N/A"}
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-
-              {/* Contact Information */}
-              <div>
-
-                <h4 className="text-sm font-bold text-gray-800 mb-3">
-                  Contact Information
-                </h4>
-
-                <div className="bg-gray-50 p-4 rounded-2xl space-y-4">
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Phone
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.phone || "N/A"}
-                    </span>
-                  </div>
-
-
-                  <div>
-                    <span className="text-xs text-gray-400 block">
-                      Address
-                    </span>
-
-                    <span className="font-semibold text-gray-700">
-                      {viewStudent.address || "N/A"}
-                    </span>
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            {/* Footer */}
-            <div className="p-4 bg-gray-50/50 flex justify-end border-t border-gray-100">
-
-              <button
-                onClick={() => setViewStudent(null)}
-                className="px-5 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition shadow-sm"
-              >
-                Close View
-              </button>
-
             </div>
 
           </div>
 
+
+          {/* Close Button */}
+          <button
+            onClick={() => setViewStudent(null)}
+            className="shrink-0 w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-gray-700 hover:bg-gray-50 flex items-center justify-center transition shadow-sm"
+          >
+            <X size={18} />
+          </button>
+
         </div>
-      )}
+
+      </div>
+
+
+      {/* ================= SCROLLABLE CONTENT ================= */}
+      <div className="overflow-y-auto flex-1">
+
+        <div className="p-5 sm:p-7 space-y-6">
+
+
+          {/* ================= BASIC INFORMATION ================= */}
+          <section>
+
+            <div className="flex items-center gap-2 mb-3">
+
+              <div className="w-1.5 h-5 rounded-full bg-green-500"></div>
+
+              <h4 className="text-sm font-bold text-gray-800">
+                Basic Information
+              </h4>
+
+            </div>
+
+
+            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+
+                {/* Full Name */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Full Name
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.full_name || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* Email */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Email
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700 break-all">
+                    {viewStudent.email || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* Gender */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Gender
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.gender || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* DOB */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Date of Birth
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.dob || "N/A"}
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          {/* ================= ACADEMIC INFORMATION ================= */}
+          <section>
+
+            <div className="flex items-center gap-2 mb-3">
+
+              <div className="w-1.5 h-5 rounded-full bg-blue-500"></div>
+
+              <h4 className="text-sm font-bold text-gray-800">
+                Academic Information
+              </h4>
+
+            </div>
+
+
+            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+
+                {/* Class */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Class
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.class || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* Section */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Section
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.section || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* Roll Number */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Roll Number
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.roll_no || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* Admission Number */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Admission Number
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.admission_no || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* Status */}
+                <div className="sm:col-span-2">
+
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Status
+                  </span>
+
+                  <span
+                    className={`inline-flex px-3 py-1.5 rounded-full text-xs font-semibold ${
+                      viewStudent.status === "Active"
+                        ? "bg-green-100 text-green-700"
+                        : viewStudent.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {viewStudent.status || "N/A"}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          {/* ================= CONTACT INFORMATION ================= */}
+          <section>
+
+            <div className="flex items-center gap-2 mb-3">
+
+              <div className="w-1.5 h-5 rounded-full bg-purple-500"></div>
+
+              <h4 className="text-sm font-bold text-gray-800">
+                Contact Information
+              </h4>
+
+            </div>
+
+
+            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+
+                {/* Phone */}
+                <div>
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Phone
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.phone || "N/A"}
+                  </span>
+                </div>
+
+
+                {/* Address */}
+                <div className="sm:col-span-1">
+
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Address
+                  </span>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {viewStudent.address || "N/A"}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          {/* ================= PARENT / FAMILY INFORMATION ================= */}
+          <section>
+
+            <div className="flex items-center gap-2 mb-3">
+
+              <div className="w-1.5 h-5 rounded-full bg-orange-500"></div>
+
+              <h4 className="text-sm font-bold text-gray-800">
+                Parent / Family Information
+              </h4>
+
+            </div>
+
+
+            {viewStudent.parent_id ? (
+
+              <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+
+                  {/* Parent Name */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Parent Name
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {viewStudent.parent_name || "N/A"}
+                    </span>
+                  </div>
+
+
+                  {/* Parent Email */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Parent Email
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700 break-all">
+                      {viewStudent.parent_email || "N/A"}
+                    </span>
+                  </div>
+
+
+                  {/* Father Name */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Father Name
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {viewStudent.father_name || "N/A"}
+                    </span>
+                  </div>
+
+
+                  {/* Mother Name */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Mother Name
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {viewStudent.mother_name || "N/A"}
+                    </span>
+                  </div>
+
+
+                  {/* Relation */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Relation
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {viewStudent.parent_relation || "N/A"}
+                    </span>
+                  </div>
+
+
+                  {/* Parent Phone */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Parent Phone
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {viewStudent.parent_phone || "N/A"}
+                    </span>
+                  </div>
+
+
+                  {/* Occupation */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Occupation
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {viewStudent.occupation || "N/A"}
+                    </span>
+                  </div>
+
+
+                  {/* Parent Address */}
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Parent Address
+                    </span>
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {viewStudent.parent_address || "N/A"}
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
+
+            ) : (
+
+              <div className="bg-gray-50 border border-dashed border-gray-300 rounded-2xl p-7 text-center">
+
+                <div className="w-11 h-11 mx-auto rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center mb-3">
+                  <Users size={20} />
+                </div>
+
+                <p className="text-sm font-semibold text-gray-600">
+                  No Parent Linked
+                </p>
+
+                <p className="text-xs text-gray-400 mt-1">
+                  Parent information will appear here once a parent is linked with this student.
+                </p>
+
+              </div>
+
+            )}
+
+          </section>
+
+        </div>
+
+      </div>
+
+
+      {/* ================= FOOTER ================= */}
+      <div className="shrink-0 px-5 sm:px-7 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+
+        <button
+          onClick={() => setViewStudent(null)}
+          className="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition shadow-sm"
+        >
+          Close View
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
