@@ -298,6 +298,105 @@ export default function AdminParent() {
     }
   };
 
+
+  const handleUpdateParent = async () => {
+  if (!editParent) {
+    return;
+  }
+
+  if (
+    !editParent.name ||
+    !editParent.email
+  ) {
+    alert("Parent name and email are required");
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateParent.php",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          id: editParent.id,
+
+          user_id: editParent.user_id,
+
+          name: editParent.name,
+
+          email: editParent.email,
+
+          father_name:
+            editParent.father_name || "",
+
+          mother_name:
+            editParent.mother_name || "",
+
+          phone:
+            editParent.phone || "",
+
+          occupation:
+            editParent.occupation || "",
+
+          address:
+            editParent.address || "",
+        }),
+      }
+    );
+
+
+    const data =
+      await response.json();
+
+
+    console.log(
+      "Update Parent Response:",
+      data
+    );
+
+
+    alert(data.message);
+
+
+    if (data.status) {
+
+      /*
+       * Close modal
+       */
+
+      setShowEditModal(false);
+
+      setEditParent(null);
+
+
+      /*
+       * Refresh parent list
+       */
+
+      fetchParents();
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Update Parent Error:",
+      error
+    );
+
+    alert(
+      "Unable to update parent"
+    );
+
+  }
+};
+
   /* Search */
   const filteredParents = parents.filter((parent) => {
     const searchText = search.toLowerCase();
@@ -1148,6 +1247,7 @@ export default function AdminParent() {
           </button>
 
           <button
+            onClick={handleUpdateParent}
             className="px-6 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium"
           >
             Update Parent
