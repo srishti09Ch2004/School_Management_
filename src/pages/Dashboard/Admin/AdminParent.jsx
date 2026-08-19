@@ -260,6 +260,8 @@ export default function AdminParent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [viewParent, setViewParent] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editParent, setEditParent] = useState(null);
 
   /* API URL */
   const API_URL =
@@ -554,6 +556,10 @@ export default function AdminParent() {
 
                           {/* Edit - abhi sirf UI */}
                           <button
+                            onClick={() => {
+                              setEditParent(parent);
+                              setShowEditModal(true);
+                            }}
                             className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
                             title="Edit Parent"
                           >
@@ -899,6 +905,255 @@ export default function AdminParent() {
         >
           Close
         </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
+{showEditModal && editParent && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+
+    <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl">
+
+      {/* Header */}
+      <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Edit Parent
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Update parent and guardian information
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            setShowEditModal(false);
+            setEditParent(null);
+          }}
+          className="p-2 rounded-xl hover:bg-gray-100 text-gray-500"
+        >
+          <X size={18} />
+        </button>
+
+      </div>
+
+
+      {/* Form */}
+      <div className="p-6">
+
+        <div className="grid md:grid-cols-2 gap-4">
+
+          {/* Parent Name */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Parent Name
+            </label>
+
+            <input
+              type="text"
+              value={editParent.name || ""}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  name: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+
+          {/* Email */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Email
+            </label>
+
+            <input
+              type="email"
+              value={editParent.email || ""}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  email: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+
+          {/* Father Name */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Father Name
+            </label>
+
+            <input
+              type="text"
+              value={editParent.father_name || ""}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  father_name: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+
+          {/* Mother Name */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Mother Name
+            </label>
+
+            <input
+              type="text"
+              value={editParent.mother_name || ""}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  mother_name: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+
+          {/* Phone */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Phone
+            </label>
+
+            <input
+              type="text"
+              value={editParent.phone || ""}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  phone: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+
+          {/* Occupation */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Occupation
+            </label>
+
+            <input
+              type="text"
+              value={editParent.occupation || ""}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  occupation: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+
+          {/* Relation */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Relation
+            </label>
+
+            <select
+              value={editParent.relation || "Guardian"}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  relation: e.target.value,
+                })
+              }
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="Father">Father</option>
+              <option value="Mother">Mother</option>
+              <option value="Father & Mother">
+                Father & Mother
+              </option>
+              <option value="Guardian">Guardian</option>
+            </select>
+          </div>
+
+
+          {/* Student */}
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Linked Student
+            </label>
+
+            <input
+              type="text"
+              value={editParent.student || "Not Linked"}
+              disabled
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 bg-gray-100 text-gray-500"
+            />
+          </div>
+
+
+          {/* Address */}
+          <div className="md:col-span-2">
+
+            <label className="text-sm font-medium text-gray-600">
+              Address
+            </label>
+
+            <textarea
+              value={editParent.address || ""}
+              onChange={(e) =>
+                setEditParent({
+                  ...editParent,
+                  address: e.target.value,
+                })
+              }
+              rows="3"
+              className="w-full border border-gray-200 rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-green-500"
+            />
+
+          </div>
+
+        </div>
+
+
+        {/* Buttons */}
+        <div className="flex justify-end gap-3 mt-6">
+
+          <button
+            onClick={() => {
+              setShowEditModal(false);
+              setEditParent(null);
+            }}
+            className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            className="px-6 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium"
+          >
+            Update Parent
+          </button>
+
+        </div>
 
       </div>
 
