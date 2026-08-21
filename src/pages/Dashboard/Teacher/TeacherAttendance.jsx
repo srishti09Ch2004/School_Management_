@@ -376,6 +376,7 @@ function StudentList({
   present,
   absent,
   handleSaveAttendance,
+  savingAttendance,
 }) {
 
   const filtered = students.filter(
@@ -515,10 +516,20 @@ function StudentList({
         </div>
         <button
           onClick={handleSaveAttendance}
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-medium transition shadow-sm hover:shadow"
+          disabled={savingAttendance || students.length === 0}
+          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-medium transition shadow-sm hover:shadow disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <Save size={16} />
-          Save Attendance
+          {savingAttendance ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save size={16} />
+              Save Attendance
+            </>
+          )}
         </button>
       </div>
     </div>
@@ -651,6 +662,17 @@ export default function TeacherAttendance() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const { toast, showToast } = useToast();
+  const [savingAttendance, setSavingAttendance] = useState(false);
+
+    const getLoggedInTeacher = () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        return user;
+      } catch (error) {
+        console.error("User data error:", error);
+        return null;
+      }
+    };
 
  const loadStudents = async () => {
   try {
@@ -788,9 +810,101 @@ const loadClassSections = async () => {
     showToast("Teacher attendance marked successfully!", "success");
   };
 
-  const handleSaveAttendance = () => {
-    showToast("Attendance saved successfully!", "success");
-  };
+
+const handleSaveAttendance = async () => {
+  try {
+    setSavingAttendance(true);
+
+    // Get logged-in teacher
+    const user = getLoggedInTeacher();
+
+    if (!user || !user.id) {
+      showToast("Teacher login information not found", "error");
+      return;
+    }
+
+    const teacherId = Number(user.id);
+
+    // No students
+    if (students.length === 0) {
+      showToast("No students found for this class and section", "error");
+      return;
+    }
+
+    // Check if every student has attendance marked
+    const unmarkedStudents = students.filter(
+      (student) =>
+        student.status !== "Present" &&
+        student.status !== "Absent"
+    );
+
+    if (unmarkedStudents.length > 0) {
+      showToast(
+        `Please mark attendance for all students. ${unmarkedStudents.length} student(s) are still unmarked.`,
+        "error"
+      );
+      return;
+    }
+
+    // Prepare attendance data
+    const attendanceData = students.map((student) => ({
+      student_id: Number(student.id),
+      status: student.status,
+      attendance_type:
+        student.attendance_type || "Manual",
+    }));
+
+    const response = await fetch(
+      "http://localhost/school_management_system/backend/api/teacher/saveAttendance.php",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          teacher_id: teacherId,
+          attendance_date: selectedDate,
+          attendance: attendanceData,
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.status) {
+      showToast(
+        result.message || "Unable to save attendance",
+        "error"
+      );
+      return;
+    }
+
+    showToast(
+      "Attendance saved successfully!",
+      "success"
+    );
+
+    // Reload latest attendance from database
+    await loadStudents();
+
+  } catch (error) {
+
+    console.error("Save attendance error:", error);
+
+    showToast(
+      "Unable to connect with server",
+      "error"
+    );
+
+  } finally {
+
+    setSavingAttendance(false);
+
+  }
+};
+
 
   const total = students.length;
   const present = students.filter((s) => s.status === "Present").length;
@@ -866,6 +980,7 @@ const loadClassSections = async () => {
           present={present}
           absent={absent}
           handleSaveAttendance={handleSaveAttendance}
+          savingAttendance={savingAttendance}
         />
 
         {method === "face" && (
