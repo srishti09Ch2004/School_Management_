@@ -16,6 +16,8 @@ import {
   Camera,
 } from "lucide-react";
 
+
+
 function useToast() {
   const [toast, setToast] = useState({
     message: "",
@@ -33,6 +35,7 @@ function useToast() {
   return { toast, showToast };
 }
 
+
 function useCamera() {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -40,31 +43,69 @@ function useCamera() {
 
   const start = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
       setActive(true);
-    } catch {
-      alert("Camera permission denied or not available.");
+    } catch (error) {
+      console.error("Camera error:", error);
+      alert("Camera permission denied or camera not available.");
     }
   }, []);
 
+  useEffect(() => {
+    if (active && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+
+      videoRef.current
+        .play()
+        .catch((error) => {
+          console.error("Video play error:", error);
+        });
+    }
+  }, [active]);
+
   const stop = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => {
+        track.stop();
+      });
+
       streamRef.current = null;
     }
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
     setActive(false);
   }, []);
 
   useEffect(() => {
-    return () => stop();
-  }, [stop]);
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+    };
+  }, []);
 
-  return { videoRef, active, start, stop };
+  return {
+    videoRef,
+    active,
+    start,
+    stop,
+  };
 }
+
 
 function usePagination(items, itemsPerPage = 10) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,26 +129,9 @@ function usePagination(items, itemsPerPage = 10) {
   };
 }
 
-const generateStudents = (base, count) => {
-  const names = [
-    "Rahul", "Priya", "Ankit", "Sneha", "Aman", "Neha", "Rohit", "Pooja",
-    "Vikas", "Kavya", "Suresh", "Meera", "Arjun", "Kiran", "Ravi", "Sunita",
-    "Deepak", "Anjali", "Mohan", "Nisha",
-  ];
-  const statuses = ["Present", "Absent"];
-  return Array.from({ length: count }, (_, i) => ({
-    id: base + i,
-    roll: String(base + i).padStart(3, "0"),
-    name: `${names[i % names.length]} ${Math.floor(Math.random() * 1000)}`,
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-  }));
-};
 
-const classData = {
-  "10-A": generateStudents(1, 50),
-  "9-B": generateStudents(51, 80),
-  "8-C": generateStudents(81, 100),
-};
+
+
 
 const cardColors = {
   blue: {
@@ -246,25 +270,69 @@ function ProgressBar({ percentage }) {
 function Filters({
   selectedClass,
   setSelectedClass,
+  selectedSection,
+  setSelectedSection,
   selectedDate,
   setSelectedDate,
   searchQuery,
   setSearchQuery,
   loadStudents,
   loading,
+  classes,
+  sections,
+  loadingClasses,
+
 }) {
+
   return (
     <div className="bg-white rounded-2xl p-5 shadow-md border">
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+        
         <select
-          value={selectedClass}
-          onChange={(e) => setSelectedClass(e.target.value)}
-          className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="10-A">10-A</option>
-          <option value="9-B">9-B</option>
-          <option value="8-C">8-C</option>
-        </select>
+            value={selectedClass}
+            onChange={(e) => {
+              const newClass = e.target.value;
+
+              setSelectedClass(newClass);
+
+              const classSections = sections[newClass] || [];
+
+              setSelectedSection(classSections[0] || "");
+            }}
+            disabled={loadingClasses}
+            className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            {loadingClasses ? (
+              <option>Loading classes...</option>
+            ) : classes.length === 0 ? (
+              <option value="">No classes found</option>
+            ) : (
+              classes.map((className) => (
+                <option key={className} value={className}>
+                  Class {className}
+                </option>
+              ))
+            )}
+          </select>
+
+          <select
+            value={selectedSection}
+            onChange={(e) => setSelectedSection(e.target.value)}
+            disabled={!selectedClass || loadingClasses}
+            className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            {!selectedClass ? (
+              <option value="">Select class first</option>
+            ) : (sections[selectedClass] || []).length === 0 ? (
+              <option value="">No sections found</option>
+            ) : (
+              (sections[selectedClass] || []).map((section) => (
+                <option key={section} value={section}>
+                  Section {section}
+                </option>
+              ))
+            )}
+          </select>
 
         <input
           type="date"
@@ -299,6 +367,7 @@ function Filters({
 
 function StudentList({
   selectedClass,
+  selectedSection,
   students,
   searchQuery,
   itemsPerPage,
@@ -308,6 +377,7 @@ function StudentList({
   absent,
   handleSaveAttendance,
 }) {
+
   const filtered = students.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -328,7 +398,11 @@ function StudentList({
   return (
     <div className="bg-white rounded-2xl shadow-md border overflow-hidden">
       <div className="px-6 py-4 border-b bg-gray-50 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-semibold text-gray-800">Class {selectedClass}</h3>
+
+        <h3 className="font-semibold text-gray-800">
+          Class {selectedClass}-{selectedSection}
+        </h3>
+
         <div className="flex items-center gap-4 text-sm text-gray-500">
           <span>
             Showing {startIndex + 1} - {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
@@ -485,7 +559,16 @@ function FaceModal({ onClose, onMark }) {
             </div>
           ) : (
             <>
-              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+                style={{
+                  transform: "scaleX(-1)",
+                }}
+              />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-4 border-green-400 rounded-full shadow-lg animate-pulse ring-4 ring-green-300/50" />
               <div className="absolute bottom-4 left-4 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
                 Scanning face...
@@ -554,9 +637,13 @@ function FingerModal({ onClose, onMark }) {
 export default function TeacherAttendance() {
   const [method, setMethod] = useState(null);
   const [teacherMarked, setTeacherMarked] = useState(false);
-  const [selectedClass, setSelectedClass] = useState("10-A");
+  const [selectedClass, setSelectedClass] = useState("12");
+  const [selectedSection, setSelectedSection] = useState("A");
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [classes, setClasses] = useState([]);
+  const [sections, setSections] = useState({});
+  const [loadingClasses, setLoadingClasses] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -565,22 +652,129 @@ export default function TeacherAttendance() {
 
   const { toast, showToast } = useToast();
 
-  const loadStudents = (classValue) => {
+ const loadStudents = async () => {
+  try {
     setLoading(true);
-    setTimeout(() => {
-      setStudents(classData[classValue] || []);
-      setLoading(false);
-    }, 500);
-  };
 
-  useEffect(() => {
-    loadStudents(selectedClass);
-  }, [selectedClass]);
+    const url =
+      `http://localhost/school_management_system/backend/api/teacher/getAttendance.php` +
+      `?class=${encodeURIComponent(selectedClass)}` +
+      `&section=${encodeURIComponent(selectedSection)}` +
+      `&attendance_date=${encodeURIComponent(selectedDate)}`;
 
-  const changeClass = (value) => {
-    setSelectedClass(value);
-    setSearchQuery("");
-  };
+    const response = await fetch(url);
+
+    const result = await response.json();
+
+    if (!result.status) {
+      showToast(
+        result.message || "Unable to fetch attendance",
+        "error"
+      );
+
+      setStudents([]);
+      return;
+    }
+
+    const formattedStudents = result.data.map((student) => ({
+      id: student.student_id,
+      roll: student.roll_no,
+      name: student.name,
+      admission_no: student.admission_no,
+      class: student.class,
+      section: student.section,
+      status: student.status,
+      attendance_id: student.attendance_id,
+      teacher_id: student.teacher_id,
+      attendance_type: student.attendance_type,
+    }));
+
+    setStudents(formattedStudents);
+
+  } catch (error) {
+
+    console.error("Attendance fetch error:", error);
+
+    showToast(
+      "Unable to connect with server",
+      "error"
+    );
+
+    setStudents([]);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
+
+useEffect(() => {
+  loadClassSections();
+}, []);
+
+ useEffect(() => {
+  loadStudents();
+}, [selectedClass, selectedSection, selectedDate]);
+
+ const changeClass = (value) => {
+  setSelectedClass(value);
+  setSearchQuery("");
+};
+
+const loadClassSections = async () => {
+  try {
+    setLoadingClasses(true);
+
+    const response = await fetch(
+      "http://localhost/school_management_system/backend/api/teacher/getClassSections.php"
+    );
+
+    const result = await response.json();
+
+    if (!result.status) {
+      showToast(
+        result.message || "Unable to fetch classes",
+        "error"
+      );
+      return;
+    }
+
+    setClasses(result.classes || []);
+    setSections(result.sections || {});
+
+    // First available class select
+    if (result.classes?.length > 0) {
+      const firstClass = result.classes[0];
+
+      setSelectedClass((current) =>
+        result.classes.includes(current)
+          ? current
+          : firstClass
+      );
+
+      const firstSections = result.sections?.[firstClass] || [];
+
+      setSelectedSection((current) =>
+        firstSections.includes(current)
+          ? current
+          : firstSections[0] || ""
+      );
+    }
+
+  } catch (error) {
+
+    console.error("Class/Section fetch error:", error);
+
+    showToast(
+      "Unable to connect with server",
+      "error"
+    );
+
+  } finally {
+    setLoadingClasses(false);
+  }
+};
 
   const updateAttendance = (id, status) => {
     setStudents((prev) =>
@@ -643,17 +837,27 @@ export default function TeacherAttendance() {
 
         <Filters
           selectedClass={selectedClass}
-          setSelectedClass={changeClass}
+          setSelectedClass={setSelectedClass}
+
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
+
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          loadStudents={() => loadStudents(selectedClass)}
+
+          loadStudents={loadStudents}
           loading={loading}
+          classes={classes}
+          sections={sections}
+          loadingClasses={loadingClasses}
         />
 
         <StudentList
           selectedClass={selectedClass}
+          selectedSection={selectedSection}
           students={students}
           searchQuery={searchQuery}
           itemsPerPage={itemsPerPage}
