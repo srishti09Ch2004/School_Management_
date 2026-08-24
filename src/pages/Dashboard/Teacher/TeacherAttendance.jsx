@@ -804,11 +804,67 @@ const loadClassSections = async () => {
     );
   };
 
-  const markTeacherAttendance = () => {
+  const markTeacherAttendance = async () => {
+  try {
+    const storedUser = localStorage.getItem("user");
+
+    if (!storedUser) {
+      showToast("Teacher login information not found", "error");
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
+
+    const teacherId = Number(user.id);
+
+    if (!teacherId) {
+      showToast("Invalid teacher ID", "error");
+      return;
+    }
+
+    const response = await fetch(
+      "http://localhost/school_management_system/backend/api/teacher/saveTeacherAttendance.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          teacher_id: teacherId,
+          attendance_date: selectedDate,
+          status: "Present",
+          attendance_type: "Face",
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.status) {
+      showToast(
+        result.message || "Unable to save teacher attendance",
+        "error"
+      );
+      return;
+    }
+
     setTeacherMarked(true);
     setMethod(null);
-    showToast("Teacher attendance marked successfully!", "success");
-  };
+
+    showToast(
+      "Teacher attendance marked successfully!",
+      "success"
+    );
+
+  } catch (error) {
+    console.error("Teacher attendance error:", error);
+
+    showToast(
+      "Unable to connect with server",
+      "error"
+    );
+  }
+};
 
 
 const handleSaveAttendance = async () => {

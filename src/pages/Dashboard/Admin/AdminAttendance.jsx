@@ -21,39 +21,8 @@ export default function AdminAttendance() {
   const [activeTab, setActiveTab] =
     useState("students");
 
-  const [students, setStudents] =
-    useState([
-      {
-        id: 1,
-        roll: "101",
-        name: "Rahul Sharma",
-        attendance: {},
-      },
-      {
-        id: 2,
-        roll: "102",
-        name: "Priya Singh",
-        attendance: {},
-      },
-      {
-        id: 3,
-        roll: "103",
-        name: "Ankit Verma",
-        attendance: {},
-      },
-      {
-        id: 4,
-        roll: "104",
-        name: "Neha Gupta",
-        attendance: {},
-      },
-      {
-        id: 5,
-        roll: "105",
-        name: "Aman Yadav",
-        attendance: {},
-      },
-    ]);
+    
+     
 
   const [teachers, setTeachers] =
     useState([
