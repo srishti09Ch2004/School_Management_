@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CalendarCheck,
   Search,
@@ -7,8 +7,37 @@ import {
   GraduationCap,
 } from "lucide-react";
 
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
+
+
 export default function AdminAttendance() {
-  const today = new Date()
+    const [students, setStudents] = useState([]);
+    const [teachers, setTeachers] = useState([]);
+    const [loading, setLoading] = useState(false);
+      const [summary, setSummary] = useState({
+    students: {
+      present: 0,
+      absent: 0,
+      leave: 0,
+      total: 0,
+    },
+    teachers: {
+      present: 0,
+      absent: 0,
+      leave: 0,
+      total: 0,
+    },
+  });
+    const today = new Date()
+
     .toISOString()
     .split("T")[0];
 
@@ -23,137 +52,173 @@ export default function AdminAttendance() {
 
     
      
+const loadAttendance = async () => {
+  try {
+    setLoading(true);
 
-  const [teachers, setTeachers] =
-    useState([
-      {
-        id: 1,
-        name: "Amit Sir",
-        subject: "Math",
-        attendance: {},
-      },
-      {
-        id: 2,
-        name: "Neha Ma'am",
-        subject: "Science",
-        attendance: {},
-      },
-      {
-        id: 3,
-        name: "Rohit Sir",
-        subject: "English",
-        attendance: {},
-      },
-    ]);
+    const type =
+      activeTab === "students"
+        ? "students"
+        : "teachers";
+
+    const response = await fetch(
+      `http://localhost/school_management_system/backend/api/admin/attendance.php?date=${selectedDate}&type=${type}`
+    );
+
+    const result = await response.json();
+
+    if (!result.status) {
+      console.error(result.message);
+      return;
+    }
+
+    if (type === "students") {
+      setStudents(result.data || []);
+    } else {
+      setTeachers(result.data || []);
+    }
+
+  } catch (error) {
+    console.error(
+      "Admin attendance error:",
+      error
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+    
+
+  const loadSummary = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost/school_management_system/backend/api/admin/attendance-summary.php?date=${selectedDate}`
+      );
+
+      const result = await response.json();
+
+      if (result.status) {
+        setSummary({
+          students: result.students || {
+            present: 0,
+            absent: 0,
+            leave: 0,
+            total: 0,
+          },
+          teachers: result.teachers || {
+            present: 0,
+            absent: 0,
+            leave: 0,
+            total: 0,
+          },
+        });
+      }
+    } catch (error) {
+      console.error(
+        "Attendance summary error:",
+        error
+      );
+    }
+  };
+
+  useEffect(() => {
+  loadAttendance();
+  loadSummary();
+}, [selectedDate, activeTab]);
 
   const data =
     activeTab === "students"
       ? students
       : teachers;
 
-  const setData =
-    activeTab === "students"
-      ? setStudents
-      : setTeachers;
+ 
 
-  const toggleAttendance = (id) => {
-    setData((prev) =>
-      prev.map((item) => {
-        if (item.id !== id)
-          return item;
+  
 
-        const current =
-          item.attendance[selectedDate];
+   
 
-        let next = "P";
 
-        if (current === "P")
-          next = "A";
-        else if (current === "A")
-          next = "L";
-        else if (current === "L")
-          next = "";
+    const filteredData = data.filter((item) =>
+    String(item.name || "")
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
-        return {
-          ...item,
-          attendance: {
-            ...item.attendance,
-            [selectedDate]: next,
-          },
-        };
-      })
-    );
+  
+  const getStatus = (item) => {
+    if (item.status) {
+      return item.status;
+    }
+
+    if (item.attendance?.[selectedDate]) {
+      return item.attendance[selectedDate];
+    }
+
+    return "";
   };
 
-  const getColor = (value) => {
-    if (value === "P")
-      return "bg-green-100 text-green-700";
+  const totalPresent = data.filter(
+    (item) => getStatus(item) === "Present"
+  ).length;
 
-    if (value === "A")
-      return "bg-red-100 text-red-700";
+  const totalAbsent = data.filter(
+    (item) => getStatus(item) === "Absent"
+  ).length;
 
-    if (value === "L")
-      return "bg-yellow-100 text-yellow-700";
+  const totalLeave = data.filter(
+    (item) => getStatus(item) === "Leave"
+  ).length;
 
-    return "bg-gray-100 text-gray-500";
-  };
+    const presentList = data.filter(
+    (item) => getStatus(item) === "Present"
+  );
 
-  const filteredData =
-    data.filter((item) =>
-      item.name
-        .toLowerCase()
-        .includes(
-          search.toLowerCase()
-        )
-    );
+  const absentList = data.filter(
+    (item) => getStatus(item) === "Absent"
+  );
 
-  const totalPresent =
-    data.filter(
-      (item) =>
-        item.attendance[
-          selectedDate
-        ] === "P"
-    ).length;
+  const leaveList = data.filter(
+    (item) => getStatus(item) === "Leave"
+  );
+  
 
-  const totalAbsent =
-    data.filter(
-      (item) =>
-        item.attendance[
-          selectedDate
-        ] === "A"
-    ).length;
+    const studentPieData = [
+    {
+      name: "Present",
+      value: summary.students.present,
+    },
+    {
+      name: "Absent",
+      value: summary.students.absent,
+    },
+    {
+      name: "Leave",
+      value: summary.students.leave,
+    },
+  ];
 
-  const totalLeave =
-    data.filter(
-      (item) =>
-        item.attendance[
-          selectedDate
-        ] === "L"
-    ).length;
+  const teacherPieData = [
+    {
+      name: "Present",
+      value: summary.teachers.present,
+    },
+    {
+      name: "Absent",
+      value: summary.teachers.absent,
+    },
+    {
+      name: "Leave",
+      value: summary.teachers.leave,
+    },
+  ];
 
-  const presentList =
-    data.filter(
-      (item) =>
-        item.attendance[
-          selectedDate
-        ] === "P"
-    );
+    const PIE_COLORS = [
+    "#22c55e",
+    "#ef4444",
+    "#eab308",
+  ];
 
-  const absentList =
-    data.filter(
-      (item) =>
-        item.attendance[
-          selectedDate
-        ] === "A"
-    );
-
-  const leaveList =
-    data.filter(
-      (item) =>
-        item.attendance[
-          selectedDate
-        ] === "L"
-    );
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 space-y-7">
@@ -304,12 +369,12 @@ export default function AdminAttendance() {
                   </th>
                 )}
 
-                {activeTab ===
+                {/* {activeTab ===
                   "teachers" && (
                   <th className="p-4 text-left">
                     Subject
                   </th>
-                )}
+                )} */}
 
                 <th className="p-4 text-center">
                   Status
@@ -322,21 +387,32 @@ export default function AdminAttendance() {
             </thead>
 
             <tbody>
-              {filteredData.map(
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="p-8 text-center text-gray-500"
+                    >
+                      Loading attendance...
+                    </td>
+                  </tr>
+                ) : filteredData.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="p-8 text-center text-gray-500"
+                    >
+                      No attendance records found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredData.map(
                 (item) => {
-                  const status =
-                    item.attendance[
-                      selectedDate
-                    ] || "";
+                  const status = getStatus(item);
 
-                  const total =
-                    Object.values(
-                      item.attendance
-                    ).filter(
-                      (x) =>
-                        x ===
-                        "P"
-                    ).length;
+                  const total = Number(
+                    item.total_present ?? 0
+                  );
 
                   return (
                     <tr
@@ -353,34 +429,34 @@ export default function AdminAttendance() {
                         "students" && (
                         <td className="p-4">
                           {
-                            item.roll
+                            item.roll_no
                           }
                         </td>
                       )}
 
-                      {activeTab ===
+                      {/* {activeTab ===
                         "teachers" && (
                         <td className="p-4">
                           {
                             item.subject
                           }
                         </td>
-                      )}
+                      )} */}
 
                       <td className="p-4 text-center">
-                        <button
-                          onClick={() =>
-                            toggleAttendance(
-                              item.id
-                            )
-                          }
-                          className={`w-11 h-11 rounded-xl font-bold ${getColor(
-                            status
-                          )}`}
-                        >
-                          {status ||
-                            "-"}
-                        </button>
+                      <span
+                        className={`inline-flex items-center justify-center w-20 h-10 rounded-xl font-bold ${
+                          status === "Present"
+                            ? "bg-green-100 text-green-700"
+                            : status === "Absent"
+                            ? "bg-red-100 text-red-700"
+                            : status === "Leave"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
+                        {status || "Not Marked"}
+                      </span>
                       </td>
 
                       <td className="p-4 text-center font-bold text-green-600">
@@ -389,6 +465,7 @@ export default function AdminAttendance() {
                     </tr>
                   );
                 }
+              )
               )}
             </tbody>
           </table>
@@ -427,6 +504,8 @@ export default function AdminAttendance() {
             )}
           </div>
         </div>
+
+        
 
         <div className="bg-white p-5 rounded-3xl shadow-sm">
           <h3 className="font-bold text-red-600 mb-4">
@@ -489,6 +568,84 @@ export default function AdminAttendance() {
             )}
           </div>
         </div>
+      </div>
+            {/* Overall Attendance Charts */}
+      <div className="grid md:grid-cols-2 gap-6">
+
+        {/* Student Overall Attendance */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm">
+          <h2 className="text-lg font-bold mb-2">
+            Overall Student Attendance
+          </h2>
+
+          <p className="text-gray-500 text-sm mb-4">
+            Total Records: {summary.students.total}
+          </p>
+
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={studentPieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {studentPieData.map((entry, index) => (
+                    <Cell
+                      key={`student-${index}`}
+                      fill={PIE_COLORS[index]}
+                    />
+                  ))}
+                </Pie>
+
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Teacher Overall Attendance */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm">
+          <h2 className="text-lg font-bold mb-2">
+            Overall Teacher Attendance
+          </h2>
+
+          <p className="text-gray-500 text-sm mb-4">
+            Total Records: {summary.teachers.total}
+          </p>
+
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={teacherPieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {teacherPieData.map((entry, index) => (
+                    <Cell
+                      key={`teacher-${index}`}
+                      fill={PIE_COLORS[index]}
+                    />
+                  ))}
+                </Pie>
+
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
       </div>
     </div>
   );
