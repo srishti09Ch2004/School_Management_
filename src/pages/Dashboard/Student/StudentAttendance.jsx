@@ -15,22 +15,22 @@ export default function StudentAttendance() {
   const [attendance, setAttendance] = useState([]);
 
   const [summary, setSummary] = useState({
-    total: 0,
-    present: 0,
-    absent: 0,
-    percentage: 0,
+  total: 0,
+  present: 0,
+  absent: 0,
+  leave: 0,
+  percentage: 0,
   });
 
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+  return new Date().toISOString().slice(0, 7);
+  });
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | Load student attendance
-  |--------------------------------------------------------------------------
-  */
+  /* Load student attendance */
 
   const loadAttendance = async () => {
 
@@ -74,7 +74,8 @@ export default function StudentAttendance() {
 
       const url =
         `http://localhost/school_management_system/backend/api/student/getAttendance.php` +
-        `?user_id=${encodeURIComponent(user.id)}`;
+        `?user_id=${encodeURIComponent(user.id)}` +
+        `&month=${encodeURIComponent(selectedMonth)}`;
 
 
       const response =
@@ -111,6 +112,7 @@ export default function StudentAttendance() {
           total: 0,
           present: 0,
           absent: 0,
+          leave: 0,
           percentage: 0,
         }
       );
@@ -135,24 +137,16 @@ export default function StudentAttendance() {
   };
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | Load on page open
-  |--------------------------------------------------------------------------
-  */
+  // Load on page open
 
   useEffect(() => {
 
-    loadAttendance();
+  loadAttendance();
 
-  }, []);
+}, [selectedMonth]);
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | Loading
-  |--------------------------------------------------------------------------
-  */
+  // Loading
 
   if (loading) {
 
@@ -177,11 +171,7 @@ export default function StudentAttendance() {
   }
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | Error
-  |--------------------------------------------------------------------------
-  */
+  // Error
 
   if (error) {
 
@@ -222,9 +212,7 @@ export default function StudentAttendance() {
     <div className="space-y-8 max-w-[1800px] mx-auto p-3">
 
 
-      {/* =========================================================
-          HEADER
-      ========================================================= */}
+      {/*           HEADER              */}
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 
@@ -241,43 +229,66 @@ export default function StudentAttendance() {
         </div>
 
 
-        {student && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
 
-          <div className="flex items-center gap-3 bg-white px-4 py-3 rounded-2xl border shadow-sm">
+  {/* Month Selector */}
 
-            <div className="bg-blue-100 p-2 rounded-xl">
+  <div className="bg-white px-4 py-3 rounded-2xl border shadow-sm">
 
-              <User
-                size={18}
-                className="text-blue-600"
-              />
+    <label className="block text-xs text-gray-400 mb-1">
+      Select Month
+    </label>
 
-            </div>
+    <input
+      type="month"
+      value={selectedMonth}
+      onChange={(e) =>
+        setSelectedMonth(e.target.value)
+      }
+      className="font-semibold text-gray-700 outline-none"
+    />
 
-            <div>
+  </div>
 
-              <p className="font-semibold text-gray-800">
-                {student.name}
-              </p>
 
-              <p className="text-xs text-gray-500">
-                Class {student.class} - Section {student.section}
-              </p>
+    {/* Student Information */}
 
-            </div>
+    {student && (
 
-          </div>
+      <div className="flex items-center gap-3 bg-white px-4 py-3 rounded-2xl border shadow-sm">
 
-        )}
+        <div className="bg-blue-100 p-2 rounded-xl">
+
+          <User
+            size={18}
+            className="text-blue-600"
+          />
+
+        </div>
+
+        <div>
+
+          <p className="font-semibold text-gray-800">
+            {student.name}
+          </p>
+
+          <p className="text-xs text-gray-500">
+            Class {student.class} - Section {student.section}
+          </p>
+
+        </div>
 
       </div>
 
+    )}
 
-      {/* =========================================================
-          SUMMARY CARDS
-      ========================================================= */}
+  </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      </div>
+
+{/* SUMMARY CARDS */}
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
 
         {/* Total */}
@@ -377,10 +388,39 @@ export default function StudentAttendance() {
 
       </div>
 
+            {/* Leave */}
 
-      {/* =========================================================
-          OVERALL ATTENDANCE
-      ========================================================= */}
+      <div className="bg-yellow-50 rounded-3xl p-6 border border-yellow-100 shadow-sm">
+
+        <div className="flex items-center gap-3">
+
+          <div className="bg-yellow-100 p-3 rounded-2xl">
+
+            <CalendarCheck
+              size={22}
+              className="text-yellow-600"
+            />
+
+          </div>
+
+          <div>
+
+            <p className="text-sm text-gray-500">
+              Leave
+            </p>
+
+            <h3 className="text-3xl font-black text-yellow-700">
+              {summary.leave || 0}
+            </h3>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* OVERALL ATTENDANCE */}
 
       <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
 
@@ -393,7 +433,7 @@ export default function StudentAttendance() {
             </h3>
 
             <p className="text-xs text-gray-400 mt-1">
-              Based on all attendance records
+              Based on {selectedMonth} attendance records
             </p>
 
           </div>
@@ -419,9 +459,7 @@ export default function StudentAttendance() {
       </div>
 
 
-      {/* =========================================================
-          ATTENDANCE HISTORY
-      ========================================================= */}
+     {/* ATTENDANCE HISTORY */}
 
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
 
@@ -521,18 +559,24 @@ export default function StudentAttendance() {
                     <td className="text-center px-6 py-4">
 
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold ${
-                          record.status === "Present"
-                            ? "bg-green-50 text-green-700"
-                            : "bg-red-50 text-red-700"
-                        }`}
-                      >
+                          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                            record.status === "Present"
+                              ? "bg-green-50 text-green-700"
+                              : record.status === "Absent"
+                              ? "bg-red-50 text-red-700"
+                              : record.status === "Leave"
+                              ? "bg-yellow-50 text-yellow-700"
+                              : "bg-gray-50 text-gray-600"
+                          }`}
+                        >
 
                         {record.status === "Present" ? (
-                          <CheckCircle2 size={13} />
-                        ) : (
-                          <XCircle size={13} />
-                        )}
+                            <CheckCircle2 size={13} />
+                          ) : record.status === "Absent" ? (
+                            <XCircle size={13} />
+                          ) : (
+                            <CalendarCheck size={13} />
+                          )}
 
                         {record.status}
 
