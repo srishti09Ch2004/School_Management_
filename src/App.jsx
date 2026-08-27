@@ -7,12 +7,12 @@ import Footer from "./components/Footer";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Demo from "./pages/Demo";
+// import Demo from "./pages/Demo";
 
 import About from "./components/About";
 import Modules from "./components/Modules";
 import Contact from "./components/Contact";
-import Pricing from "./components/Pricing";
+// import Pricing from "./components/Pricing";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
@@ -52,8 +52,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/modules" element={<Modules />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/demo" element={<Demo />} />
+        {/* <Route path="/pricing" element={<Pricing />} /> */}
+        {/* <Route path="/demo" element={<Demo />} /> */}
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
 

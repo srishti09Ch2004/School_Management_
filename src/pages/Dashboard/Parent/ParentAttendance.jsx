@@ -1,3 +1,4 @@
+
 import {
   User,
   GraduationCap,
@@ -7,7 +8,8 @@ import {
   Clock3,
 } from "lucide-react";
 
-export default function ParentAttendance() {
+export default function ParentAttendance({ parent, student }) {
+
   const attendance = [
     { date: "01 Jul 2026", status: "Present" },
     { date: "02 Jul 2026", status: "Present" },
@@ -19,11 +21,22 @@ export default function ParentAttendance() {
     { date: "08 Jul 2026", status: "Absent" },
   ];
 
+ 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">
-        Child Attendance
-      </h2>
+      <div>
+        <p className="text-sm text-gray-500">
+          Parent
+        </p>
+
+        <h2 className="text-2xl font-bold text-gray-800">
+          {parent?.name || "Loading..."}
+        </h2>
+
+        <p className="text-sm text-gray-500 mt-1">
+          Child Attendance
+        </p>
+      </div>
 
       {/* Student Info */}
       <div className="bg-white rounded-3xl p-6 shadow-sm">
@@ -39,7 +52,7 @@ export default function ParentAttendance() {
               </p>
 
               <h3 className="font-bold">
-                Aarti Sharma
+                {student?.full_name || "N/A"}
               </h3>
             </div>
           </div>
@@ -55,7 +68,9 @@ export default function ParentAttendance() {
               </p>
 
               <h3 className="font-bold">
-                10-A
+                {student
+                  ? `${student.class}-${student.section}`
+                  : "N/A"}
               </h3>
             </div>
           </div>
@@ -71,7 +86,7 @@ export default function ParentAttendance() {
               </p>
 
               <h3 className="font-bold">
-                18
+                {student?.roll_no || "N/A"}
               </h3>
             </div>
           </div>

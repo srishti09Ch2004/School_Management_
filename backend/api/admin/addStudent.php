@@ -1,110 +1,3 @@
-<?php
-
-// header("Access-Control-Allow-Origin: *");
-// header("Access-Control-Allow-Headers: Content-Type");
-// header("Content-Type: application/json");
-
-// include("../../config/db.php");
-
-// // Only POST request allowed
-// if ($_SERVER["REQUEST_METHOD"] != "POST") {
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "Invalid Request"
-//     ]);
-//     exit;
-// }
-
-// $data = json_decode(file_get_contents("php://input"), true);
-
-// // Get Data
-// $full_name = $data["full_name"] ?? "";
-// $email = $data["email"] ?? "";
-// $password = $data["password"] ?? "";
-// $class = $data["class"] ?? "";
-// $section = $data["section"] ?? "";
-// $roll_no = $data["roll_no"] ?? "";
-// $gender = $data["gender"] ?? "";
-// $dob = $data["dob"] ?? "";
-// $phone = $data["phone"] ?? "";
-// $address = $data["address"] ?? "";
-
-// // Validation
-// if (
-//     empty($full_name) ||
-//     empty($email) ||
-//     empty($password) ||
-//     empty($class) ||
-//     empty($section) ||
-//     empty($roll_no) ||
-//     empty($gender) ||
-//     empty($dob) ||
-//     empty($phone) ||
-//     empty($address)
-// ) {
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "All fields are required"
-//     ]);
-//     exit;
-// }
-
-// // Check Email
-// $check = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
-
-
-// // duplicate roll_no
-// $rollCheck = mysqli_query($conn,"SELECT * FROM students WHERE roll_no='$roll_no'");
-
-// if(mysqli_num_rows($rollCheck)>0){
-
-//     echo json_encode([
-//         "status"=>false,
-//         "message"=>"Roll Number already exists"
-//     ]);
-
-//     exit;
-// }
-
-// if (mysqli_num_rows($check) > 0) {
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "Email already exists"
-//     ]);
-//     exit;
-// }
-
-// // Insert into users table
-// mysqli_query($conn, "INSERT INTO users(full_name,email,password,role)
-// VALUES('$full_name','$email','$password','student')");
-
-// $user_id = mysqli_insert_id($conn);
-
-// // Generate Admission Number
-// $admission_no = "FA" . rand(1000, 9999);
-
-// // Insert into students table
-// mysqli_query($conn, "INSERT INTO students
-// (user_id,admission_no,class,section,roll_no,gender,dob,phone,address,status)
-// VALUES
-// ('$user_id','$admission_no','$class','$section','$roll_no','$gender','$dob','$phone','$address','Active')");
-
-// // Success Response
-// echo json_encode([
-//     "status" => true,
-//     "message" => "Student Added Successfully"
-// ]);
-
-// ?>
-
-
-
-
-
-
-
-
-
 
 <?php
 
@@ -114,12 +7,7 @@ header("Content-Type: application/json");
 
 include("../../config/db.php");
 
-
-/*
-|--------------------------------------------------------------------------
-| Only POST request allowed
-|--------------------------------------------------------------------------
-*/
+//  Only POST request allowed
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
@@ -132,17 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Get JSON Data
-|--------------------------------------------------------------------------
-*/
+// Get JSON Data
 
 $data = json_decode(
     file_get_contents("php://input"),
     true
 );
-
 
 if (!$data) {
 
@@ -154,12 +37,7 @@ if (!$data) {
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| STUDENT DATA
-|--------------------------------------------------------------------------
-*/
+// STUDENT DATA
 
 $full_name = trim($data["full_name"] ?? "");
 $email     = trim($data["email"] ?? "");
@@ -175,11 +53,7 @@ $address   = trim($data["address"] ?? "");
 $status    = trim($data["status"] ?? "Active");
 
 
-/*
-|--------------------------------------------------------------------------
-| FAMILY DATA
-|--------------------------------------------------------------------------
-*/
+// FAMILY DATA
 
 $father_name = trim(
     $data["father_name"] ?? ""
@@ -209,12 +83,7 @@ $parent_address = trim(
     $data["parent_address"] ?? ""
 );
 
-
-/*
-|--------------------------------------------------------------------------
-| VALIDATION
-|--------------------------------------------------------------------------
-*/
+// VALIDATION
 
 if (
     empty($full_name) ||
@@ -237,7 +106,6 @@ if (
     exit;
 }
 
-
 if (
     empty($father_name) &&
     empty($mother_name)
@@ -250,7 +118,6 @@ if (
 
     exit;
 }
-
 
 if (
     empty($parent_email) ||
@@ -268,12 +135,7 @@ if (
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| CHECK STUDENT EMAIL
-|--------------------------------------------------------------------------
-*/
+// CHECK STUDENT EMAIL
 
 $checkStudentEmail = mysqli_prepare(
     $conn,
@@ -306,12 +168,7 @@ if (
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| CHECK PARENT EMAIL
-|--------------------------------------------------------------------------
-*/
+// CHECK PARENT EMAIL
 
 $checkParentEmail = mysqli_prepare(
     $conn,
@@ -344,12 +201,7 @@ if (
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| CHECK ROLL NUMBER
-|--------------------------------------------------------------------------
-*/
+// CHECK ROLL NUMBER
 
 $rollCheck = mysqli_prepare(
     $conn,
@@ -380,24 +232,13 @@ if (
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| START TRANSACTION
-|--------------------------------------------------------------------------
-*/
+// START TRANSACTION
 
 mysqli_begin_transaction($conn);
 
-
 try {
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | CREATE STUDENT USER
-    |--------------------------------------------------------------------------
-    */
+// CREATE STUDENT USER
 
     $studentUser = mysqli_prepare(
         $conn,
@@ -425,22 +266,12 @@ try {
     $student_user_id =
         mysqli_insert_id($conn);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | GENERATE ADMISSION NUMBER
-    |--------------------------------------------------------------------------
-    */
+// GENERATE ADMISSION NUMBER
 
     $admission_no =
         "FA" . rand(1000, 9999);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | CREATE STUDENT
-    |--------------------------------------------------------------------------
-    */
+// CREATE STUDENT
 
     $studentInsert = mysqli_prepare(
         $conn,
@@ -460,7 +291,6 @@ try {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
-
     mysqli_stmt_bind_param(
         $studentInsert,
         "isssssssss",
@@ -476,7 +306,6 @@ try {
         $status
     );
 
-
     if (
         !mysqli_stmt_execute($studentInsert)
     ) {
@@ -486,22 +315,12 @@ try {
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | GET STUDENT ID
-    |--------------------------------------------------------------------------
-    */
+    // GET STUDENT ID
 
     $student_id =
         mysqli_insert_id($conn);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | CREATE PARENT USER
-    |--------------------------------------------------------------------------
-    */
+    // CREATE PARENT USER
 
     /*
      * Parent account name
@@ -537,14 +356,12 @@ try {
             $mother_name;
     }
 
-
     $parentUser = mysqli_prepare(
         $conn,
         "INSERT INTO users
         (full_name, email, password, role)
         VALUES (?, ?, ?, 'parent')"
     );
-
 
     mysqli_stmt_bind_param(
         $parentUser,
@@ -553,7 +370,6 @@ try {
         $parent_email,
         $parent_password
     );
-
 
     if (
         !mysqli_stmt_execute($parentUser)
@@ -564,16 +380,10 @@ try {
         );
     }
 
-
     $parent_user_id =
         mysqli_insert_id($conn);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | CREATE PARENT RECORD
-    |--------------------------------------------------------------------------
-    */
+    // CREATE PARENT RECORD
 
     $parentInsert = mysqli_prepare(
         $conn,
@@ -590,7 +400,6 @@ try {
         VALUES (?, ?, ?, ?, ?, ?, ?)"
     );
 
-
     mysqli_stmt_bind_param(
         $parentInsert,
         "iisssss",
@@ -603,7 +412,6 @@ try {
         $parent_address
     );
 
-
     if (
         !mysqli_stmt_execute($parentInsert)
     ) {
@@ -613,12 +421,7 @@ try {
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | EVERYTHING SUCCESSFUL
-    |--------------------------------------------------------------------------
-    */
+// EVERYTHING SUCCESSFUL
 
     mysqli_commit($conn);
 
@@ -641,19 +444,11 @@ try {
 
     ]);
 
-
 } catch (Exception $e) {
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | ROLLBACK
-    |--------------------------------------------------------------------------
-    */
+    // ROLLBACK
 
     mysqli_rollback($conn);
-
-
     echo json_encode([
 
         "status" => false,
@@ -662,7 +457,5 @@ try {
             $e->getMessage()
 
     ]);
-
 }
-
 ?>

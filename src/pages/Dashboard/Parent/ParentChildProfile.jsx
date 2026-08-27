@@ -11,25 +11,7 @@ import {
   Briefcase,
 } from "lucide-react";
 
-export default function ParentChildProfile() {
-  const student = {
-    name: "Aarti Sharma",
-    admissionNo: "FA1023",
-    class: "10-A",
-    rollNo: "18",
-    gender: "Female",
-    dob: "12 Jan 2010",
-    age: "16 Years",
-    bloodGroup: "B+",
-    phone: "+91 9876543210",
-    address: "New Delhi, India",
-    fatherName: "Rajesh Sharma",
-    fatherOccupation: "Software Engineer",
-    fatherPhone: "+91 9876543211",
-    motherName: "Pooja Sharma",
-    motherOccupation: "Teacher",
-    motherPhone: "+91 9876543212",
-  };
+export default function ParentChildProfile({ parent, student }) {
 
   return (
     <div className="space-y-8">
@@ -50,11 +32,11 @@ export default function ParentChildProfile() {
             </div>
 
             <h3 className="text-xl font-bold mt-4">
-              {student.name}
+              {student.full_name}
             </h3>
 
             <p className="text-gray-500 text-sm mt-1">
-              Class {student.class}
+              Class {student.class}-{student.section}
             </p>
 
             <div className="mt-5 w-full space-y-3">
@@ -64,7 +46,7 @@ export default function ParentChildProfile() {
                 </p>
 
                 <p className="font-semibold">
-                  {student.admissionNo}
+                  {student.admission_no}
                 </p>
               </div>
 
@@ -74,7 +56,7 @@ export default function ParentChildProfile() {
                 </p>
 
                 <p className="font-semibold">
-                  {student.rollNo}
+                  {student.roll_no}
                 </p>
               </div>
             </div>
@@ -96,7 +78,7 @@ export default function ParentChildProfile() {
                   </div>
 
                   <p className="font-semibold mt-2">
-                    {student.class}
+                    {student.class}-{student.section}
                   </p>
                 </div>
 
@@ -188,7 +170,7 @@ export default function ParentChildProfile() {
                       </p>
 
                       <p className="font-semibold">
-                        {student.fatherName}
+                        {parent?.father_name || "N/A"}
                       </p>
                     </div>
 
@@ -228,7 +210,7 @@ export default function ParentChildProfile() {
                       </p>
 
                       <p className="font-semibold">
-                        {student.motherName}
+                        {parent?.mother_name || "N/A"}
                       </p>
                     </div>
 
@@ -256,7 +238,6 @@ export default function ParentChildProfile() {
                 </div>
               </div>
             </div>
-
            
           </div>
         </div>

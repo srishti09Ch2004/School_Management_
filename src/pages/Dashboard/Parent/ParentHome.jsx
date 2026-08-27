@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   User,
   CalendarCheck,
@@ -7,7 +8,8 @@ import {
   Trophy,
 } from "lucide-react";
 
-export default function ParentHome() {
+export default function ParentHome({ parent, student }) {
+  
   const notices = [
     {
       title: "PTM Meeting",
@@ -65,7 +67,7 @@ export default function ParentHome() {
               </p>
 
               <h3 className="text-xl font-bold mt-2">
-                Aarti Sharma
+                {student?.full_name || "N/A"}
               </h3>
             </div>
 
@@ -83,7 +85,9 @@ export default function ParentHome() {
               </p>
 
               <h3 className="text-xl font-bold mt-2">
-                10 - A
+                {student
+                  ? `${student.class} - ${student.section}`
+                  : "N/A"}
               </h3>
             </div>
 

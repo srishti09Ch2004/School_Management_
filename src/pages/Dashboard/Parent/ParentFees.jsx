@@ -7,7 +7,7 @@ import {
   CircleDollarSign,
 } from "lucide-react";
 
-export default function ParentFees() {
+export default function ParentFees({ parent, student }) {
   const fees = [
     {
       month: "April 2026",
@@ -55,7 +55,7 @@ export default function ParentFees() {
               </p>
 
               <h3 className="font-bold">
-                Aarti Sharma
+                {student?.full_name || "N/A"}
               </h3>
             </div>
           </div>
@@ -71,7 +71,9 @@ export default function ParentFees() {
               </p>
 
               <h3 className="font-bold">
-                10-A
+                {student
+                  ? `${student.class}-${student.section}`
+                  : "N/A"}
               </h3>
             </div>
           </div>
@@ -87,7 +89,7 @@ export default function ParentFees() {
               </p>
 
               <h3 className="font-bold">
-                FA1023
+                {student?.admission_no || "N/A"}
               </h3>
             </div>
           </div>

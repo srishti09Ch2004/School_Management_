@@ -11,9 +11,9 @@ function Navbar() {
   const menus = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { name: "Pricing", path: "/pricing" },
+    // { name: "Pricing", path: "/pricing" },
     { name: "Modules", path: "/modules" },
-    { name: "Demo", path: "/demo" },
+    // { name: "Demo", path: "/demo" },
     { name: "Contact", path: "/contact" },
   ];
 

@@ -7,12 +7,7 @@ header("Content-Type: application/json");
 
 include("../../config/db.php");
 
-
-/*
-|--------------------------------------------------------------------------
-| Only GET request allowed
-|--------------------------------------------------------------------------
-*/
+// Only GET request allowed
 
 if ($_SERVER["REQUEST_METHOD"] !== "GET") {
 
@@ -24,12 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "GET") {
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Get parameters
-|--------------------------------------------------------------------------
-*/
+// Get parameters
 
 $class = $_GET["class"] ?? "";
 
@@ -37,12 +27,7 @@ $section = $_GET["section"] ?? "";
 
 $attendance_date = $_GET["attendance_date"] ?? "";
 
-
-/*
-|--------------------------------------------------------------------------
-| Validation
-|--------------------------------------------------------------------------
-*/
+//  Validation
 
 if ($class === "") {
 
@@ -54,7 +39,6 @@ if ($class === "") {
     exit;
 }
 
-
 if ($section === "") {
 
     echo json_encode([
@@ -64,7 +48,6 @@ if ($section === "") {
 
     exit;
 }
-
 
 if ($attendance_date === "") {
 
@@ -76,17 +59,12 @@ if ($attendance_date === "") {
     exit;
 }
 
-
 /*
-|--------------------------------------------------------------------------
-| Fetch students + attendance
-|--------------------------------------------------------------------------
-|
+| Fetch students + attendance|
 | students = student information
 | users = student name/email
 | attendance = attendance for selected date
-|
-|--------------------------------------------------------------------------
+
 */
 
 $sql = "
@@ -149,9 +127,7 @@ $sql = "
 
 ";
 
-
 $stmt = mysqli_prepare($conn, $sql);
-
 
 if (!$stmt) {
 
@@ -163,17 +139,11 @@ if (!$stmt) {
     exit;
 }
 
-
 /*
-|--------------------------------------------------------------------------
 | Bind parameters
-|--------------------------------------------------------------------------
-|
 | attendance_date = string
 | class           = string
 | section         = string
-|
-|--------------------------------------------------------------------------
 */
 
 mysqli_stmt_bind_param(
@@ -184,12 +154,7 @@ mysqli_stmt_bind_param(
     $section
 );
 
-
-/*
-|--------------------------------------------------------------------------
-| Execute
-|--------------------------------------------------------------------------
-*/
+// Execute
 
 if (!mysqli_stmt_execute($stmt)) {
 
@@ -204,12 +169,7 @@ if (!mysqli_stmt_execute($stmt)) {
 
 $result = mysqli_stmt_get_result($stmt);
 
-
-/*
-|--------------------------------------------------------------------------
-| Prepare response
-|--------------------------------------------------------------------------
-*/
+// Prepare response
 
 $students = [];
 
@@ -283,12 +243,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     ];
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Success response
-|--------------------------------------------------------------------------
-*/
+// Success response
 
 echo json_encode([
 

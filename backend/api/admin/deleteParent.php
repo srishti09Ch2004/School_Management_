@@ -47,10 +47,9 @@ if ($id <= 0) {
 try {
 
     /*
-     * Get Parent information
-     *
-     * We need user_id because parent
-     * has an account in users table.
+      Get Parent information
+      We need user_id because parent
+      has an account in users table.
      */
 
     $stmt = mysqli_prepare(
@@ -97,15 +96,13 @@ try {
         intval($parent["user_id"]);
 
 
-    /*
-     * Start Transaction
-     */
+    /*      Start Transaction     */
 
     mysqli_begin_transaction($conn);
 
 
     /*
-     * 1. Delete Parent record
+      1. Delete Parent record
      */
 
     $deleteParent = mysqli_prepare(
@@ -133,9 +130,8 @@ try {
 
 
     /*
-     * 2. Delete Parent user account
-     *
-     * Only if user_id exists
+     2. Delete Parent user account
+     
      */
 
     if ($userId > 0) {
@@ -167,7 +163,7 @@ try {
 
 
     /*
-     * Commit
+      Commit
      */
 
     mysqli_commit($conn);
@@ -186,7 +182,7 @@ try {
 } catch (Exception $e) {
 
     /*
-     * Rollback if anything fails
+     Rollback if anything fails
      */
 
     mysqli_rollback($conn);
@@ -203,7 +199,6 @@ try {
             $e->getMessage()
 
     ]);
-
 }
 
 ?>

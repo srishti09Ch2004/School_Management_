@@ -8,7 +8,7 @@ import {
   FileText,
 } from "lucide-react";
 
-export default function ParentReportCard() {
+export default function ParentReportCard({ parent, student }) {
   const marks = [
     {
       subject: "Mathematics",
@@ -57,7 +57,7 @@ export default function ParentReportCard() {
               </p>
 
               <h3 className="font-bold">
-                Aarti Sharma
+                {student?.full_name || "N/A"}
               </h3>
             </div>
           </div>
@@ -73,7 +73,9 @@ export default function ParentReportCard() {
               </p>
 
               <h3 className="font-bold">
-                10-A
+                {student
+                ? `${student.class}-${student.section}`
+                : "N/A"}
               </h3>
             </div>
           </div>
@@ -89,7 +91,7 @@ export default function ParentReportCard() {
               </p>
 
               <h3 className="font-bold">
-                18
+                {student?.roll_no || "N/A"}
               </h3>
             </div>
           </div>
