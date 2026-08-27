@@ -24,12 +24,7 @@ $date = $_GET["date"] ?? date("Y-m-d");
 $monthStart = date("Y-m-01", strtotime($date));
 $monthEnd = date("Y-m-t", strtotime($date));
 
-
-/*
-|--------------------------------------------------------------------------
-| STUDENT MONTHLY SUMMARY
-|--------------------------------------------------------------------------
-*/
+// STUDENT MONTHLY SUMMARY
 
 $studentSql = "
     SELECT
@@ -60,13 +55,7 @@ $student = mysqli_fetch_assoc($studentResult);
 
 mysqli_stmt_close($stmt);
 
-
-/*
-|--------------------------------------------------------------------------
-| TEACHER MONTHLY SUMMARY
-|--------------------------------------------------------------------------
-*/
-
+// TEACHER MONTHLY SUMMARY
 $teacherSql = "
     SELECT
         SUM(status = 'Present') AS present,
@@ -96,12 +85,7 @@ $teacher = mysqli_fetch_assoc($teacherResult);
 
 mysqli_stmt_close($stmt);
 
-
-/*
-|--------------------------------------------------------------------------
-| RESPONSE
-|--------------------------------------------------------------------------
-*/
+// RESPONSE
 
 echo json_encode([
     "status" => true,

@@ -14,13 +14,21 @@ const [fees, setFees] = useState([]);
 const [searchQuery, setSearchQuery] = useState("");
 const [showFeeModal, setShowFeeModal] = useState(false);
 const [viewFee, setViewFee] = useState(null);
+const [paymentHistory, setPaymentHistory] = useState([]);
+const [showHistory, setShowHistory] = useState(false);
+const [historyStudent, setHistoryStudent] = useState(null);
 
 const [payFeeData, setPayFeeData] = useState(null);
 
 const [paymentForm, setPaymentForm] = useState({
   payment_amount: "",
   payment_date: "",
+  payment_method: "Cash",
+  transaction_id: "",
+  receipt_no: "",
+  remarks: "",
 });
+
 const [students, setStudents] = useState([]);
 
 const [feeForm, setFeeForm] = useState({
@@ -87,6 +95,10 @@ const handlePayFee = (fee) => {
   setPaymentForm({
     payment_amount: "",
     payment_date: new Date().toISOString().split("T")[0],
+    payment_method: "Cash",
+    transaction_id: "",
+    receipt_no: "",
+    remarks: "",
   });
 };
 
@@ -119,18 +131,25 @@ const handlePayFee = (fee) => {
 
 };
 
-const handleViewFee = (fee) => {
-  setViewFee(fee);
-};
+const handlePaymentHistory = async (fee) => {
+  try {
+    const response = await fetch(
+      `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feePayments.php?student_id=${fee.student_id}`
+    );
 
-const fetchStudents = () => {
-  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feeStudents.php")
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.status) {
-        setStudents(data.data);
-      }
-    });
+    const data = await response.json();
+
+    if (data.status) {
+      setPaymentHistory(data.data);
+      setHistoryStudent(fee);
+      setShowHistory(true);
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Unable to fetch payment history");
+  }
 };
 
 
@@ -361,6 +380,15 @@ const filteredFees = useMemo(() => {
                       >
                         <CreditCard size={16} />
                       </button>
+
+                      <button
+                        onClick={() => handlePaymentHistory(fee)}
+                        className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center hover:bg-purple-100 transition"
+                        title="Payment History"
+                      >
+                        <Wallet size={16} />
+                      </button>
+
                     </div>
                   </td>
                 </tr>
@@ -529,6 +557,62 @@ const filteredFees = useMemo(() => {
           </p>
         </div>
 
+        <select
+          value={paymentForm.payment_method}
+          onChange={(e) =>
+            setPaymentForm({
+              ...paymentForm,
+              payment_method: e.target.value,
+            })
+          }
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="Cash">Cash</option>
+          <option value="UPI">UPI</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Card">Card</option>
+        </select>
+
+        <input
+          type="text"
+          placeholder="Transaction ID (optional)"
+          value={paymentForm.transaction_id}
+          onChange={(e) =>
+            setPaymentForm({
+              ...paymentForm,
+              transaction_id: e.target.value,
+            })
+          }
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <input
+          type="text"
+          placeholder="Receipt No. (optional)"
+          value={paymentForm.receipt_no}
+          onChange={(e) =>
+            setPaymentForm({
+              ...paymentForm,
+              receipt_no: e.target.value,
+            })
+          }
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <textarea
+          placeholder="Remarks (optional)"
+          value={paymentForm.remarks}
+          onChange={(e) =>
+            setPaymentForm({
+              ...paymentForm,
+              remarks: e.target.value,
+            })
+          }
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+          rows="3"
+        />
+
         <div className="col-span-2 bg-gray-50 rounded-xl p-4">
           <p className="text-xs text-gray-500">Status</p>
 
@@ -643,53 +727,189 @@ const filteredFees = useMemo(() => {
           Cancel
         </button>
 
+        onClick={async () => {
+        if (
+          !paymentForm.payment_amount ||
+          !paymentForm.payment_date
+        ) {
+          alert("Please enter payment details");
+          return;
+        }
+
+        const amount = Number(paymentForm.payment_amount);
+        const due = Number(payFeeData.due_fee);
+
+        if (amount <= 0) {
+          alert("Payment amount must be greater than 0");
+          return;
+        }
+
+        if (amount > due) {
+          alert("Payment cannot be greater than due fee");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addFeePayment.php",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fee_id: payFeeData.id,
+                student_id: payFeeData.student_id,
+                amount: amount,
+                payment_date: paymentForm.payment_date,
+                payment_method: paymentForm.payment_method,
+                transaction_id:
+                  paymentForm.transaction_id || null,
+                receipt_no:
+                  paymentForm.receipt_no || null,
+                remarks:
+                  paymentForm.remarks || null,
+              }),
+            }
+          );
+
+          const data = await response.json();
+
+          alert(data.message);
+
+          if (data.status) {
+            setPayFeeData(null);
+
+            setPaymentForm({
+              payment_amount: "",
+              payment_date: "",
+              payment_method: "Cash",
+              transaction_id: "",
+              receipt_no: "",
+              remarks: "",
+            });
+
+            fetchFees();
+          }
+        } catch (error) {
+          console.error(error);
+          alert("Unable to process payment");
+        }
+      }}               
+            </div>
+
+          </div>
+        </div>
+      )}
+
+{showHistory && historyStudent && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-3xl w-full max-w-3xl overflow-hidden shadow-xl">
+
+      <div className="p-6 border-b flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Payment History
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            {historyStudent.full_name} — Class {historyStudent.class} {historyStudent.section}
+          </p>
+        </div>
+
         <button
-          onClick={async () => {
-            if (
-              !paymentForm.payment_amount ||
-              !paymentForm.payment_date
-            ) {
-              alert("Please enter payment details");
-              return;
-            }
-
-            if (
-              Number(paymentForm.payment_amount) >
-              Number(payFeeData.due_fee)
-            ) {
-              alert("Payment cannot be greater than due fee");
-              return;
-            }
-
-            const response = await fetch(
-              "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/payFee.php",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  fee_id: payFeeData.id,
-                  payment_amount: paymentForm.payment_amount,
-                  payment_date: paymentForm.payment_date,
-                }),
-              }
-            );
-
-            const data = await response.json();
-
-            alert(data.message);
-
-            if (data.status) {
-              setPayFeeData(null);
-              fetchFees();
-            }
+          onClick={() => {
+            setShowHistory(false);
+            setHistoryStudent(null);
+            setPaymentHistory([]);
           }}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl"
+          className="text-2xl text-gray-400 hover:text-gray-700"
         >
-          Pay Fee
+          ×
         </button>
+      </div>
 
+      <div className="p-6">
+
+        {paymentHistory.length === 0 ? (
+          <div className="text-center py-10 text-gray-500">
+            No payment history found.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-gray-50">
+                <tr className="text-sm text-gray-600">
+                  <th className="px-4 py-3 text-left">
+                    Date
+                  </th>
+
+                  <th className="px-4 py-3 text-center">
+                    Amount
+                  </th>
+
+                  <th className="px-4 py-3 text-center">
+                    Method
+                  </th>
+
+                  <th className="px-4 py-3 text-center">
+                    Receipt
+                  </th>
+
+                  <th className="px-4 py-3 text-left">
+                    Remarks
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {paymentHistory.map((payment) => (
+                  <tr
+                    key={payment.id}
+                    className="border-t"
+                  >
+                    <td className="px-4 py-4">
+                      {payment.payment_date}
+                    </td>
+
+                    <td className="px-4 py-4 text-center font-semibold text-green-600">
+                      ₹
+                      {Number(payment.amount).toLocaleString("en-IN")}
+                    </td>
+
+                    <td className="px-4 py-4 text-center">
+                      <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs">
+                        {payment.payment_method}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-4 text-center">
+                      {payment.receipt_no || "—"}
+                    </td>
+
+                    <td className="px-4 py-4 text-gray-500">
+                      {payment.remarks || "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+      </div>
+
+      <div className="p-5 border-t flex justify-end">
+        <button
+          onClick={() => {
+            setShowHistory(false);
+            setHistoryStudent(null);
+            setPaymentHistory([]);
+          }}
+          className="px-5 py-2 rounded-xl border hover:bg-gray-50"
+        >
+          Close
+        </button>
       </div>
 
     </div>
