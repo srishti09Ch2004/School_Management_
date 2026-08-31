@@ -7,25 +7,17 @@ header("Content-Type: application/json");
 
 include("../../config/db.php");
 
-// OPTIONS
-
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     exit;
 }
 
-// Only POST
-
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-
     echo json_encode([
         "status" => false,
         "message" => "Invalid request method"
     ]);
-
     exit;
 }
-
-// Get JSON
 
 $data = json_decode(
     file_get_contents("php://input"),
@@ -33,50 +25,30 @@ $data = json_decode(
 );
 
 if (!$data) {
-
     echo json_encode([
         "status" => false,
         "message" => "Invalid JSON data"
     ]);
-
     exit;
 }
 
-//  Input
+$user_id = intval($data["user_id"] ?? 0);
+$fee_id = intval($data["fee_id"] ?? 0);
+$amount = floatval($data["amount"] ?? 0);
 
-$user_id = isset($data["user_id"])
-    ? intval($data["user_id"])
-    : 0;
-
-$fee_id = isset($data["fee_id"])
-    ? intval($data["fee_id"])
-    : 0;
-
-$amount = isset($data["amount"])
-    ? floatval($data["amount"])
-    : 0;
-
-$payment_date = !empty($data["payment_date"])
-    ? $data["payment_date"]
-    : date("Y-m-d");
-
-$payment_method = !empty($data["payment_method"])
-    ? trim($data["payment_method"])
-    : "UPI";
+$payment_method = trim(
+    $data["payment_method"] ?? "UPI"
+);
 
 $transaction_id = !empty($data["transaction_id"])
     ? trim($data["transaction_id"])
-    : null;
-
-$receipt_no = !empty($data["receipt_no"])
-    ? trim($data["receipt_no"])
     : null;
 
 $remarks = !empty($data["remarks"])
     ? trim($data["remarks"])
     : null;
 
-// Basic Validation
+$payment_date = date("Y-m-d");
 
 if ($user_id <= 0 || $fee_id <= 0 || $amount <= 0) {
 
@@ -88,16 +60,10 @@ if ($user_id <= 0 || $fee_id <= 0 || $amount <= 0) {
     exit;
 }
 
-
-/*
- Find Parent + Student|
- Parent user_id -> parents -> student_id
-*/
+// Find Parent
 
 $parentSql = "
-    SELECT
-        id,
-        student_id
+    SELECT student_id
     FROM parents
     WHERE user_id = ?
     LIMIT 1
@@ -108,25 +74,13 @@ $parentStmt = mysqli_prepare(
     $parentSql
 );
 
-if (!$parentStmt) {
-
-    echo json_encode([
-        "status" => false,
-        "message" => "Parent query preparation failed"
-    ]);
-
-    exit;
-}
-
 mysqli_stmt_bind_param(
     $parentStmt,
     "i",
     $user_id
 );
 
-mysqli_stmt_execute(
-    $parentStmt
-);
+mysqli_stmt_execute($parentStmt);
 
 $parentResult =
     mysqli_stmt_get_result($parentStmt);
@@ -135,7 +89,6 @@ $parent =
     mysqli_fetch_assoc($parentResult);
 
 mysqli_stmt_close($parentStmt);
-
 
 if (!$parent) {
 
@@ -150,7 +103,7 @@ if (!$parent) {
 $student_id =
     intval($parent["student_id"]);
 
-//  Check Fee Belongs To Parent's Student
+// Find Fee
 
 $feeSql = "
     SELECT
@@ -158,7 +111,8 @@ $feeSql = "
         student_id,
         total_fee,
         paid_fee,
-        due_fee
+        due_fee,
+        status
     FROM fees
     WHERE id = ?
     AND student_id = ?
@@ -170,16 +124,6 @@ $feeStmt = mysqli_prepare(
     $feeSql
 );
 
-if (!$feeStmt) {
-
-    echo json_encode([
-        "status" => false,
-        "message" => "Fee query preparation failed"
-    ]);
-
-    exit;
-}
-
 mysqli_stmt_bind_param(
     $feeStmt,
     "ii",
@@ -187,9 +131,7 @@ mysqli_stmt_bind_param(
     $student_id
 );
 
-mysqli_stmt_execute(
-    $feeStmt
-);
+mysqli_stmt_execute($feeStmt);
 
 $feeResult =
     mysqli_stmt_get_result($feeStmt);
@@ -208,12 +150,13 @@ if (!$fee) {
 
     exit;
 }
-// Check Due Amount
 
-$current_due =
+// Check Due
+
+$currentDue =
     floatval($fee["due_fee"]);
 
-if ($current_due <= 0) {
+if ($currentDue <= 0) {
 
     echo json_encode([
         "status" => false,
@@ -223,53 +166,56 @@ if ($current_due <= 0) {
     exit;
 }
 
-if ($amount > $current_due) {
+if ($amount > $currentDue) {
 
     echo json_encode([
         "status" => false,
         "message" => "Payment amount cannot be greater than due fee",
-        "due_fee" => $current_due
+        "due_fee" => $currentDue
     ]);
 
     exit;
 }
 
-// Calculate New Fee
+// Calculate New Values
 
-$current_paid =
+$currentPaid =
     floatval($fee["paid_fee"]);
 
-$total_fee =
+$totalFee =
     floatval($fee["total_fee"]);
 
-$new_paid =
-    $current_paid + $amount;
+$newPaid =
+    $currentPaid + $amount;
 
-$new_due =
-    $total_fee - $new_paid;
+$newDue =
+    $totalFee - $newPaid;
 
-if ($new_due < 0) {
-    $new_due = 0;
+if ($newDue < 0) {
+    $newDue = 0;
 }
 
-$new_status =
-    ($new_due <= 0)
+$newStatus =
+    ($newDue <= 0)
         ? "Paid"
         : "Pending";
-//  Generate Receipt Number
 
-if (!$receipt_no) {
 
-    $receipt_no =
-        "REC-" . date("YmdHis");
-}
+// Receipt Number
 
-// Database Transaction
+$receiptNo =
+    "REC-" . date("YmdHis") . rand(100, 999);
+
+
+// Transaction
+
 mysqli_begin_transaction($conn);
 
 try {
 
-    // Insert Payment History
+    /*
+    | Insert Payment History
+    */
 
     $paymentSql = "
         INSERT INTO fee_payments
@@ -307,7 +253,7 @@ try {
         $payment_date,
         $payment_method,
         $transaction_id,
-        $receipt_no,
+        $receiptNo,
         $remarks
     );
 
@@ -318,12 +264,15 @@ try {
         );
     }
 
-    $payment_id =
+    $paymentId =
         mysqli_insert_id($conn);
 
     mysqli_stmt_close($paymentStmt);
 
-// Update Fees
+
+    /*
+    | Update Fee
+    */
 
     $updateSql = "
         UPDATE fees
@@ -342,20 +291,13 @@ try {
             $updateSql
         );
 
-    if (!$updateStmt) {
-
-        throw new Exception(
-            "Fee update preparation failed"
-        );
-    }
-
     mysqli_stmt_bind_param(
         $updateStmt,
         "ddssii",
-        $new_paid,
-        $new_due,
+        $newPaid,
+        $newDue,
         $payment_date,
-        $new_status,
+        $newStatus,
         $fee_id,
         $student_id
     );
@@ -369,11 +311,13 @@ try {
 
     mysqli_stmt_close($updateStmt);
 
-// Commit
+
+    /*
+    | Commit
+    */
 
     mysqli_commit($conn);
 
-// Success
 
     echo json_encode([
 
@@ -383,10 +327,10 @@ try {
             "Fee payment successful",
 
         "payment_id" =>
-            $payment_id,
+            $paymentId,
 
         "receipt_no" =>
-            $receipt_no,
+            $receiptNo,
 
         "payment" => [
 
@@ -412,17 +356,18 @@ try {
                 $student_id,
 
             "total_fee" =>
-                $total_fee,
+                $totalFee,
 
             "paid_fee" =>
-                $new_paid,
+                $newPaid,
 
             "due_fee" =>
-                $new_due,
+                $newDue,
 
             "status" =>
-                $new_status
+                $newStatus
         ]
+
     ]);
 
 } catch (Exception $e) {

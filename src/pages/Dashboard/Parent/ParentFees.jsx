@@ -1,264 +1,3 @@
-// import {
-//   User,
-//   GraduationCap,
-//   Hash,
-//   IndianRupee,
-//   Receipt,
-//   CircleDollarSign,
-// } from "lucide-react";
-
-// export default function ParentFees({ parent, student }) {
-//   const fees = [
-//     {
-//       month: "April 2026",
-//       amount: "₹8,000",
-//       dueDate: "10 Apr 2026",
-//       status: "Paid",
-//     },
-//     {
-//       month: "May 2026",
-//       amount: "₹8,000",
-//       dueDate: "10 May 2026",
-//       status: "Paid",
-//     },
-//     {
-//       month: "June 2026",
-//       amount: "₹8,000",
-//       dueDate: "10 Jun 2026",
-//       status: "Pending",
-//     },
-//     {
-//       month: "July 2026",
-//       amount: "₹8,000",
-//       dueDate: "10 Jul 2026",
-//       status: "Pending",
-//     },
-//   ];
-
-//   return (
-//     <div className="space-y-6">
-//       <h2 className="text-2xl font-bold text-gray-800">
-//         Fee Details
-//       </h2>
-
-//       {/* Student Information */}
-//       <div className="bg-white rounded-3xl p-6 shadow-sm">
-//         <div className="grid md:grid-cols-3 gap-5">
-//           <div className="flex items-center gap-3">
-//             <div className="w-11 h-11 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
-//               <User size={20} />
-//             </div>
-
-//             <div>
-//               <p className="text-sm text-gray-500">
-//                 Student Name
-//               </p>
-
-//               <h3 className="font-bold">
-//                 {student?.full_name || "N/A"}
-//               </h3>
-//             </div>
-//           </div>
-
-//           <div className="flex items-center gap-3">
-//             <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
-//               <GraduationCap size={20} />
-//             </div>
-
-//             <div>
-//               <p className="text-sm text-gray-500">
-//                 Class
-//               </p>
-
-//               <h3 className="font-bold">
-//                 {student
-//                   ? `${student.class}-${student.section}`
-//                   : "N/A"}
-//               </h3>
-//             </div>
-//           </div>
-
-//           <div className="flex items-center gap-3">
-//             <div className="w-11 h-11 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
-//               <Hash size={20} />
-//             </div>
-
-//             <div>
-//               <p className="text-sm text-gray-500">
-//                 Admission No
-//               </p>
-
-//               <h3 className="font-bold">
-//                 {student?.admission_no || "N/A"}
-//               </h3>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Summary Cards */}
-//       <div className="grid md:grid-cols-3 gap-5">
-//         <div className="bg-white rounded-3xl p-5 shadow-sm">
-//           <div className="flex justify-between items-center">
-//             <div>
-//               <p className="text-sm text-gray-500">
-//                 Total Fees
-//               </p>
-
-//               <h3 className="text-xl font-bold mt-4">
-//                 ₹32,000
-//               </h3>
-//             </div>
-
-//             <div className="w-11 h-11 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
-//               <IndianRupee size={20} />
-//             </div>
-//           </div>
-//         </div>
-
-//         <div className="bg-white rounded-3xl p-5 shadow-sm">
-//           <div className="flex justify-between items-center">
-//             <div>
-//               <p className="text-sm text-gray-500">
-//                 Paid Amount
-//               </p>
-
-//               <h3 className="text-xl font-bold text-green-600 mt-4">
-//                 ₹16,000
-//               </h3>
-//             </div>
-
-//             <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
-//               <CircleDollarSign size={20} />
-//             </div>
-//           </div>
-//         </div>
-
-//         <div className="bg-white rounded-3xl p-5 shadow-sm">
-//           <div className="flex justify-between items-center">
-//             <div>
-//               <p className="text-sm text-gray-500">
-//                 Pending Amount
-//               </p>
-
-//               <h3 className="text-xl font-bold text-red-600 mt-4">
-//                 ₹16,000
-//               </h3>
-//             </div>
-
-//             <div className="w-11 h-11 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center">
-//               <Receipt size={20} />
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Fee History */}
-//       <div className="bg-white rounded-3xl p-6 shadow-sm">
-//         <div className="flex items-center justify-between mb-5">
-//           <h3 className="text-lg font-bold">
-//             Fee History
-//           </h3>
-
-//           <button className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm">
-//             Pay Now
-//           </button>
-//         </div>
-
-//         <div className="overflow-x-auto">
-//           <table className="w-full">
-//             <thead>
-//               <tr className="border-b border-gray-100">
-//                 <th className="text-left py-3 text-sm text-gray-500">
-//                   Month
-//                 </th>
-
-//                 <th className="text-left py-3 text-sm text-gray-500">
-//                   Amount
-//                 </th>
-
-//                 <th className="text-left py-3 text-sm text-gray-500">
-//                   Due Date
-//                 </th>
-
-//                 <th className="text-left py-3 text-sm text-gray-500">
-//                   Status
-//                 </th>
-
-//                 <th className="text-left py-3 text-sm text-gray-500">
-//                   Receipt
-//                 </th>
-//               </tr>
-//             </thead>
-
-//             <tbody>
-//               {fees.map((item, index) => (
-//                 <tr
-//                   key={index}
-//                   className="border-b border-gray-100"
-//                 >
-//                   <td className="py-4 font-medium">
-//                     {item.month}
-//                   </td>
-
-//                   <td className="py-4">
-//                     {item.amount}
-//                   </td>
-
-//                   <td className="py-4 text-gray-600">
-//                     {item.dueDate}
-//                   </td>
-
-//                   <td className="py-4">
-//                     <span
-//                       className={`px-4 py-2 rounded-full text-sm font-semibold ${
-//                         item.status === "Paid"
-//                           ? "bg-green-100 text-green-700"
-//                           : "bg-red-100 text-red-700"
-//                       }`}
-//                     >
-//                       {item.status}
-//                     </span>
-//                   </td>
-
-//                   <td className="py-4">
-//                     {item.status === "Paid" ? (
-//                       <button className="text-blue-600 font-medium">
-//                         Download
-//                       </button>
-//                     ) : (
-//                       <span className="text-gray-400">
-//                         -
-//                       </span>
-//                     )}
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-
-//         {/* Important Notice */}
-//         <div className="mt-6 bg-red-50 border border-red-100 rounded-2xl p-4">
-//           <p className="text-red-700 text-sm font-medium">
-//             ₹16,000 fees are pending. Please pay before
-//             10 July 2026 to avoid late charges.
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
 
 import { useEffect, useState } from "react";
 import {
@@ -272,6 +11,13 @@ import {
 } from "lucide-react";
 
 export default function ParentFees({ parent, student }) {
+const [showPaymentModal, setShowPaymentModal] = useState(false);
+const [selectedFee, setSelectedFee] = useState(null);
+const [paymentAmount, setPaymentAmount] = useState("");
+const [paymentMethod, setPaymentMethod] = useState("UPI");
+const [transactionId, setTransactionId] = useState("");
+const [paying, setPaying] = useState(false);
+const [paymentMessage, setPaymentMessage] = useState("");
 
   const [feeData, setFeeData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -385,6 +131,143 @@ export default function ParentFees({ parent, student }) {
       </div>
     );
   }
+
+  const handlePayNow = (fee) => {
+
+  setSelectedFee(fee);
+  setPaymentAmount(fee.due_fee);
+  setPaymentMethod("UPI");
+  setTransactionId("");
+  setPaymentMessage("");
+
+  setShowPaymentModal(true);
+};
+
+
+const handlePayment = async () => {
+
+  const storedUser =
+    JSON.parse(localStorage.getItem("user"));
+
+  if (!storedUser?.id) {
+
+    setPaymentMessage(
+      "Parent login information not found"
+    );
+
+    return;
+  }
+
+  const amount =
+    Number(paymentAmount);
+
+  if (!amount || amount <= 0) {
+
+    setPaymentMessage(
+      "Please enter a valid payment amount"
+    );
+
+    return;
+  }
+
+  if (
+    selectedFee &&
+    amount > Number(selectedFee.due_fee)
+  ) {
+
+    setPaymentMessage(
+      "Payment cannot be greater than due amount"
+    );
+
+    return;
+  }
+
+  try {
+
+    setPaying(true);
+    setPaymentMessage("");
+
+    const response = await fetch(
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/parent/payFee.php",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify({
+
+          user_id:
+            storedUser.id,
+
+          fee_id:
+            selectedFee.id,
+
+          amount:
+            amount,
+
+          payment_method:
+            paymentMethod,
+
+          transaction_id:
+            transactionId || null,
+
+          remarks:
+            "Parent online payment"
+        })
+      }
+    );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "Payment Response:",
+      data
+    );
+
+    if (!data.status) {
+
+      setPaymentMessage(
+        data.message ||
+        "Payment failed"
+      );
+
+      return;
+    }
+
+    alert(
+      `Payment successful!\nReceipt: ${data.receipt_no}`
+    );
+
+    setShowPaymentModal(false);
+
+    setSelectedFee(null);
+
+    setPaymentAmount("");
+
+    setTransactionId("");
+
+    await fetchFees();
+
+  } catch (error) {
+
+    console.error(
+      "Payment Error:",
+      error
+    );
+
+    setPaymentMessage(
+      "Unable to process payment"
+    );
+
+  } finally {
+
+    setPaying(false);
+  }
+};
 
   const summary = feeData.summary || {};
   const fees = feeData.fees || [];
@@ -767,6 +650,10 @@ export default function ParentFees({ parent, student }) {
                     Status
                   </th>
 
+                   <th className="text-left py-3 px-2 text-sm text-gray-500">
+                      Action
+                  </th>
+
                 </tr>
 
               </thead>
@@ -841,6 +728,28 @@ export default function ParentFees({ parent, student }) {
                       </span>
 
                     </td>
+                    <td className="py-4 px-2">
+
+                      {Number(fee.due_fee) > 0 ? (
+
+                        <button
+                          onClick={() =>
+                            handlePayNow(fee)
+                          }
+                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
+                        >
+                          Pay Now
+                        </button>
+
+                      ) : (
+
+                        <span className="text-sm text-gray-400">
+                          No Due
+                        </span>
+
+                      )}
+
+                    </td>
 
                   </tr>
 
@@ -851,6 +760,204 @@ export default function ParentFees({ parent, student }) {
           </div>
         )}
       </div>
+
+        {showPaymentModal && selectedFee && (
+
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+
+            <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl">
+
+              <div className="flex justify-between items-center mb-6">
+
+                <div>
+
+                  <h3 className="text-xl font-bold text-gray-800">
+                    Pay Fee
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Fee #{selectedFee.id}
+                  </p>
+
+                </div>
+
+                <button
+                  onClick={() =>
+                    setShowPaymentModal(false)
+                  }
+                  className="text-gray-400 hover:text-gray-700 text-xl"
+                >
+                  ×
+                </button>
+
+              </div>
+
+
+              <div className="bg-gray-50 rounded-2xl p-4 space-y-2 mb-5">
+
+                <div className="flex justify-between">
+
+                  <span className="text-gray-500">
+                    Total Fee
+                  </span>
+
+                  <span className="font-semibold">
+                    {formatCurrency(
+                      selectedFee.total_fee
+                    )}
+                  </span>
+
+                </div>
+
+                <div className="flex justify-between">
+
+                  <span className="text-gray-500">
+                    Already Paid
+                  </span>
+
+                  <span className="font-semibold text-green-600">
+                    {formatCurrency(
+                      selectedFee.paid_fee
+                    )}
+                  </span>
+
+                </div>
+
+                <div className="flex justify-between">
+
+                  <span className="text-gray-500">
+                    Remaining Due
+                  </span>
+
+                  <span className="font-bold text-red-600">
+                    {formatCurrency(
+                      selectedFee.due_fee
+                    )}
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div className="space-y-4">
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Payment Amount
+                  </label>
+
+                  <input
+                    type="number"
+                    value={paymentAmount}
+                    onChange={(e) =>
+                      setPaymentAmount(
+                        e.target.value
+                      )
+                    }
+                    max={selectedFee.due_fee}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Enter amount"
+                  />
+
+                </div>
+
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Payment Method
+                  </label>
+
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) =>
+                      setPaymentMethod(
+                        e.target.value
+                      )
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none"
+                  >
+
+                    <option value="UPI">
+                      UPI
+                    </option>
+
+                    <option value="Card">
+                      Card
+                    </option>
+
+                    <option value="Net Banking">
+                      Net Banking
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Transaction ID
+                  </label>
+
+                  <input
+                    type="text"
+                    value={transactionId}
+                    onChange={(e) =>
+                      setTransactionId(
+                        e.target.value
+                      )
+                    }
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none"
+                    placeholder="Enter transaction ID"
+                  />
+
+                </div>
+
+
+                {paymentMessage && (
+
+                  <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl">
+                    {paymentMessage}
+                  </div>
+
+                )}
+
+
+                <div className="flex gap-3 pt-2">
+
+                  <button
+                    onClick={() =>
+                      setShowPaymentModal(false)
+                    }
+                    className="flex-1 border border-gray-200 py-3 rounded-xl"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={handlePayment}
+                    disabled={paying}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-medium disabled:opacity-50"
+                  >
+                    {paying
+                      ? "Processing..."
+                      : "Pay Now"}
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        )}
+
     </div>
   );
 }
