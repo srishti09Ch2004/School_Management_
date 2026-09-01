@@ -213,10 +213,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "GET") {
 
 
 /*
-|--------------------------------------------------------------------------
-| Fetch All Fee Records
-|--------------------------------------------------------------------------
-|
+
+| Fetch All Fee Records|
 | Admin ko Pending + Partially Paid + Paid
 | sabhi fee records dikhne chahiye.
 |
@@ -267,12 +265,7 @@ if (!$result) {
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Prepare Fee Data
-|--------------------------------------------------------------------------
-*/
+// Prepare Fee Data
 
 $fees = [];
 
@@ -296,11 +289,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         "student_id" =>
             intval($row["student_id"]),
 
-        /*
-        |--------------------------------------------------------------
-        | Student Information
-        |--------------------------------------------------------------
-        */
+        // Student Information
 
         "full_name" =>
             $row["full_name"],
@@ -324,11 +313,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             $row["roll_no"],
 
 
-        /*
-        |--------------------------------------------------------------
-        | Fee Information
-        |--------------------------------------------------------------
-        */
+//  Fee Information
 
         "total_fee" =>
             $total,
@@ -346,24 +331,14 @@ while ($row = mysqli_fetch_assoc($result)) {
             $row["status"]
     ];
 
-
-    /*
-    |--------------------------------------------------------------
-    | Admin Summary
-    |--------------------------------------------------------------
-    */
+//  Admin Summary
 
     $totalFee += $total;
     $totalPaid += $paid;
     $totalDue += $due;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Final Response
-|--------------------------------------------------------------------------
-*/
+// Final Response
 
 echo json_encode([
 

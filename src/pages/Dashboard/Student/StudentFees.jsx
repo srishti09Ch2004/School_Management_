@@ -959,26 +959,35 @@ export default function StudentFees() {
                     <td className="px-6 py-5 text-center">
 
                       <button
-                        type="button"
-                        onClick={() =>
-                          alert(
-                            `Receipt: ${
-                              payment.receipt_no || "N/A"
-                            }\nAmount: ${
-                              formatCurrency(payment.amount)
-                            }\nDate: ${
-                              formatDate(payment.payment_date)
-                            }`
-                          )
-                        }
-                        className="inline-flex items-center gap-2 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition text-sm"
-                      >
+                          type="button"
+                          onClick={() => {
+                            const storedUser = JSON.parse(
+                              localStorage.getItem("user")
+                            );
 
-                        <Download size={16} />
+                            if (!storedUser?.id) {
+                              alert("Student login information not found");
+                              return;
+                            }
 
-                        Receipt
+                            if (!payment.id) {
+                              alert("Payment ID not found");
+                              return;
+                            }
 
-                      </button>
+                            const receiptUrl =
+                              `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/student/generateReceipt.php` +
+                              `?payment_id=${payment.id}` +
+                              `&user_id=${storedUser.id}`;
+
+                            window.open(receiptUrl, "_blank");
+                          }}
+                          className="inline-flex items-center gap-2 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition text-sm"
+                        >
+                          <Download size={16} />
+                          Receipt
+                        </button>
+                                        
 
                     </td>
 
