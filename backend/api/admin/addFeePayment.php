@@ -127,6 +127,13 @@ if (!$fee) {
 $total_fee = floatval($fee["total_fee"]);
 $paid_fee = floatval($fee["paid_fee"]);
 $due_fee = floatval($fee["due_fee"]);
+if ($due_fee <= 0 || $fee["status"] === "Paid") {
+    echo json_encode([
+        "status" => false,
+        "message" => "This fee is already fully paid"
+    ]);
+    exit;
+}
 
 // Prevent overpayment
 
@@ -150,10 +157,13 @@ if ($new_due_fee < 0) {
     $new_due_fee = 0;
 }
 
-$new_status =
-    ($new_due_fee <= 0)
-    ? "Paid"
-    : "Pending";
+if ($new_due_fee <= 0) {
+    $new_status = "Paid";
+} elseif ($new_paid_fee > 0) {
+    $new_status = "Partial";
+} else {
+    $new_status = "Pending";
+}
 
 // Generate receipt if empty
 

@@ -118,7 +118,7 @@ $checkSql = "
         status
     FROM fees
     WHERE student_id = ?
-    AND status = 'Pending'
+    AND status IN ('Pending', 'Partial')
     LIMIT 1
 ";
 
@@ -149,7 +149,7 @@ if ($existingFee) {
 
     echo json_encode([
         "status" => false,
-        "message" => "This student already has a pending fee record",
+        "message" => "This student already has an active fee record",
         "existing_fee" => [
             "fee_id" => intval($existingFee["id"]),
             "total_fee" => floatval($existingFee["total_fee"]),
