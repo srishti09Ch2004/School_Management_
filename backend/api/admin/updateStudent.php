@@ -2,85 +2,217 @@
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST");
 header("Content-Type: application/json");
 
 include("../../config/db.php");
 
-// Get JSON Data
+// ONLY POST REQUEST
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Invalid request method"
+    ]);
+
+    exit;
+}
+
+// GET JSON DATA
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!$data) {
+
     echo json_encode([
         "status" => false,
         "message" => "No data received"
     ]);
+
     exit;
 }
 
-// Data
-$id = $data["id"];
-$full_name = $data["full_name"];
-$email = $data["email"];
-$password = $data["password"];
+// STUDENT DATA
 
-$class = $data["class"];
-$section = $data["section"];
-$roll_no = $data["roll_no"];
-$gender = $data["gender"];
-$dob = $data["dob"];
-$phone = $data["phone"];
-$address = $data["address"];
+$id = $data["id"] ?? "";
+
+$full_name = trim($data["full_name"] ?? "");
+$email = trim($data["email"] ?? "");
+$password = trim($data["password"] ?? "");
+
+$class = trim($data["class"] ?? "");
+$section = trim($data["section"] ?? "");
+$roll_no = trim($data["roll_no"] ?? "");
+$gender = trim($data["gender"] ?? "");
+
+$dob = trim($data["dob"] ?? "");
+$admission_date = trim($data["admission_date"] ?? "");
+
+$phone = trim($data["phone"] ?? "");
+$address = trim($data["address"] ?? "");
+
 $status = $data["status"] ?? "Active";
 
 
-// ================= USERS TABLE =================
+// VALIDATION
+if (
+    empty($id) ||
+    empty($full_name) ||
+    empty($email) ||
+    empty($class) ||
+    empty($section) ||
+    empty($roll_no) ||
+    empty($gender) ||
+    empty($dob) ||
+    empty($admission_date) ||
+    empty($phone) ||
+    empty($address)
+) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Please fill all required student fields"
+    ]);
+
+    exit;
+}
+
+// UPDATE USERS TABLE
 
 if (!empty($password)) {
 
-    mysqli_query($conn,"
+    $sql = "
         UPDATE users
         SET
-        full_name='$full_name',
-        email='$email',
-        password='$password'
-        WHERE id='$id'
-    ");
+            full_name = ?,
+            email = ?,
+            password = ?
+        WHERE id = ?
+    ";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "sssi",
+        $full_name,
+        $email,
+        $password,
+        $id
+    );
 
 } else {
 
-    mysqli_query($conn,"
+    $sql = "
         UPDATE users
         SET
-        full_name='$full_name',
-        email='$email'
-        WHERE id='$id'
-    ");
+            full_name = ?,
+            email = ?
+        WHERE id = ?
+    ";
 
+    $stmt = mysqli_prepare($conn, $sql);
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "ssi",
+        $full_name,
+        $email,
+        $id
+    );
 }
 
+if (!mysqli_stmt_execute($stmt)) {
 
-// ================= STUDENTS TABLE =================
+    echo json_encode([
+        "status" => false,
+        "message" => "Failed to update user",
+        "error" => mysqli_stmt_error($stmt)
+    ]);
 
-mysqli_query($conn,"
+    exit;
+}
+
+mysqli_stmt_close($stmt);
+
+// UPDATE STUDENTS TABLE
+
+$sql = "
     UPDATE students
     SET
-    class='$class',
-    section='$section',
-    roll_no='$roll_no',
-    gender='$gender',
-    dob='$dob',
-    phone='$phone',
-    address='$address',
-    status='$status'
-    WHERE user_id='$id'
-");
+        admission_date = ?,
+        class = ?,
+        section = ?,
+        roll_no = ?,
+        gender = ?,
+        dob = ?,
+        phone = ?,
+        address = ?,
+        status = ?
+    WHERE user_id = ?
+";
 
+$stmt = mysqli_prepare($conn, $sql);
 
-// ================= RESPONSE =================
+if (!$stmt) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Failed to prepare student update",
+        "error" => mysqli_error($conn)
+    ]);
+
+    exit;
+}
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "sssssssssi",
+    $admission_date,
+    $class,
+    $section,
+    $roll_no,
+    $gender,
+    $dob,
+    $phone,
+    $address,
+    $status,
+    $id
+);
+
+if (!mysqli_stmt_execute($stmt)) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Failed to update student",
+        "error" => mysqli_stmt_error($stmt)
+    ]);
+
+    exit;
+}
+
+mysqli_stmt_close($stmt);
+
+// RESPONSE
 
 echo json_encode([
     "status" => true,
-    "message" => "Student Updated Successfully"
+    "message" => "Student Updated Successfully",
+    "data" => [
+        "user_id" => $id,
+        "full_name" => $full_name,
+        "email" => $email,
+        "admission_date" => $admission_date,
+        "class" => $class,
+        "section" => $section,
+        "roll_no" => $roll_no,
+        "gender" => $gender,
+        "dob" => $dob,
+        "phone" => $phone,
+        "address" => $address,
+        "status" => $status
+    ]
 ]);
 
 ?>

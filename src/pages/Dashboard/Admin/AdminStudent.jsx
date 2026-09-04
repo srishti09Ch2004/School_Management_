@@ -33,6 +33,7 @@ const [formData, setFormData] = useState({
   roll_no: "",
   gender: "",
   dob: "",
+  admission_date: "",
   phone: "",
   address: "",
   status: "Active",
@@ -192,6 +193,7 @@ const handleSubmit = async () => {
     !formData.roll_no ||
     !formData.gender ||
     !formData.dob ||
+    !formData.admission_date ||
     !formData.phone ||
     !formData.address ||
     !formData.father_name ||
@@ -236,6 +238,7 @@ const handleSubmit = async () => {
         roll_no: "",
         gender: "",
         dob: "",
+        admission_date: "",
         phone: "",
         address: "",
         status: "Active",
@@ -548,7 +551,9 @@ const handleDelete = async (id) => {
 
   return (
     <div className="space-y-7 max-w-[1600px] mx-auto p-1">
+
       {/* Header */}
+
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Student Management</h1>
@@ -612,6 +617,7 @@ const handleDelete = async (id) => {
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Roll No.</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Gender</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Admission No</th>
+                <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Admission Date</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -619,7 +625,7 @@ const handleDelete = async (id) => {
             <tbody className="divide-y divide-gray-100">
               {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-10 text-gray-400 text-sm">
+                  <td colSpan="8" className="text-center py-10 text-gray-400 text-sm">
                     No students found matching the filters.
                   </td>
                 </tr>
@@ -631,6 +637,7 @@ const handleDelete = async (id) => {
                     <td className="text-center text-gray-600 text-sm">{student.roll_no}</td>
                     <td className="text-center text-gray-600 text-sm">{student.gender}</td>
                     <td className="text-center text-gray-500 text-sm">{student.admission_no}</td>
+                    <td className="text-center text-gray-500 text-sm">{student.admission_date || "N/A"}</td>
                     <td className="text-center">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -666,6 +673,7 @@ const handleDelete = async (id) => {
                                 roll_no: student.roll_no,
                                 gender: student.gender,
                                 dob: student.dob,
+                                admission_date: student.admission_date || "",
                                 phone: student.phone,
                                 address: student.address,
                                 status: student.status,
@@ -741,31 +749,7 @@ const handleDelete = async (id) => {
       </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     {/* Student View Modal */}
+    {/* Student View Modal */}
 {viewStudent && (
   <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
 
@@ -970,6 +954,13 @@ const handleDelete = async (id) => {
                   <span className="text-sm font-semibold text-gray-700">
                     {viewStudent.admission_no || "N/A"}
                   </span>
+                </div>
+
+                <div> 
+                  <span className="text-sm text-gray-500"> Admission Date </span> 
+                  <span className="font-semibold text-gray-800"> 
+                    {viewStudent.admission_date || "N/A"} 
+                  </span> 
                 </div>
 
 
@@ -1321,6 +1312,14 @@ const handleDelete = async (id) => {
           onChange={handleChange}
           className="border rounded-xl p-3"
         />
+        <input
+          type="date"
+          name="admission_date"
+          value={formData.admission_date}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+          required
+        />
 
         <input
           type="text"
@@ -1542,6 +1541,13 @@ const handleDelete = async (id) => {
           type="date"
           name="dob"
           value={formData.dob}
+          onChange={handleChange}
+          className="border rounded-xl p-3"
+        />
+        <input
+          type="date"
+          name="admission_date"
+          value={formData.admission_date}
           onChange={handleChange}
           className="border rounded-xl p-3"
         />
