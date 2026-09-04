@@ -1,5 +1,4 @@
 <?php
-
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
@@ -53,6 +52,13 @@ $admission_date = trim(
 );
 
 $phone   = trim($data["phone"] ?? "");
+if (!preg_match('/^[0-9]{10}$/', $phone)) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Student phone number must be exactly 10 digits"
+    ]);
+    exit;
+}
 $address = trim($data["address"] ?? "");
 $status  = trim($data["status"] ?? "Active");
 
@@ -77,6 +83,13 @@ $parent_password = trim(
 $parent_phone = trim(
     $data["parent_phone"] ?? ""
 );
+if (!preg_match('/^[0-9]{10}$/', $parent_phone)) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Parent phone number must be exactly 10 digits"
+    ]);
+    exit;
+}
 
 $parent_occupation = trim(
     $data["parent_occupation"] ?? ""

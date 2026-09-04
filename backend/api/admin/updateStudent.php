@@ -50,6 +50,13 @@ $dob = trim($data["dob"] ?? "");
 $admission_date = trim($data["admission_date"] ?? "");
 
 $phone = trim($data["phone"] ?? "");
+if (!preg_match('/^[0-9]{10}$/', $phone)) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Phone number must be exactly 10 digits"
+    ]);
+    exit;
+}
 $address = trim($data["address"] ?? "");
 
 $status = $data["status"] ?? "Active";

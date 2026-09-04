@@ -153,6 +153,18 @@ const handleSubmit = async () => {
     return;
   }
 
+    // Student Phone Validation
+    if (!/^\d{10}$/.test(formData.phone)) {
+      alert("Student phone number must be exactly 10 digits");
+      return;
+    }
+
+    // Parent Phone Validation
+    if (!/^\d{10}$/.test(formData.parent_phone)) {
+      alert("Parent phone number must be exactly 10 digits");
+      return;
+    }
+
   try {
 
     const response = await fetch(
@@ -256,6 +268,11 @@ const handleUpdate = async () => {
     return;
   }
 
+  if (!/^\d{10}$/.test(formData.phone)) {
+    alert("Student phone number must be exactly 10 digits");
+    return;
+  }
+
   const response = await fetch(
     "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateStudent.php",
     {
@@ -341,9 +358,7 @@ const handleDelete = async (id) => {
     console.log("Delete Check Response:", data);
 
 
-    /*
-     * Student has linked parent
-     */
+    /*  Student has linked parent  */
 
     if (data.requires_parent_confirmation) {
 
@@ -657,22 +672,35 @@ const stats = [
                         <button
                           onClick={() => {
                               setFormData({
-                                id: student.user_id || student.id,
-                                full_name: student.full_name,
-                                email: student.email,
-                                password: "",
-                                class: student.class,
-                                section: student.section,
-                                roll_no: student.roll_no,
-                                gender: student.gender,
-                                dob: student.dob,
-                                admission_date: student.admission_date || "",
-                                phone: student.phone,
-                                address: student.address,
-                                status: student.status,
-                              });
+                              id: student.user_id || student.id,
 
-                              setShowEditModal(true);
+                              full_name: student.full_name || "",
+                              email: student.email || "",
+                              password: "",
+
+                              class: student.class || "",
+                              section: student.section || "",
+                              roll_no: student.roll_no || "",
+
+                              gender: student.gender || "",
+                              dob: student.dob || "",
+                              admission_date: student.admission_date || "",
+
+                              phone: student.phone || "",
+                              address: student.address || "",
+
+                              status: student.status || "Active",
+
+                              father_name: "",
+                              mother_name: "",
+                              parent_email: "",
+                              parent_password: "",
+                              parent_phone: "",
+                              parent_occupation: "",
+                              parent_address: "",
+                            });
+
+                            setShowEditModal(true);
 
                           }}
                           className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition"
@@ -1198,394 +1226,737 @@ const stats = [
   </div>
 )}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       {showAddModal && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div className="bg-white rounded-3xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">
-          Add Student
-        </h2>
+          <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl">
 
-        <button
-          onClick={() => setShowAddModal(false)}
-          className="text-2xl"
-        >
-          x
-        </button>
-      </div>
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-white px-6 py-5 border-b border-gray-100 flex justify-between items-center">
 
-      <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Add Student
+                </h2>
 
-        <input
-          type="text"
-          name="full_name"
-          placeholder="Full Name"
-          value={formData.full_name}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter student and family information
+                </p>
+              </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="w-9 h-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-100 flex items-center justify-center text-lg"
+              >
+                ×
+              </button>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
-
-        <input
-          type="text"
-          name="class"
-          placeholder="Class"
-          value={formData.class}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
-
-        <input
-          type="text"
-          name="section"
-          placeholder="Section"
-          value={formData.section}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
-
-        <input
-          type="text"
-          name="roll_no"
-          placeholder="Roll No"
-          value={formData.roll_no}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
-
-        <select
-          name="gender"
-          value={formData.gender}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        >
-          <option value="">Select Gender</option>
-          <option>Male</option>
-          <option>Female</option>
-        </select>
-
-        <input
-          type="date"
-          name="dob"
-          value={formData.dob}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
-        <input
-          type="date"
-          name="admission_date"
-          value={formData.admission_date}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-          required
-        />
-
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone"
-          value={formData.phone}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
-
-        <textarea
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={handleChange}
-          className="border rounded-xl p-3 md:col-span-2"
-          rows="3"
-        />
+            </div>
 
 
-{/* ================= FAMILY INFORMATION ================= */}
+            {/* Form */}
+            <div className="p-6">
 
-<div className="md:col-span-2 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4 items-start">
 
-  <h3 className="text-lg font-bold text-gray-800 mb-1">
-    Family Information
-  </h3>
 
-  <p className="text-sm text-gray-500 mb-4">
-    Enter basic parent/guardian information. This will automatically
-    be linked with the student.
-  </p>
+                {/* ================= BASIC STUDENT INFORMATION ================= */}
 
-</div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Full Name
+                  </label>
 
-<input
-  type="text"
-  name="father_name"
-  placeholder="Father Name"
-  value={formData.father_name}
-  onChange={handleChange}
-  className="border rounded-xl p-3"
-/>
+                  <input
+                    type="text"
+                    name="full_name"
+                    placeholder="Enter full name"
+                    value={formData.full_name}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
 
-<input
-  type="text"
-  name="mother_name"
-  placeholder="Mother Name"
-  value={formData.mother_name}
-  onChange={handleChange}
-  className="border rounded-xl p-3"
-/>
 
-<input
-  type="email"
-  name="parent_email"
-  placeholder="Parent Email"
-  value={formData.parent_email}
-  onChange={handleChange}
-  className="border rounded-xl p-3"
-/>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Email
+                  </label>
 
-<input
-  type="password"
-  name="parent_password"
-  placeholder="Parent Password"
-  value={formData.parent_password}
-  onChange={handleChange}
-  className="border rounded-xl p-3"
-/>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter student email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
 
-<input
-  type="text"
-  name="parent_phone"
-  placeholder="Parent Phone"
-  value={formData.parent_phone}
-  onChange={handleChange}
-  className="border rounded-xl p-3"
-/>
 
-<input
-  type="text"
-  name="parent_occupation"
-  placeholder="Parent Occupation"
-  value={formData.parent_occupation}
-  onChange={handleChange}
-  className="border rounded-xl p-3"
-/>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Password
+                  </label>
 
-<textarea
-  name="parent_address"
-  placeholder="Parent Address"
-  value={formData.parent_address}
-  onChange={handleChange}
-  className="border rounded-xl p-3 md:col-span-2"
-  rows="3"
-/>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="border rounded-xl p-3 md:col-span-2"
-        >
-          <option value="Active">Active</option>
-          <option value="Pending">Pending</option>
-          <option value="Inactive">Inactive</option>
-        </select>
 
-      </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Class
+                  </label>
 
-      <div className="flex justify-end gap-3 mt-6">
+                  <input
+                    type="text"
+                    name="class"
+                    placeholder="Enter class"
+                    value={formData.class}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
 
-        <button
-          onClick={() => setShowAddModal(false)}
-          className="px-5 py-2 rounded-xl border"
-        >
-          Cancel
-        </button>
 
-        <button
-          onClick={handleSubmit}
-          className="bg-green-600 text-white px-6 py-2 rounded-xl"
-        >
-          Save Student
-        </button>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Section
+                  </label>
 
-      </div>
+                  <input
+                    type="text"
+                    name="section"
+                    placeholder="Enter section"
+                    value={formData.section}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
 
-    </div>
-  </div>
-)}
 
-{showEditModal && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div className="bg-white rounded-3xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Roll No
+                  </label>
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">
-          Edit Student
-        </h2>
+                  <input
+                    type="text"
+                    name="roll_no"
+                    placeholder="Enter roll number"
+                    value={formData.roll_no}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
 
-        <button
-          onClick={() => setShowEditModal(false)}
-          className="text-2xl"
-        >
-          ×
-        </button>
-      </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+                {/* Gender */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Gender
+                  </label>
 
-        <input
-          type="text"
-          name="full_name"
-          placeholder="Full Name"
-          value={formData.full_name}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Leave blank to keep old password"
-          value={formData.password}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
+                {/* Date of Birth */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Date of Birth
+                  </label>
 
-        <input
-          type="text"
-          name="class"
-          placeholder="Class"
-          value={formData.class}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
+                  <input
+                    type="date"
+                    name="dob"
+                    value={formData.dob}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
 
-        <input
-          type="text"
-          name="section"
-          placeholder="Section"
-          value={formData.section}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
 
-        <input
-          type="text"
-          name="roll_no"
-          placeholder="Roll No"
-          value={formData.roll_no}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
+                {/* Admission Date */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Admission Date
+                  </label>
 
-        <select
-          name="gender"
-          value={formData.gender}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        >
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
+                  <input
+                    type="date"
+                    name="admission_date"
+                    value={formData.admission_date}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
 
-        <input
-          type="date"
-          name="dob"
-          value={formData.dob}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
-        <input
-          type="date"
-          name="admission_date"
-          value={formData.admission_date}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Date student joined the school
+                  </p>
+                </div>
 
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone"
-          value={formData.phone}
-          onChange={handleChange}
-          className="border rounded-xl p-3"
-        />
 
-        <textarea
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={handleChange}
-          className="border rounded-xl p-3 md:col-span-2"
-          rows="3"
-        />
+                {/* Student Phone */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Student Phone
+                  </label>
 
-      </div>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    name="phone"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
 
-      <div className="flex justify-end gap-3 mt-6">
+                      setFormData({
+                        ...formData,
+                        phone: value,
+                      });
+                    }}
+                    placeholder="10-digit phone number"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
 
-        <button
-          onClick={() => setShowEditModal(false)}
-          className="px-5 py-2 rounded-xl border"
-        >
-          Cancel
-        </button>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Enter exactly 10 digits
+                  </p>
+                </div>
 
-        <button
-          onClick={handleUpdate}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl"
-        >
-          Update Student
-        </button>
 
-      </div>
+                {/* Address */}
+                <div className="md:col-span-2">
 
-    </div>
-  </div>
-)}
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Address
+                  </label>
+
+                  <textarea
+                    name="address"
+                    placeholder="Enter student address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    rows="3"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  />
+
+                </div>
+
+
+                {/* ================= FAMILY INFORMATION ================= */}
+
+                <div className="md:col-span-2 pt-3 border-t border-gray-100">
+
+                  <h3 className="text-lg font-bold text-gray-800">
+                    Family Information
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Enter basic parent or guardian information.
+                  </p>
+
+                </div>
+
+
+                {/* Father */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Father Name
+                  </label>
+
+                  <input
+                    type="text"
+                    name="father_name"
+                    placeholder="Enter father name"
+                    value={formData.father_name}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Mother */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Mother Name
+                  </label>
+
+                  <input
+                    type="text"
+                    name="mother_name"
+                    placeholder="Enter mother name"
+                    value={formData.mother_name}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Parent Email */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Parent Email
+                  </label>
+
+                  <input
+                    type="email"
+                    name="parent_email"
+                    placeholder="Enter parent email"
+                    value={formData.parent_email}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Parent Password */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Parent Password
+                  </label>
+
+                  <input
+                    type="password"
+                    name="parent_password"
+                    placeholder="Enter parent password"
+                    value={formData.parent_password}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Parent Phone */}
+                <div>
+
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Parent Phone
+                  </label>
+
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    name="parent_phone"
+                    value={formData.parent_phone}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
+
+                      setFormData({
+                        ...formData,
+                        parent_phone: value,
+                      });
+                    }}
+                    placeholder="10-digit parent phone"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+
+                  <p className="text-xs text-gray-400 mt-1">
+                    Enter exactly 10 digits
+                  </p>
+
+                </div>
+
+
+                {/* Occupation */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Parent Occupation
+                  </label>
+
+                  <input
+                    type="text"
+                    name="parent_occupation"
+                    placeholder="Enter occupation"
+                    value={formData.parent_occupation}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+
+                {/* Parent Address */}
+                <div className="md:col-span-2">
+
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Parent Address
+                  </label>
+
+                  <textarea
+                    name="parent_address"
+                    placeholder="Enter parent address"
+                    value={formData.parent_address}
+                    onChange={handleChange}
+                    rows="3"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  />
+
+                </div>
+
+
+                {/* Status */}
+                <div className="md:col-span-2">
+
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Student Status
+                  </label>
+
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+
+                </div>
+
+              </div>
+
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-100">
+
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleSubmit}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-semibold"
+                >
+                  Save Student
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+          <div className="bg-white rounded-3xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+
+            {/* ================= HEADER ================= */}
+            <div className="flex justify-between items-center mb-6">
+
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Edit Student
+                </h2>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  Update student information
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="w-9 h-9 rounded-xl hover:bg-gray-100 text-gray-500 hover:text-gray-800 flex items-center justify-center text-xl transition"
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            {/* ================= STUDENT INFORMATION ================= */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Full Name
+                </label>
+
+                <input
+                  type="text"
+                  name="full_name"
+                  value={formData.full_name}
+                  onChange={handleChange}
+                  placeholder="Enter full name"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Email
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter email"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Password
+                </label>
+
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Leave blank to keep old password"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Class */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Class
+                </label>
+
+                <input
+                  type="text"
+                  name="class"
+                  value={formData.class}
+                  onChange={handleChange}
+                  placeholder="Enter class"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Section */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Section
+                </label>
+
+                <input
+                  type="text"
+                  name="section"
+                  value={formData.section}
+                  onChange={handleChange}
+                  placeholder="Enter section"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Roll Number */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Roll Number
+                </label>
+
+                <input
+                  type="text"
+                  name="roll_no"
+                  value={formData.roll_no}
+                  onChange={handleChange}
+                  placeholder="Enter roll number"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Gender
+                </label>
+
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+
+
+              {/* Date of Birth */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Date of Birth
+                </label>
+
+                <p className="text-xs text-gray-400 mb-2">
+                  Student's birth date
+                </p>
+
+                <input
+                  type="date"
+                  name="dob"
+                  value={formData.dob}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Admission Date */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Admission Date
+                </label>
+
+                <p className="text-xs text-gray-400 mb-2">
+                  Date student joined the school
+                </p>
+
+                <input
+                  type="date"
+                  name="admission_date"
+                  value={formData.admission_date}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+
+              {/* Student Phone */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Student Phone
+                </label>
+
+                <input
+                  type="tel"
+                  name="phone"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={formData.phone}
+                  onChange={(e) => {
+
+                    const value = e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 10);
+
+                    setFormData({
+                      ...formData,
+                      phone: value,
+                    });
+
+                  }}
+                  placeholder="10-digit phone number"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                <p className="text-xs text-gray-400 mt-1">
+                  Enter exactly 10 digits
+                </p>
+              </div>
+
+
+              {/* Address */}
+              <div className="md:col-span-2">
+
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Address
+                </label>
+
+                <textarea
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Enter student address"
+                  rows="3"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+
+              </div>
+
+
+              {/* Status */}
+              <div className="md:col-span-2">
+
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Status
+                </label>
+
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-xl px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+
+              </div>
+
+            </div>
+            {/* ===== IMPORTANT: GRID CLOSED HERE ===== */}
+
+
+            {/* ================= FOOTER BUTTONS ================= */}
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleUpdate}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl transition shadow-sm"
+              >
+                Update Student
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
     </div>
   );
