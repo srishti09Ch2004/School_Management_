@@ -1,4 +1,3 @@
-
 <?php
 
 header("Access-Control-Allow-Origin: *");
@@ -7,7 +6,7 @@ header("Content-Type: application/json");
 
 include("../../config/db.php");
 
-//  Only POST request allowed
+// ONLY POST REQUEST ALLOWED
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
@@ -19,8 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-
-// Get JSON Data
+// GET JSON DATA
 
 $data = json_decode(
     file_get_contents("php://input"),
@@ -47,11 +45,16 @@ $class     = trim($data["class"] ?? "");
 $section   = trim($data["section"] ?? "");
 $roll_no   = trim($data["roll_no"] ?? "");
 $gender    = trim($data["gender"] ?? "");
-$dob       = trim($data["dob"] ?? "");
-$phone     = trim($data["phone"] ?? "");
-$address   = trim($data["address"] ?? "");
-$status    = trim($data["status"] ?? "Active");
 
+$dob = trim($data["dob"] ?? "");
+
+$admission_date = trim(
+    $data["admission_date"] ?? ""
+);
+
+$phone   = trim($data["phone"] ?? "");
+$address = trim($data["address"] ?? "");
+$status  = trim($data["status"] ?? "Active");
 
 // FAMILY DATA
 
@@ -83,7 +86,7 @@ $parent_address = trim(
     $data["parent_address"] ?? ""
 );
 
-// VALIDATION
+// STUDENT VALIDATION
 
 if (
     empty($full_name) ||
@@ -94,6 +97,7 @@ if (
     empty($roll_no) ||
     empty($gender) ||
     empty($dob) ||
+    empty($admission_date) ||
     empty($phone) ||
     empty($address)
 ) {
@@ -106,6 +110,8 @@ if (
     exit;
 }
 
+// PARENT NAME VALIDATION
+
 if (
     empty($father_name) &&
     empty($mother_name)
@@ -113,11 +119,14 @@ if (
 
     echo json_encode([
         "status" => false,
-        "message" => "At least Father Name or Mother Name is required"
+        "message" =>
+            "At least Father Name or Mother Name is required"
     ]);
 
     exit;
 }
+
+// PARENT DATA VALIDATION
 
 if (
     empty($parent_email) ||
@@ -129,7 +138,8 @@ if (
 
     echo json_encode([
         "status" => false,
-        "message" => "All parent fields are required"
+        "message" =>
+            "All parent fields are required"
     ]);
 
     exit;
@@ -153,8 +163,9 @@ mysqli_stmt_execute(
 );
 
 $studentEmailResult =
-    mysqli_stmt_get_result($checkStudentEmail);
-
+    mysqli_stmt_get_result(
+        $checkStudentEmail
+    );
 
 if (
     mysqli_num_rows($studentEmailResult) > 0
@@ -186,8 +197,9 @@ mysqli_stmt_execute(
 );
 
 $parentEmailResult =
-    mysqli_stmt_get_result($checkParentEmail);
-
+    mysqli_stmt_get_result(
+        $checkParentEmail
+    );
 
 if (
     mysqli_num_rows($parentEmailResult) > 0
@@ -217,8 +229,9 @@ mysqli_stmt_bind_param(
 mysqli_stmt_execute($rollCheck);
 
 $rollResult =
-    mysqli_stmt_get_result($rollCheck);
-
+    mysqli_stmt_get_result(
+        $rollCheck
+    );
 
 if (
     mysqli_num_rows($rollResult) > 0
@@ -232,13 +245,15 @@ if (
     exit;
 }
 
+
 // START TRANSACTION
 
 mysqli_begin_transaction($conn);
 
 try {
 
-// CREATE STUDENT USER
+
+    // CREATE STUDENT USER
 
     $studentUser = mysqli_prepare(
         $conn,
@@ -255,7 +270,9 @@ try {
         $password
     );
 
-    if (!mysqli_stmt_execute($studentUser)) {
+    if (
+        !mysqli_stmt_execute($studentUser)
+    ) {
 
         throw new Exception(
             mysqli_stmt_error($studentUser)
@@ -271,14 +288,17 @@ try {
     $admission_no =
         "FA" . rand(1000, 9999);
 
-// CREATE STUDENT
+
+    // CREATE STUDENT RECORD
 
     $studentInsert = mysqli_prepare(
         $conn,
+
         "INSERT INTO students
         (
             user_id,
             admission_no,
+            admission_date,
             class,
             section,
             roll_no,
@@ -288,14 +308,15 @@ try {
             address,
             status
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
     mysqli_stmt_bind_param(
         $studentInsert,
-        "isssssssss",
+        "issssssssss",
         $student_user_id,
         $admission_no,
+        $admission_date,
         $class,
         $section,
         $roll_no,
@@ -323,15 +344,13 @@ try {
     // CREATE PARENT USER
 
     /*
-     * Parent account name
+     * Father + Mother:
+     * Father & Mother
      *
-     * Father + Mother available:
-     * "Father & Mother"
-     *
-     * Only father:
+     * Only Father:
      * Father's name
      *
-     * Only mother:
+     * Only Mother:
      * Mother's name
      */
 
@@ -356,12 +375,16 @@ try {
             $mother_name;
     }
 
+    // CREATE PARENT USER
+
     $parentUser = mysqli_prepare(
         $conn,
+
         "INSERT INTO users
         (full_name, email, password, role)
         VALUES (?, ?, ?, 'parent')"
     );
+
 
     mysqli_stmt_bind_param(
         $parentUser,
@@ -383,10 +406,12 @@ try {
     $parent_user_id =
         mysqli_insert_id($conn);
 
+
     // CREATE PARENT RECORD
 
     $parentInsert = mysqli_prepare(
         $conn,
+
         "INSERT INTO parents
         (
             user_id,
@@ -412,6 +437,7 @@ try {
         $parent_address
     );
 
+
     if (
         !mysqli_stmt_execute($parentInsert)
     ) {
@@ -421,7 +447,8 @@ try {
         );
     }
 
-// EVERYTHING SUCCESSFUL
+
+    // EVERYTHING SUCCESSFUL
 
     mysqli_commit($conn);
 
@@ -437,18 +464,25 @@ try {
             $student_id,
 
         "parent_id" =>
-            mysqli_insert_id($conn),
+            $parent_user_id,
 
         "admission_no" =>
-            $admission_no
+            $admission_no,
+
+        "admission_date" =>
+            $admission_date
 
     ]);
 
+
 } catch (Exception $e) {
+
 
     // ROLLBACK
 
     mysqli_rollback($conn);
+
+
     echo json_encode([
 
         "status" => false,
@@ -458,4 +492,5 @@ try {
 
     ]);
 }
+
 ?>
