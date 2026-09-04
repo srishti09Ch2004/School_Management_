@@ -1,12 +1,14 @@
+```php
 <?php
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST");
 header("Content-Type: application/json");
 
 include("../../config/db.php");
 
-// Only POST
+// ONLY POST REQUEST
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
@@ -18,12 +20,22 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-// Get Request Data
+// GET JSON DATA
 
 $data = json_decode(
     file_get_contents("php://input"),
     true
 );
+
+if (!$data) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => "No data received"
+    ]);
+
+    exit;
+}
 
 $studentId = intval(
     $data["id"] ?? 0
@@ -37,7 +49,7 @@ $forceDeleteStudent = isset($data["force_delete_student"])
     ? (bool)$data["force_delete_student"]
     : false;
 
-// Validate Student
+// VALIDATE STUDENT ID
 
 if ($studentId <= 0) {
 
@@ -50,7 +62,7 @@ if ($studentId <= 0) {
 }
 
 try {
-// Get Student
+    // GET STUDENT
 
     $studentStmt = mysqli_prepare(
         $conn,
@@ -61,8 +73,10 @@ try {
     );
 
     if (!$studentStmt) {
+
         throw new Exception(
-            "Student query preparation failed"
+            "Student query preparation failed: " .
+            mysqli_error($conn)
         );
     }
 
@@ -72,20 +86,25 @@ try {
         $studentId
     );
 
-    mysqli_stmt_execute(
-        $studentStmt
+    if (!mysqli_stmt_execute($studentStmt)) {
+
+        throw new Exception(
+            mysqli_stmt_error($studentStmt)
+        );
+    }
+
+    // GET RESULT WITHOUT mysqli_stmt_get_result()
+
+    mysqli_stmt_bind_result(
+        $studentStmt,
+        $foundStudentId,
+        $studentUserId
     );
 
-    $studentResult =
-        mysqli_stmt_get_result(
-            $studentStmt
-        );
 
+    if (!mysqli_stmt_fetch($studentStmt)) {
 
-    if (
-        !$studentResult ||
-        mysqli_num_rows($studentResult) === 0
-    ) {
+        mysqli_stmt_close($studentStmt);
 
         echo json_encode([
             "status" => false,
@@ -95,15 +114,12 @@ try {
         exit;
     }
 
-    $student =
-        mysqli_fetch_assoc(
-            $studentResult
-        );
+    $studentUserId = intval($studentUserId);
 
-    $studentUserId =
-        intval($student["user_id"]);
+    mysqli_stmt_close($studentStmt);
 
-// Find Linked Parent
+    // FIND LINKED PARENT
+
     $parentStmt = mysqli_prepare(
         $conn,
         "SELECT id, user_id
@@ -113,8 +129,10 @@ try {
     );
 
     if (!$parentStmt) {
+
         throw new Exception(
-            "Parent query preparation failed"
+            "Parent query preparation failed: " .
+            mysqli_error($conn)
         );
     }
 
@@ -124,31 +142,41 @@ try {
         $studentId
     );
 
-    mysqli_stmt_execute(
-        $parentStmt
+
+    if (!mysqli_stmt_execute($parentStmt)) {
+
+        throw new Exception(
+            mysqli_stmt_error($parentStmt)
+        );
+    }
+
+    // GET PARENT WITHOUT mysqli_stmt_get_result()
+
+    mysqli_stmt_bind_result(
+        $parentStmt,
+        $parentId,
+        $parentUserId
     );
 
-    $parentResult =
-        mysqli_stmt_get_result(
-            $parentStmt
-        );
+    $parentExists = mysqli_stmt_fetch($parentStmt);
 
-    $parent = null;
+    if ($parentExists) {
 
-    if (
-        $parentResult &&
-        mysqli_num_rows($parentResult) > 0
-    ) {
+        $parentId = intval($parentId);
+        $parentUserId = intval($parentUserId);
 
-        $parent =
-            mysqli_fetch_assoc(
-                $parentResult
-            );
+    } else {
+
+        $parentId = 0;
+        $parentUserId = 0;
     }
-//  Parent exists but Admin has not decided
+
+    mysqli_stmt_close($parentStmt);
+
+    // PARENT CONFIRMATION
 
     if (
-        $parent &&
+        $parentExists &&
         !$deleteParent &&
         !$forceDeleteStudent
     ) {
@@ -166,36 +194,33 @@ try {
 
         exit;
     }
-//  Start Transaction
 
-    mysqli_begin_transaction(
-        $conn
-    );
+    // START TRANSACTION
 
-    /*
-     Admin said YES
-     Delete Parent + Parent User
-    */
+    mysqli_begin_transaction($conn);
+
+    // OPTION 1
+    // DELETE PARENT + PARENT USER
 
     if (
-        $parent &&
+        $parentExists &&
         $deleteParent
     ) {
 
-        $parentId =
-            intval($parent["id"]);
+        // Delete Parent Record
 
-        $parentUserId =
-            intval($parent["user_id"]);
+        $deleteParentStmt = mysqli_prepare(
+            $conn,
+            "DELETE FROM parents
+             WHERE id = ?"
+        );
 
-// Delete Parent Record
+        if (!$deleteParentStmt) {
 
-        $deleteParentStmt =
-            mysqli_prepare(
-                $conn,
-                "DELETE FROM parents
-                 WHERE id = ?"
+            throw new Exception(
+                "Parent delete preparation failed"
             );
+        }
 
         mysqli_stmt_bind_param(
             $deleteParentStmt,
@@ -203,75 +228,72 @@ try {
             $parentId
         );
 
-        if (
-            !mysqli_stmt_execute(
-                $deleteParentStmt
-            )
-        ) {
+        if (!mysqli_stmt_execute($deleteParentStmt)) {
 
             throw new Exception(
-                mysqli_stmt_error(
-                    $deleteParentStmt
-                )
+                mysqli_stmt_error($deleteParentStmt)
             );
         }
 
-// Delete Parent Login
+        mysqli_stmt_close($deleteParentStmt);
+
+        // Delete Parent Login
 
         if ($parentUserId > 0) {
 
-            $deleteParentUser =
-                mysqli_prepare(
-                    $conn,
-                    "DELETE FROM users
-                     WHERE id = ?
-                     AND role = 'parent'"
+            $deleteParentUserStmt = mysqli_prepare(
+                $conn,
+                "DELETE FROM users
+                 WHERE id = ?
+                 AND role = 'parent'"
+            );
+
+            if (!$deleteParentUserStmt) {
+
+                throw new Exception(
+                    "Parent user delete preparation failed"
                 );
+            }
 
             mysqli_stmt_bind_param(
-                $deleteParentUser,
+                $deleteParentUserStmt,
                 "i",
                 $parentUserId
             );
 
-            if (
-                !mysqli_stmt_execute(
-                    $deleteParentUser
-                )
-            ) {
+            if (!mysqli_stmt_execute($deleteParentUserStmt)) {
 
                 throw new Exception(
-                    mysqli_stmt_error(
-                        $deleteParentUser
-                    )
+                    mysqli_stmt_error($deleteParentUserStmt)
                 );
             }
+
+            mysqli_stmt_close($deleteParentUserStmt);
         }
     }
 
-    /*
-     OPTION 2
-      Admin said NO
-      Keep Parent but UNLINK student
-    */
+    // OPTION 2
+    // KEEP PARENT BUT UNLINK STUDENT
 
     if (
-        $parent &&
+        $parentExists &&
         !$deleteParent &&
         $forceDeleteStudent
     ) {
 
-        $parentId =
-            intval($parent["id"]);
+        $unlinkParentStmt = mysqli_prepare(
+            $conn,
+            "UPDATE parents
+             SET student_id = NULL
+             WHERE id = ?"
+        );
 
+        if (!$unlinkParentStmt) {
 
-        $unlinkParentStmt =
-            mysqli_prepare(
-                $conn,
-                "UPDATE parents
-                 SET student_id = NULL
-                 WHERE id = ?"
+            throw new Exception(
+                "Parent unlink preparation failed"
             );
+        }
 
         mysqli_stmt_bind_param(
             $unlinkParentStmt,
@@ -279,28 +301,32 @@ try {
             $parentId
         );
 
-        if (
-            !mysqli_stmt_execute(
-                $unlinkParentStmt
-            )
-        ) {
+
+        if (!mysqli_stmt_execute($unlinkParentStmt)) {
 
             throw new Exception(
-                mysqli_stmt_error(
-                    $unlinkParentStmt
-                )
+                mysqli_stmt_error($unlinkParentStmt)
             );
         }
+
+
+        mysqli_stmt_close($unlinkParentStmt);
     }
 
-//  Delete Student Record
+    // DELETE STUDENT RECORD
 
-    $deleteStudentStmt =
-        mysqli_prepare(
-            $conn,
-            "DELETE FROM students
-             WHERE id = ?"
+    $deleteStudentStmt = mysqli_prepare(
+        $conn,
+        "DELETE FROM students
+         WHERE id = ?"
+    );
+
+    if (!$deleteStudentStmt) {
+
+        throw new Exception(
+            "Student delete preparation failed"
         );
+    }
 
     mysqli_stmt_bind_param(
         $deleteStudentStmt,
@@ -308,60 +334,57 @@ try {
         $studentId
     );
 
-    if (
-        !mysqli_stmt_execute(
-            $deleteStudentStmt
-        )
-    ) {
+    if (!mysqli_stmt_execute($deleteStudentStmt)) {
 
         throw new Exception(
-            mysqli_stmt_error(
-                $deleteStudentStmt
-            )
+            mysqli_stmt_error($deleteStudentStmt)
         );
     }
-//  Delete Student Login
+
+    mysqli_stmt_close($deleteStudentStmt);
+
+    // DELETE STUDENT LOGIN
 
     if ($studentUserId > 0) {
 
-        $deleteStudentUser =
-            mysqli_prepare(
-                $conn,
-                "DELETE FROM users
-                 WHERE id = ?
-                 AND role = 'student'"
+        $deleteStudentUserStmt = mysqli_prepare(
+            $conn,
+            "DELETE FROM users
+             WHERE id = ?
+             AND role = 'student'"
+        );
+
+        if (!$deleteStudentUserStmt) {
+
+            throw new Exception(
+                "Student user delete preparation failed"
             );
+        }
 
         mysqli_stmt_bind_param(
-            $deleteStudentUser,
+            $deleteStudentUserStmt,
             "i",
             $studentUserId
         );
 
-        if (
-            !mysqli_stmt_execute(
-                $deleteStudentUser
-            )
-        ) {
+        if (!mysqli_stmt_execute($deleteStudentUserStmt)) {
 
             throw new Exception(
-                mysqli_stmt_error(
-                    $deleteStudentUser
-                )
+                mysqli_stmt_error($deleteStudentUserStmt)
             );
         }
+
+        mysqli_stmt_close($deleteStudentUserStmt);
     }
 
-//    Commit
+    // COMMIT
 
-    mysqli_commit(
-        $conn
-    );
+    mysqli_commit($conn);
 
-//  Final Response
+    // RESPONSE
 
     if (
-        $parent &&
+        $parentExists &&
         $deleteParent
     ) {
 
@@ -386,20 +409,19 @@ try {
         ]);
     }
 
+
 } catch (Exception $e) {
 
-// Rollback
+    // ROLLBACK
 
-    mysqli_rollback(
-        $conn
-    );
+    mysqli_rollback($conn);
 
     echo json_encode([
 
         "status" => false,
 
-        "message" =>
-            $e->getMessage()
+        "message" => $e->getMessage()
+
     ]);
 }
 ?>

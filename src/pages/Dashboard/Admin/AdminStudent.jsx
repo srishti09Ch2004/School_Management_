@@ -126,61 +126,6 @@ const handleChange = (e) => {
   });
 };
 
-//   const handleSubmit = async () => {
-
-//   if (
-//     !formData.full_name ||
-//     !formData.email ||
-//     !formData.password ||
-//     !formData.class ||
-//     !formData.section ||
-//     !formData.roll_no ||
-//     !formData.gender ||
-//     !formData.dob ||
-//     !formData.phone ||
-//     !formData.address
-//   ) {
-//     alert("Please fill all fields");
-//     return;
-//   }
-
-//   const response = await fetch(
-//     "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addStudent.php",
-//     {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(formData),
-//     }
-//   );
-
-//   const data = await response.json();
-
-//   alert(data.message);
-
-//   if (data.status) {
-//     setShowAddModal(false);
-
-//     setFormData({
-//       full_name: "",
-//       email: "",
-//       password: "",
-//       class: "",
-//       section: "",
-//       roll_no: "",
-//       gender: "",
-//       dob: "",
-//       phone: "",
-//       address: "",
-//       status: "Active",
-//     });
-
-//     fetchStudents();
-//     setCurrentPage(1);
-//   }
-// };
-
 
 const handleSubmit = async () => {
 
@@ -338,8 +283,18 @@ const handleUpdate = async () => {
       roll_no: "",
       gender: "",
       dob: "",
+      admission_date: "",
       phone: "",
       address: "",
+      status: "Active",
+
+      father_name: "",
+      mother_name: "",
+      parent_email: "",
+      parent_password: "",
+      parent_phone: "",
+      parent_occupation: "",
+      parent_address: "",
     });
 
     fetchStudents();
@@ -486,10 +441,7 @@ const handleDelete = async (id) => {
 
     }
 
-
-    /*
-     * Error
-     */
+    /*Error     */
 
     else {
 
@@ -536,18 +488,58 @@ const handleDelete = async (id) => {
     return pages;
   };
 
-  // ---------- Stats (computed from actual data) ----------
-  const totalStudents = students.length;
-  const activeStudents = students.length;
-  const newAdmissions = students.length;
+// ---------- Stats (computed from actual student data) ----------
 
-  const stats = [
-    { title: "Total Students", value: totalStudents.toLocaleString(), icon: <Users size={18} />, color: "bg-blue-100 text-blue-600" },
-    { title: "Active Students", value: activeStudents.toLocaleString(), icon: <UserCheck size={18} />, color: "bg-green-100 text-green-600" },
-    { title: "New Admissions", value: newAdmissions.toLocaleString(), icon: <UserPlus size={18} />, color: "bg-orange-100 text-orange-600" },
-  ];
+const totalStudents = students.length;
 
-  
+const activeStudents = students.filter(
+  (student) => student.status === "Active"
+).length;
+
+// Current month ki admissions
+const currentDate = new Date();
+
+const currentMonth = currentDate.getMonth();
+const currentYear = currentDate.getFullYear();
+
+const newAdmissions = students.filter((student) => {
+
+  if (!student.admission_date) {
+    return false;
+  }
+
+  const admissionDate = new Date(student.admission_date);
+
+  return (
+    admissionDate.getMonth() === currentMonth &&
+    admissionDate.getFullYear() === currentYear
+  );
+
+}).length;
+
+
+const stats = [
+  {
+    title: "Total Students",
+    value: totalStudents.toLocaleString(),
+    icon: <Users size={18} />,
+    color: "bg-blue-100 text-blue-600"
+  },
+
+  {
+    title: "Active Students",
+    value: activeStudents.toLocaleString(),
+    icon: <UserCheck size={18} />,
+    color: "bg-green-100 text-green-600"
+  },
+
+  {
+    title: "New Admissions",
+    value: newAdmissions.toLocaleString(),
+    icon: <UserPlus size={18} />,
+    color: "bg-orange-100 text-orange-600"
+  },
+];
 
   return (
     <div className="space-y-7 max-w-[1600px] mx-auto p-1">
@@ -600,11 +592,12 @@ const handleDelete = async (id) => {
         </div>
 
       {/* Table */}
+
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="flex justify-between items-center p-6 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">Student Profiles</h2>
           <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">
-            Active Batch Count: {filteredStudents.length}
+            Showing: {filteredStudents.length} Students
           </span>
         </div>
 
