@@ -208,10 +208,8 @@ $data = json_decode(
     true
 );
 
-
 $email = trim($data["email"] ?? "");
 $password = $data["password"] ?? "";
-
 
 // VALIDATION
 
@@ -262,9 +260,7 @@ $sql = "
     LIMIT 1
 ";
 
-
 $stmt = mysqli_prepare($conn, $sql);
-
 
 if (!$stmt) {
 
@@ -276,19 +272,15 @@ if (!$stmt) {
     exit;
 }
 
-
 mysqli_stmt_bind_param(
     $stmt,
     "s",
     $email
 );
 
-
 mysqli_stmt_execute($stmt);
 
-
 $result = mysqli_stmt_get_result($stmt);
-
 
 if (!$result) {
 
@@ -311,7 +303,6 @@ if (mysqli_num_rows($result) === 0) {
 
     exit;
 }
-
 
 $user = mysqli_fetch_assoc($result);
 

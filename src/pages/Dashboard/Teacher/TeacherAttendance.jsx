@@ -16,8 +16,6 @@ import {
   Camera,
 } from "lucide-react";
 
-
-
 function useToast() {
   const [toast, setToast] = useState({
     message: "",
@@ -289,50 +287,72 @@ function Filters({
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
         
         <select
-            value={selectedClass}
-            onChange={(e) => {
-              const newClass = e.target.value;
+          value={selectedClass}
+          onChange={(e) => {
+            const newClass = e.target.value;
 
-              setSelectedClass(newClass);
+            setSelectedClass(newClass);
+            setSearchQuery("");
 
-              const classSections = sections[newClass] || [];
+            const classSections = Array.isArray(
+              sections[newClass]
+            )
+              ? sections[newClass]
+              : [];
 
-              setSelectedSection(classSections[0] || "");
-            }}
-            disabled={loadingClasses}
-            className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            {loadingClasses ? (
-              <option>Loading classes...</option>
-            ) : classes.length === 0 ? (
-              <option value="">No classes found</option>
-            ) : (
-              classes.map((className) => (
-                <option key={className} value={className}>
-                  Class {className}
-                </option>
-              ))
-            )}
-          </select>
+            setSelectedSection(
+              classSections.length > 0
+                ? classSections[0]
+                : ""
+            );
+          }}
+          disabled={loadingClasses}
+          className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          {loadingClasses ? (
+            <option value="">Loading classes...</option>
+          ) : classes.length === 0 ? (
+            <option value="">No classes found</option>
+          ) : (
+            classes.map((className) => (
+              <option key={className} value={className}>
+                Class {className}
+              </option>
+            ))
+          )}
+        </select>
 
           <select
-            value={selectedSection}
-            onChange={(e) => setSelectedSection(e.target.value)}
-            disabled={!selectedClass || loadingClasses}
-            className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            {!selectedClass ? (
-              <option value="">Select class first</option>
-            ) : (sections[selectedClass] || []).length === 0 ? (
-              <option value="">No sections found</option>
-            ) : (
-              (sections[selectedClass] || []).map((section) => (
-                <option key={section} value={section}>
-                  Section {section}
-                </option>
-              ))
-            )}
-          </select>
+          value={selectedSection}
+          onChange={(e) => {
+            setSelectedSection(e.target.value);
+            setSearchQuery("");
+          }}
+          disabled={
+            !selectedClass ||
+            loadingClasses ||
+            !Array.isArray(sections[selectedClass]) ||
+            sections[selectedClass].length === 0
+          }
+          className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          {!selectedClass ? (
+            <option value="">
+              Select class first
+            </option>
+          ) : !Array.isArray(sections[selectedClass]) ||
+            sections[selectedClass].length === 0 ? (
+            <option value="">
+              No sections found
+            </option>
+          ) : (
+            sections[selectedClass].map((section) => (
+              <option key={section} value={section}>
+                Section {section}
+              </option>
+            ))
+          )}
+        </select>
 
         <input
           type="date"
@@ -379,11 +399,16 @@ function StudentList({
   savingAttendance,
 }) {
 
-  const filtered = students.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.roll.includes(searchQuery)
-  );
+  const filtered = students.filter((s) => {
+  const name = String(s.name || "").toLowerCase();
+  const roll = String(s.roll || "").toLowerCase();
+  const query = String(searchQuery || "").toLowerCase();
+
+    return (
+      name.includes(query) ||
+      roll.includes(query)
+    );
+  });
 
   const {
     currentPage,
@@ -648,8 +673,8 @@ function FingerModal({ onClose, onMark }) {
 export default function TeacherAttendance() {
   const [method, setMethod] = useState(null);
   const [teacherMarked, setTeacherMarked] = useState(false);
-  const [selectedClass, setSelectedClass] = useState("12");
-  const [selectedSection, setSelectedSection] = useState("A");
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [classes, setClasses] = useState([]);
@@ -664,84 +689,90 @@ export default function TeacherAttendance() {
   const { toast, showToast } = useToast();
   const [savingAttendance, setSavingAttendance] = useState(false);
 
-    const getLoggedInTeacher = () => {
-      try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        return user;
-      } catch (error) {
-        console.error("User data error:", error);
-        return null;
-      }
-    };
+    
+const loadStudents = async () => {
+  if (!selectedClass || !selectedSection || !selectedDate) {
+    setStudents([]);
+    return;
+  }
 
- const loadStudents = async () => {
   try {
     setLoading(true);
 
-    const url =
-      `http://localhost/school_management_system/backend/api/teacher/getAttendance.php` +
-      `?class=${encodeURIComponent(selectedClass)}` +
-      `&section=${encodeURIComponent(selectedSection)}` +
-      `&attendance_date=${encodeURIComponent(selectedDate)}`;
+    const params = new URLSearchParams({
+      class: String(selectedClass),
+      section: String(selectedSection),
+      attendance_date: selectedDate,
+    });
 
-    const response = await fetch(url);
+    const response = await fetch(
+      `http://localhost/school_management_system/backend/api/teacher/getAttendance.php?${params.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
 
     const result = await response.json();
 
-    if (!result.status) {
-      showToast(
-        result.message || "Unable to fetch attendance",
-        "error"
-      );
+    console.log("Teacher Attendance API:", result);
 
-      setStudents([]);
-      return;
+    if (!result.status) {
+      throw new Error(
+        result.message || "Unable to fetch students"
+      );
     }
 
-    const formattedStudents = result.data.map((student) => ({
-      id: student.student_id,
-      roll: student.roll_no,
-      name: student.name,
-      admission_no: student.admission_no,
-      class: student.class,
-      section: student.section,
-      status: student.status,
-      attendance_id: student.attendance_id,
-      teacher_id: student.teacher_id,
-      attendance_type: student.attendance_type,
-    }));
+    const formattedStudents = Array.isArray(result.data)
+      ? result.data.map((student) => ({
+          id: Number(student.student_id),
+          user_id: student.user_id
+            ? Number(student.user_id)
+            : null,
+
+          roll: student.roll_no ?? "",
+          name: student.name ?? "",
+          admission_no: student.admission_no ?? "",
+
+          class: student.class ?? "",
+          section: student.section ?? "",
+
+          status: [
+            "Present",
+            "Absent",
+            "Leave",
+          ].includes(student.status)
+            ? student.status
+            : "Not Marked",
+
+          attendance_id: student.attendance_id
+            ? Number(student.attendance_id)
+            : null,
+
+          teacher_id: student.teacher_id
+            ? Number(student.teacher_id)
+            : null,
+
+          attendance_type:
+            student.attendance_type ?? "",
+        }))
+      : [];
 
     setStudents(formattedStudents);
 
   } catch (error) {
-
-    console.error("Attendance fetch error:", error);
-
-    showToast(
-      "Unable to connect with server",
-      "error"
-    );
+    console.error("Load attendance error:", error);
 
     setStudents([]);
 
+    showToast(
+      error.message || "Unable to load students",
+      "error"
+    );
+
   } finally {
-
     setLoading(false);
-
   }
-};
-
-useEffect(() => {
-  loadClassSections();
-}, []);
-
- useEffect(() => {
-  loadStudents();
-}, [selectedClass, selectedSection, selectedDate]);
-
- const changeClass = (value) => {
-  setSelectedClass(value);
-  setSearchQuery("");
 };
 
 const loadClassSections = async () => {
@@ -752,44 +783,65 @@ const loadClassSections = async () => {
       "http://localhost/school_management_system/backend/api/teacher/getClassSections.php"
     );
 
-    const result = await response.json();
-
-    if (!result.status) {
-      showToast(
-        result.message || "Unable to fetch classes",
-        "error"
-      );
-      return;
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
     }
 
-    setClasses(result.classes || []);
-    setSections(result.sections || {});
+    const result = await response.json();
 
-    // First available class select
-    if (result.classes?.length > 0) {
-      const firstClass = result.classes[0];
+    console.log("Class/Section API:", result);
 
-      setSelectedClass((current) =>
-        result.classes.includes(current)
-          ? current
-          : firstClass
+    if (!result.status) {
+      throw new Error(
+        result.message || "Unable to fetch classes"
       );
+    }
 
-      const firstSections = result.sections?.[firstClass] || [];
+    const fetchedClasses = Array.isArray(result.classes)
+      ? result.classes.map(String)
+      : [];
 
-      setSelectedSection((current) =>
-        firstSections.includes(current)
+    const fetchedSections =
+      result.sections &&
+      typeof result.sections === "object"
+        ? result.sections
+        : {};
+
+    setClasses(fetchedClasses);
+    setSections(fetchedSections);
+
+    if (fetchedClasses.length > 0) {
+      setSelectedClass((currentClass) => {
+        const current = String(currentClass || "");
+
+        return fetchedClasses.includes(current)
           ? current
-          : firstSections[0] || ""
+          : fetchedClasses[0];
+      });
+    } else {
+      setSelectedClass("");
+      setSelectedSection("");
+
+      showToast(
+        "No active classes found.",
+        "error"
       );
     }
 
   } catch (error) {
+    console.error(
+      "Class/Section fetch error:",
+      error
+    );
 
-    console.error("Class/Section fetch error:", error);
+    setClasses([]);
+    setSections({});
+    setSelectedClass("");
+    setSelectedSection("");
 
     showToast(
-      "Unable to connect with server",
+      error.message ||
+        "Unable to connect with server",
       "error"
     );
 
@@ -797,6 +849,49 @@ const loadClassSections = async () => {
     setLoadingClasses(false);
   }
 };
+  
+
+useEffect(() => {
+  loadClassSections();
+}, []);
+
+useEffect(() => {
+  if (!selectedClass) {
+    setSelectedSection("");
+    return;
+  }
+
+  const classSections = Array.isArray(
+    sections[selectedClass]
+  )
+    ? sections[selectedClass]
+    : [];
+
+  if (classSections.length === 0) {
+    setSelectedSection("");
+    return;
+  }
+
+  setSelectedSection((currentSection) => {
+    return classSections.includes(currentSection)
+      ? currentSection
+      : classSections[0];
+  });
+}, [selectedClass, sections]);
+
+useEffect(() => {
+  if (
+    selectedClass &&
+    selectedSection &&
+    selectedDate
+  ) {
+    loadStudents();
+  }
+}, [
+  selectedClass,
+  selectedSection,
+  selectedDate
+]);
 
   const updateAttendance = (id, status) => {
     setStudents((prev) =>
@@ -866,101 +961,105 @@ const loadClassSections = async () => {
   }
 };
 
-
 const handleSaveAttendance = async () => {
   try {
-    setSavingAttendance(true);
+    const storedUser = localStorage.getItem("user");
 
-    // Get logged-in teacher
-    const user = getLoggedInTeacher();
-
-    if (!user || !user.id) {
-      showToast("Teacher login information not found", "error");
+    if (!storedUser) {
+      alert("Teacher session not found. Please login again.");
       return;
     }
 
+    const user = JSON.parse(storedUser);
     const teacherId = Number(user.id);
 
-    // No students
-    if (students.length === 0) {
-      showToast("No students found for this class and section", "error");
+    if (!teacherId) {
+      alert("Invalid teacher account.");
       return;
     }
 
-    // Check if every student has attendance marked
+    if (!students.length) {
+      alert("No students found for this class and section.");
+      return;
+    }
+
     const unmarkedStudents = students.filter(
       (student) =>
-        student.status !== "Present" &&
-        student.status !== "Absent"
+        !["Present", "Absent", "Leave"].includes(
+          student.status
+        )
     );
 
     if (unmarkedStudents.length > 0) {
-      showToast(
-        `Please mark attendance for all students. ${unmarkedStudents.length} student(s) are still unmarked.`,
-        "error"
+      alert(
+        `${unmarkedStudents.length} student(s) attendance not marked.`
       );
       return;
     }
 
-    // Prepare attendance data
-    const attendanceData = students.map((student) => ({
-      student_id: Number(student.id),
-      status: student.status,
-      attendance_type:
-        student.attendance_type || "Manual",
-    }));
+    setSavingAttendance(true);
+
+    const attendancePayload = students.map(
+      (student) => ({
+        student_id: Number(student.id),
+        status: student.status,
+        attendance_type:
+          student.attendance_type || "Manual",
+      })
+    );
 
     const response = await fetch(
       "http://localhost/school_management_system/backend/api/teacher/saveAttendance.php",
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           teacher_id: teacherId,
           attendance_date: selectedDate,
-          attendance: attendanceData,
+          attendance: attendancePayload,
         }),
       }
     );
 
+    if (!response.ok) {
+      throw new Error(
+        `Server error: ${response.status}`
+      );
+    }
+
     const result = await response.json();
 
     if (!result.status) {
-      showToast(
-        result.message || "Unable to save attendance",
-        "error"
+      throw new Error(
+        result.message ||
+        "Attendance could not be saved."
       );
-      return;
     }
 
-    showToast(
-      "Attendance saved successfully!",
-      "success"
+    alert(
+      result.message ||
+      "Attendance saved successfully."
     );
 
-    // Reload latest attendance from database
     await loadStudents();
 
   } catch (error) {
+    console.error(
+      "Save attendance error:",
+      error
+    );
 
-    console.error("Save attendance error:", error);
-
-    showToast(
-      "Unable to connect with server",
-      "error"
+    alert(
+      error.message ||
+      "Unable to save attendance."
     );
 
   } finally {
-
     setSavingAttendance(false);
-
   }
 };
-
 
   const total = students.length;
   const present = students.filter((s) => s.status === "Present").length;

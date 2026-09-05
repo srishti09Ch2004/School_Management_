@@ -2,7 +2,13 @@
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Content-Type: application/json");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
+    exit;
+}
 
 include("../../config/db.php");
 
@@ -11,62 +17,141 @@ try {
     $classes = [];
     $sections = [];
 
-    // Get all active classes
-    $classQuery = "
-        SELECT DISTINCT class
+    /*
+    |--------------------------------------------------------------------------
+    | GET ALL ACTIVE CLASSES
+    |--------------------------------------------------------------------------
+    */
+
+    $classSql = "
+        SELECT DISTINCT TRIM(class) AS class_name
         FROM students
         WHERE status = 'Active'
           AND class IS NOT NULL
-          AND class != ''
-        ORDER BY CAST(class AS UNSIGNED) DESC
+          AND TRIM(class) != ''
     ";
 
-    $classResult = mysqli_query($conn, $classQuery);
+    $classResult = mysqli_query($conn, $classSql);
 
-    while ($row = mysqli_fetch_assoc($classResult)) {
-        $classes[] = $row["class"];
+    if (!$classResult) {
+        throw new Exception(
+            "Unable to fetch classes: " .
+            mysqli_error($conn)
+        );
     }
 
+    while ($row = mysqli_fetch_assoc($classResult)) {
+        $classes[] = $row["class_name"];
+    }
 
-    // Get all sections
-    $sectionQuery = "
-        SELECT DISTINCT class, section
+    /*
+    |--------------------------------------------------------------------------
+    | SORT CLASSES
+    |--------------------------------------------------------------------------
+    | Numeric classes first:
+    | 1,2,3,4,10,11,12
+    |--------------------------------------------------------------------------
+    */
+
+    usort($classes, function ($a, $b) {
+
+        $aNumeric = is_numeric($a);
+        $bNumeric = is_numeric($b);
+
+        if ($aNumeric && $bNumeric) {
+            return (int)$a <=> (int)$b;
+        }
+
+        if ($aNumeric) {
+            return -1;
+        }
+
+        if ($bNumeric) {
+            return 1;
+        }
+
+        return strcasecmp($a, $b);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET SECTIONS FOR EACH CLASS
+    |--------------------------------------------------------------------------
+    */
+
+    $sectionSql = "
+        SELECT DISTINCT
+            TRIM(class) AS class_name,
+            TRIM(section) AS section_name
         FROM students
         WHERE status = 'Active'
           AND class IS NOT NULL
-          AND class != ''
+          AND TRIM(class) != ''
           AND section IS NOT NULL
-          AND section != ''
-        ORDER BY CAST(class AS UNSIGNED) DESC, section ASC
+          AND TRIM(section) != ''
     ";
 
-    $sectionResult = mysqli_query($conn, $sectionQuery);
+    $sectionResult = mysqli_query($conn, $sectionSql);
+
+    if (!$sectionResult) {
+        throw new Exception(
+            "Unable to fetch sections: " .
+            mysqli_error($conn)
+        );
+    }
 
     while ($row = mysqli_fetch_assoc($sectionResult)) {
 
-        $class = $row["class"];
-        $section = $row["section"];
+        $className = $row["class_name"];
+        $sectionName = $row["section_name"];
 
-        if (!isset($sections[$class])) {
-            $sections[$class] = [];
+        if (!isset($sections[$className])) {
+            $sections[$className] = [];
         }
 
-        $sections[$class][] = $section;
+        if (!in_array(
+            $sectionName,
+            $sections[$className],
+            true
+        )) {
+            $sections[$className][] = $sectionName;
+        }
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | SORT SECTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    foreach ($sections as $className => $classSections) {
+
+        usort(
+            $classSections,
+            function ($a, $b) {
+                return strcasecmp($a, $b);
+            }
+        );
+
+        $sections[$className] = $classSections;
+    }
 
     echo json_encode([
         "status" => true,
-        "message" => "Classes and sections fetched successfully",
+        "message" => "Classes and sections fetched successfully.",
         "classes" => $classes,
         "sections" => $sections
     ]);
 
 } catch (Exception $e) {
 
+    http_response_code(500);
+
     echo json_encode([
         "status" => false,
-        "message" => "Something went wrong",
-        "error" => $e->getMessage()
+        "message" => $e->getMessage(),
+        "classes" => [],
+        "sections" => []
     ]);
 }
+?>

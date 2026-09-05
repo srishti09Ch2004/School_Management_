@@ -16,8 +16,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
-
 export default function AdminAttendance() {
     const [students, setStudents] = useState([]);
     const [teachers, setTeachers] = useState([]);
@@ -50,8 +48,7 @@ export default function AdminAttendance() {
   const [activeTab, setActiveTab] =
     useState("students");
 
-    
-     
+       
 const loadAttendance = async () => {
   try {
     setLoading(true);
@@ -88,8 +85,7 @@ const loadAttendance = async () => {
   }
 };
 
-    
-
+ 
   const loadSummary = async () => {
     try {
       const response = await fetch(
@@ -131,12 +127,6 @@ const loadAttendance = async () => {
     activeTab === "students"
       ? students
       : teachers;
-
- 
-
-  
-
-   
 
 
     const filteredData = data.filter((item) =>
