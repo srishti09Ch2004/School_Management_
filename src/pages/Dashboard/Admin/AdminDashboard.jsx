@@ -14,8 +14,10 @@ import AdminLibrary from "./AdminLibrary";
 import AdminAttendance from "./AdminAttendance";
 
 import AdminTransport from "./AdminTransport";
+import AdminNotices from "./AdminNotices";
 import AdminReports from "./AdminReports";
 import AdminSettings from "./AdminSettings";
+
 
 export default function AdminDashboard() {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
@@ -45,6 +47,9 @@ export default function AdminDashboard() {
 
       case "Transport":
         return <AdminTransport />;
+
+      case "Notices":
+        return <AdminNotices />;
 
       case "Reports":
         return <AdminReports />;

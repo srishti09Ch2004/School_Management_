@@ -19,6 +19,7 @@ admin: [
 { name: "Exams", icon: "quiz" },
 { name: "Library", icon: "library_books" },
 { name: "Transport", icon: "directions_bus" },
+{ name: "Notices", icon: "campaign" },
 { name: "Reports", icon: "analytics" },
 { name: "Settings", icon: "settings" },
 ],
