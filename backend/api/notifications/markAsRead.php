@@ -1,168 +1,133 @@
-
 <?php
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+ob_start();
+ini_set("display_errors", "0");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
+    exit;
+}
+
+function sendJson($data, $code = 200)
+{
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+
+    http_response_code($code);
+    echo json_encode($data);
     exit;
 }
 
 include("../../config/db.php");
 
 try {
-// ONLY POST
 
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        echo json_encode([
+    // Only POST is allowed
+    if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+        sendJson([
             "status" => false,
             "message" => "Only POST method is allowed"
-        ]);
-        exit;
+        ], 405);
     }
 
-     // GET JSON BODY
+    // Read JSON body
+    $rawInput = file_get_contents("php://input");
+    $input = json_decode($rawInput, true);
 
-    $input = json_decode(
-        file_get_contents("php://input"),
-        true
-    );
-
-    if (!$input) {
-        echo json_encode([
+    if (!is_array($input)) {
+        sendJson([
             "status" => false,
             "message" => "Invalid JSON data"
-        ]);
-        exit;
+        ], 400);
     }
 
-    $notification_id = intval(
-        $input['notification_id'] ?? 0
-    );
+    $notification_id = intval($input["notification_id"] ?? 0);
+    $user_id = intval($input["user_id"] ?? 0);
 
-    $user_id = intval(
-        $input['user_id'] ?? 0
-    );
-
-   // VALIDATION
-
+    // Validate notification ID
     if ($notification_id <= 0) {
-        echo json_encode([
+        sendJson([
             "status" => false,
             "message" => "Valid notification_id is required"
-        ]);
-        exit;
+        ], 400);
     }
 
+    // Validate user ID
     if ($user_id <= 0) {
-        echo json_encode([
+        sendJson([
             "status" => false,
             "message" => "Valid user_id is required"
-        ]);
-        exit;
+        ], 400);
     }
 
-    // CHECK NOTIFICATION BELONGS TO USER
-
+    // Check notification belongs to user
     $checkStmt = $conn->prepare("
-        SELECT id, is_read
+        SELECT id, is_read, read_at
         FROM notifications
         WHERE id = ?
-          AND user_id = ?
+        AND user_id = ?
         LIMIT 1
     ");
 
     if (!$checkStmt) {
-        throw new Exception(
-            "Notification check failed: " . $conn->error
-        );
+        throw new Exception($conn->error);
     }
 
-    $checkStmt->bind_param(
-        "ii",
-        $notification_id,
-        $user_id
-    );
-
+    $checkStmt->bind_param("ii", $notification_id, $user_id);
     $checkStmt->execute();
 
-    $checkResult = $checkStmt->get_result();
-    $notification = $checkResult->fetch_assoc();
+    $result = $checkStmt->get_result();
+    $notification = $result->fetch_assoc();
 
     $checkStmt->close();
 
     if (!$notification) {
-        echo json_encode([
+        sendJson([
             "status" => false,
-            "message" => "Notification not found for this user"
-        ]);
-        exit;
-    }
-// ALREADY READ
-
-    if ((int)$notification['is_read'] === 1) {
-
-        echo json_encode([
-            "status" => true,
-            "message" => "Notification is already marked as read"
-        ]);
-
-        exit;
+            "message" => "Notification not found"
+        ], 404);
     }
 
-    // MARK AS READ
+    // Mark notification as read
+    if ((int)$notification["is_read"] === 0) {
 
-    $stmt = $conn->prepare("
-        UPDATE notifications
-        SET
-            is_read = 1,
-            read_at = NOW()
-        WHERE id = ?
-          AND user_id = ?
-    ");
+        $updateStmt = $conn->prepare("
+            UPDATE notifications
+            SET is_read = 1,
+                read_at = NOW()
+            WHERE id = ?
+            AND user_id = ?
+            AND is_read = 0
+        ");
 
-    if (!$stmt) {
-        throw new Exception(
-            "Update preparation failed: " . $conn->error
-        );
+        if (!$updateStmt) {
+            throw new Exception($conn->error);
+        }
+
+        $updateStmt->bind_param("ii", $notification_id, $user_id);
+        $updateStmt->execute();
+        $updateStmt->close();
     }
 
-    $stmt->bind_param(
-        "ii",
-        $notification_id,
-        $user_id
-    );
-
-    if (!$stmt->execute()) {
-        throw new Exception(
-            "Notification update failed: " . $stmt->error
-        );
-    }
-
-    $stmt->close();
-
-     // GET UPDATED UNREAD COUNT
-
+    // Get latest unread count
     $countStmt = $conn->prepare("
         SELECT COUNT(*) AS unread_count
         FROM notifications
         WHERE user_id = ?
-          AND is_read = 0
+        AND is_read = 0
     ");
 
     if (!$countStmt) {
-        throw new Exception(
-            "Unread count query failed: " . $conn->error
-        );
+        throw new Exception($conn->error);
     }
 
-    $countStmt->bind_param(
-        "i",
-        $user_id
-    );
-
+    $countStmt->bind_param("i", $user_id);
     $countStmt->execute();
 
     $countResult = $countStmt->get_result();
@@ -170,30 +135,25 @@ try {
 
     $countStmt->close();
 
-    $unread_count = intval(
-        $countData['unread_count'] ?? 0
-    );
+    $unreadCount = intval($countData["unread_count"] ?? 0);
 
- // SUCCESS
-
-    echo json_encode([
+    // Return success response
+    sendJson([
         "status" => true,
         "message" => "Notification marked as read",
         "notification_id" => $notification_id,
         "user_id" => $user_id,
         "is_read" => 1,
-        "read_at" => date("Y-m-d H:i:s"),
-        "unread_count" => $unread_count
+        "unread_count" => $unreadCount
     ]);
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
 
-    echo json_encode([
+    sendJson([
         "status" => false,
         "message" => $e->getMessage()
-    ]);
+    ], 500);
 }
 
 $conn->close();
-
 ?>
