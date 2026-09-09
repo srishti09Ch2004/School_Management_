@@ -1,8 +1,8 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
 
 ob_start();
@@ -10,31 +10,90 @@ ini_set("display_errors", 0);
 
 include("../../config/db.php");
 
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
+    exit;
+}
+
 try {
 
     if ($_SERVER["REQUEST_METHOD"] !== "POST") {
         throw new Exception("Only POST method is allowed");
     }
 
-    $input = json_decode(file_get_contents("php://input"), true);
+    $input = json_decode(
+        file_get_contents("php://input"),
+        true
+    );
 
-    if (!$input) {
+    if (!is_array($input)) {
         throw new Exception("Invalid request data");
     }
 
-    $teacher_id = $input["teacher_id"] ?? null;
+    // Logged-in user ID
+    $user_id = $input["user_id"] ?? $input["teacher_id"] ?? null;
+
     $title = trim($input["title"] ?? "");
     $class_name = trim($input["class_name"] ?? "");
     $section = trim($input["section"] ?? "");
     $notice_type = trim($input["notice_type"] ?? "General");
     $priority = trim($input["priority"] ?? "Normal");
-    $description = trim($input["description"] ?? "");
-    $expiry_date = $input["expiry_date"] ?? null;
+    $description = trim(
+        $input["description"]
+        ?? $input["content"]
+        ?? ""
+    );
 
-    if (!$teacher_id || !is_numeric($teacher_id)) {
-        throw new Exception("Invalid teacher ID");
+    $expiry_date = !empty($input["expiry_date"])
+        ? trim($input["expiry_date"])
+        : null;
+
+    // Validate user ID
+    if (!$user_id || !is_numeric($user_id)) {
+        throw new Exception("Invalid user ID");
     }
 
+    $user_id = (int)$user_id;
+
+    // Verify Teacher from users table
+    $userQuery = "
+        SELECT
+            id,
+            full_name,
+            role
+        FROM users
+        WHERE id = ?
+        LIMIT 1
+    ";
+
+    $userStmt = $conn->prepare($userQuery);
+
+    if (!$userStmt) {
+        throw new Exception(
+            "Unable to verify user: " . $conn->error
+        );
+    }
+
+    $userStmt->bind_param("i", $user_id);
+    $userStmt->execute();
+
+    $userResult = $userStmt->get_result();
+    $user = $userResult->fetch_assoc();
+
+    $userStmt->close();
+
+    if (!$user) {
+        throw new Exception("User not found");
+    }
+
+    // Any logged-in Teacher can create notice
+    if (strtolower(trim($user["role"])) !== "teacher") {
+        throw new Exception(
+            "Only teachers can create notices"
+        );
+    }
+
+    // Validate notice
     if ($title === "") {
         throw new Exception("Notice title is required");
     }
@@ -43,52 +102,57 @@ try {
         throw new Exception("Class is required");
     }
 
+    if ($section === "") {
+        throw new Exception("Section is required");
+    }
+
     if ($description === "") {
         throw new Exception("Notice content is required");
     }
 
-    $teacherQuery = "
-        SELECT id, full_name
-        FROM teachers
-        WHERE id = ?
-        LIMIT 1
-    ";
+    /*
+     * Convert frontend priority
+     *
+     * Normal     -> Medium
+     * Important  -> High
+     * Urgent     -> High
+     */
+    switch (strtolower($priority)) {
 
-    $teacherStmt = $conn->prepare($teacherQuery);
+        case "low":
+            $dbPriority = "Low";
+            break;
 
-    if (!$teacherStmt) {
-        throw new Exception("Unable to verify teacher");
+        case "important":
+        case "urgent":
+        case "high":
+            $dbPriority = "High";
+            break;
+
+        case "medium":
+        case "normal":
+        default:
+            $dbPriority = "Medium";
+            break;
     }
 
-    $teacherStmt->bind_param("i", $teacher_id);
-    $teacherStmt->execute();
-
-    $teacherResult = $teacherStmt->get_result();
-    $teacher = $teacherResult->fetch_assoc();
-
-    $teacherStmt->close();
-
-    if (!$teacher) {
-        throw new Exception("Teacher not found");
-    }
-
-    if ($class_name === "ALL") {
-
-        $forValue = "All Students";
-
-    } else {
-
-        if ($section === "" || $section === "ALL") {
-            $forValue = "Class " . $class_name . " - All Sections";
-        } else {
-            $forValue = "Class " . $class_name . " - Section " . $section;
-        }
-    }
-
-    $publishDate = date("Y-m-d");
+    /*
+     * notices.notice_for is an ENUM:
+     *
+     * Student
+     * Teacher
+     * Parent
+     * All
+     *
+     * Teacher notices are sent only to Students.
+     */
+    $noticeFor = "Student";
 
     $conn->begin_transaction();
 
+    /*
+     * Create main notice
+     */
     $noticeQuery = "
         INSERT INTO notices
         (
@@ -96,52 +160,68 @@ try {
             description,
             notice_type,
             priority,
-            `for`,
+            notice_for,
             created_by,
             created_role,
             publish_date,
             expiry_date,
-            status,
-            created_at,
-            updated_at
+            status
         )
         VALUES
-        (?, ?, ?, ?, ?, ?, 'Teacher', ?, ?, 'Active', NOW(), NOW())
+        (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            'teacher',
+            NOW(),
+            ?,
+            'Published'
+        )
     ";
 
     $noticeStmt = $conn->prepare($noticeQuery);
 
     if (!$noticeStmt) {
-        throw new Exception("Unable to create notice");
+        throw new Exception(
+            "Unable to prepare notice query: " .
+            $conn->error
+        );
     }
 
     $noticeStmt->bind_param(
-        "sssssi ss",
+        "sssssis",
         $title,
         $description,
         $notice_type,
-        $priority,
-        $forValue,
-        $teacher_id,
-        $publishDate,
+        $dbPriority,
+        $noticeFor,
+        $user_id,
         $expiry_date
     );
 
     if (!$noticeStmt->execute()) {
-        throw new Exception("Failed to save notice");
+        throw new Exception(
+            "Failed to save notice: " .
+            $noticeStmt->error
+        );
     }
 
-    $noticeId = $noticeStmt->insert_id;
+    $noticeId = (int)$noticeStmt->insert_id;
 
     $noticeStmt->close();
 
-    if ($class_name === "ALL") {
+    /*
+     * Find target students
+     */
+    if (strtoupper($class_name) === "ALL") {
 
         $studentQuery = "
             SELECT
                 id,
-                user_id,
-                full_name
+                user_id
             FROM students
             WHERE status = 'Active'
               AND user_id IS NOT NULL
@@ -149,50 +229,57 @@ try {
 
         $studentStmt = $conn->prepare($studentQuery);
 
+        $targetType = "class";
+
+    } elseif (strtoupper($section) === "ALL") {
+
+        $studentQuery = "
+            SELECT
+                id,
+                user_id
+            FROM students
+            WHERE class = ?
+              AND status = 'Active'
+              AND user_id IS NOT NULL
+        ";
+
+        $studentStmt = $conn->prepare($studentQuery);
+
+        $targetType = "class";
+
     } else {
 
-        if ($section === "ALL" || $section === "") {
+        $studentQuery = "
+            SELECT
+                id,
+                user_id
+            FROM students
+            WHERE class = ?
+              AND section = ?
+              AND status = 'Active'
+              AND user_id IS NOT NULL
+        ";
 
-            $studentQuery = "
-                SELECT
-                    id,
-                    user_id,
-                    full_name
-                FROM students
-                WHERE class = ?
-                  AND status = 'Active'
-                  AND user_id IS NOT NULL
-            ";
+        $studentStmt = $conn->prepare($studentQuery);
 
-            $studentStmt = $conn->prepare($studentQuery);
-
-        } else {
-
-            $studentQuery = "
-                SELECT
-                    id,
-                    user_id,
-                    full_name
-                FROM students
-                WHERE class = ?
-                  AND section = ?
-                  AND status = 'Active'
-                  AND user_id IS NOT NULL
-            ";
-
-            $studentStmt = $conn->prepare($studentQuery);
-        }
+        $targetType = "student";
     }
 
     if (!$studentStmt) {
-        throw new Exception("Unable to find students");
+        throw new Exception(
+            "Unable to find target students: " .
+            $conn->error
+        );
     }
 
-    if ($class_name === "ALL") {
+    /*
+     * Execute target student query
+     */
+    if (strtoupper($class_name) === "ALL") {
 
         $studentStmt->execute();
 
-    } elseif ($section === "ALL" || $section === "") {
+    } elseif (strtoupper($section) === "ALL") {
 
         $studentStmt->bind_param(
             "s",
@@ -214,53 +301,115 @@ try {
 
     $studentResult = $studentStmt->get_result();
 
+    /*
+     * Save notice target
+     */
+    $targetQuery = "
+        INSERT INTO notice_targets
+        (
+            notice_id,
+            target_type,
+            target_role,
+            target_id
+        )
+        VALUES
+        (?, ?, 'student', ?)
+    ";
+
+    $targetStmt = $conn->prepare($targetQuery);
+
+    if (!$targetStmt) {
+        throw new Exception(
+            "Unable to prepare notice target query: " .
+            $conn->error
+        );
+    }
+
+    /*
+     * Create student notification
+     */
     $notificationQuery = "
         INSERT INTO notifications
         (
             notice_id,
             user_id,
-            title,
-            description,
-            notice_type,
-            priority,
-            creator_name,
             is_read,
-            created_at
+            read_at
         )
         VALUES
-        (?, ?, ?, ?, ?, ?, ?, 0, NOW())
+        (?, ?, 0, NULL)
     ";
 
-    $notificationStmt = $conn->prepare($notificationQuery);
+    $notificationStmt = $conn->prepare(
+        $notificationQuery
+    );
 
     if (!$notificationStmt) {
-        throw new Exception("Unable to prepare notification");
+        throw new Exception(
+            "Unable to prepare notification query: " .
+            $conn->error
+        );
     }
 
     $recipientCount = 0;
 
+    /*
+     * Send notice to every target student
+     */
     while ($student = $studentResult->fetch_assoc()) {
 
+        $studentId = (int)$student["id"];
         $studentUserId = (int)$student["user_id"];
 
-        $notificationStmt->bind_param(
-            "iisssss",
+        /*
+         * Save target
+         */
+        $targetStmt->bind_param(
+            "isi",
             $noticeId,
-            $studentUserId,
-            $title,
-            $description,
-            $notice_type,
-            $priority,
-            $teacher["full_name"]
+            $targetType,
+            $studentId
         );
 
-        if ($notificationStmt->execute()) {
-            $recipientCount++;
+        if (!$targetStmt->execute()) {
+            throw new Exception(
+                "Failed to save notice target: " .
+                $targetStmt->error
+            );
         }
+
+        /*
+         * Create notification
+         */
+        $notificationStmt->bind_param(
+            "ii",
+            $noticeId,
+            $studentUserId
+        );
+
+        if (!$notificationStmt->execute()) {
+            throw new Exception(
+                "Failed to create notification: " .
+                $notificationStmt->error
+            );
+        }
+
+        $recipientCount++;
     }
 
+    $targetStmt->close();
     $notificationStmt->close();
     $studentStmt->close();
+
+    /*
+     * If no students found, don't create an empty notice
+     */
+    if ($recipientCount === 0) {
+
+        throw new Exception(
+            "No active students found for the selected class/section"
+        );
+    }
 
     $conn->commit();
 
@@ -291,3 +440,4 @@ try {
         "message" => $e->getMessage()
     ]);
 }
+?>

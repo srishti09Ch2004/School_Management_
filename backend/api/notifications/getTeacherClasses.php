@@ -1,7 +1,8 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Content-Type: application/json");
 
 ob_start();
@@ -9,7 +10,16 @@ ini_set("display_errors", 0);
 
 include("../../config/db.php");
 
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
+    exit;
+}
+
 try {
+
+    if ($_SERVER["REQUEST_METHOD"] !== "GET") {
+        throw new Exception("Only GET method is allowed");
+    }
 
     $query = "
         SELECT DISTINCT
@@ -21,13 +31,18 @@ try {
           AND class != ''
           AND section IS NOT NULL
           AND section != ''
-        ORDER BY class, section
+        ORDER BY
+            class,
+            section
     ";
 
     $stmt = $conn->prepare($query);
 
     if (!$stmt) {
-        throw new Exception("Unable to prepare classes query");
+        throw new Exception(
+            "Unable to prepare classes query: " .
+            $conn->error
+        );
     }
 
     $stmt->execute();
@@ -65,3 +80,4 @@ try {
         "message" => $e->getMessage()
     ]);
 }
+?>

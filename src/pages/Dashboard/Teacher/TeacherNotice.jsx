@@ -378,43 +378,55 @@ const [formData, setFormData] = useState({
     }
   };
 
-  const fetchNotices = async () => {
+const fetchNotices = async () => {
+  if (!user?.id) return;
+
+  try {
+    setLoading(true);
+
+    const response = await fetch(
+      `${API}/getTeacherNotices.php?user_id=${encodeURIComponent(
+        user.id
+      )}&_=${Date.now()}`
+    );
+
+    const text = await response.text();
+
+    let result;
+
     try {
-      setLoading(true);
-
-      const response = await fetch(
-        `${API}/getTeacherNotices.php?teacher_id=${encodeURIComponent(
-          user.id
-        )}&_=${Date.now()}`
-      );
-
-      const text = await response.text();
-
-      let result;
-
-      try {
-        result = JSON.parse(text);
-      } catch {
-        console.error("Invalid response:", text);
-        throw new Error("Invalid server response");
-      }
-
-      if (result.status) {
-        setNotices(Array.isArray(result.data) ? result.data : []);
-      } else {
-        setNotices([]);
-      }
-    } catch (error) {
-      console.error("Fetch notices error:", error);
-
-      setMessage({
-        type: "error",
-        text: "Unable to load notices.",
-      });
-    } finally {
-      setLoading(false);
+      result = JSON.parse(text);
+    } catch {
+      console.error("Notices API response:", text);
+      throw new Error("Invalid server response");
     }
-  };
+
+    if (result.status) {
+      setNotices(
+        Array.isArray(result.data)
+          ? result.data
+          : []
+      );
+    } else {
+      throw new Error(
+        result.message || "Unable to load notices."
+      );
+    }
+
+  } catch (error) {
+    console.error("Fetch notices error:", error);
+
+    setNotices([]);
+
+    setMessage({
+      type: "error",
+      text: error.message || "Unable to load notices.",
+    });
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -475,15 +487,15 @@ const handleClassChange = (e) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            teacher_id: user.id,
-            title: formData.title,
-            class_name: formData.class_name,
-            section: formData.section,
-            notice_type: formData.notice_type,
-            priority: formData.priority,
-            description: formData.content,
-            expiry_date: formData.expiry_date || null,
+         body: JSON.stringify({
+              user_id: user.id,
+              title: formData.title.trim(),
+              class_name: formData.class_name,
+              section: formData.section,
+              notice_type: formData.notice_type,
+              priority: formData.priority,
+              description: formData.content.trim(),
+              expiry_date: formData.expiry_date || null,
           }),
         }
       );
