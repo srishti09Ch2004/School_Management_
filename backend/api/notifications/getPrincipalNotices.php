@@ -17,13 +17,14 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 
 try {
 
-    $user_id =
-        $_GET["user_id"] ?? null;
+    if ($_SERVER["REQUEST_METHOD"] !== "GET") {
+        throw new Exception("Only GET method is allowed");
+    }
+
+    $user_id = $_GET["user_id"] ?? null;
 
     if (!$user_id || !is_numeric($user_id)) {
-        throw new Exception(
-            "User ID is required"
-        );
+        throw new Exception("User ID is required");
     }
 
     $user_id = (int)$user_id;
@@ -32,49 +33,61 @@ try {
      * Verify Principal
      */
     $userQuery = "
-        SELECT id, full_name, role
+        SELECT
+            id,
+            full_name,
+            role
         FROM users
         WHERE id = ?
         LIMIT 1
     ";
 
-    $userStmt =
-        $conn->prepare($userQuery);
+    $userStmt = $conn->prepare($userQuery);
 
     if (!$userStmt) {
         throw new Exception(
-            "Unable to verify user"
+            "Unable to verify user: " . $conn->error
         );
     }
 
-    $userStmt->bind_param(
-        "i",
-        $user_id
-    );
-
+    $userStmt->bind_param("i", $user_id);
     $userStmt->execute();
 
-    $user =
-        $userStmt
-            ->get_result()
-            ->fetch_assoc();
+    $user = $userStmt
+        ->get_result()
+        ->fetch_assoc();
 
     $userStmt->close();
 
     if (!$user) {
-        throw new Exception(
-            "User not found"
-        );
+        throw new Exception("User not found");
     }
 
-    if (
-        strtolower(
-            trim($user["role"])
-        ) !== "principal"
-    ) {
+    if (strtolower(trim($user["role"])) !== "principal") {
         throw new Exception(
             "Only principals can access principal notices"
         );
+    }
+
+    /*
+     * Mark expired notices automatically
+     */
+    $expireQuery = "
+        UPDATE notices
+        SET status = 'Expired'
+        WHERE created_by = ?
+          AND created_role = 'principal'
+          AND status = 'Published'
+          AND expiry_date IS NOT NULL
+          AND expiry_date < NOW()
+    ";
+
+    $expireStmt = $conn->prepare($expireQuery);
+
+    if ($expireStmt) {
+        $expireStmt->bind_param("i", $user_id);
+        $expireStmt->execute();
+        $expireStmt->close();
     }
 
     /*
@@ -82,27 +95,64 @@ try {
      */
     $query = "
         SELECT
-            id,
-            title,
-            description,
-            notice_type,
-            priority,
-            notice_for,
-            created_by,
-            created_role,
-            publish_date,
-            expiry_date,
-            status,
-            created_at,
-            updated_at
-        FROM notices
-        WHERE created_by = ?
-          AND created_role = 'principal'
-        ORDER BY created_at DESC
+            n.id,
+            n.title,
+            n.description,
+            n.notice_type,
+            n.priority,
+            n.notice_for,
+            n.created_by,
+            n.created_role,
+            n.publish_date,
+            n.expiry_date,
+            n.status,
+            n.created_at,
+            n.updated_at,
+            u.full_name AS creator_name,
+            COUNT(DISTINCT no.id) AS recipient_count,
+            COUNT(
+                DISTINCT CASE
+                    WHEN no.is_read = 1
+                    THEN no.id
+                END
+            ) AS read_count,
+            COUNT(
+                DISTINCT CASE
+                    WHEN no.is_read = 0
+                    THEN no.id
+                END
+            ) AS unread_count
+        FROM notices n
+
+        LEFT JOIN users u
+            ON u.id = n.created_by
+
+        LEFT JOIN notifications no
+            ON no.notice_id = n.id
+
+        WHERE n.created_by = ?
+          AND n.created_role = 'principal'
+
+        GROUP BY
+            n.id,
+            n.title,
+            n.description,
+            n.notice_type,
+            n.priority,
+            n.notice_for,
+            n.created_by,
+            n.created_role,
+            n.publish_date,
+            n.expiry_date,
+            n.status,
+            n.created_at,
+            n.updated_at,
+            u.full_name
+
+        ORDER BY n.created_at DESC
     ";
 
-    $stmt =
-        $conn->prepare($query);
+    $stmt = $conn->prepare($query);
 
     if (!$stmt) {
         throw new Exception(
@@ -111,145 +161,184 @@ try {
         );
     }
 
-    $stmt->bind_param(
-        "i",
-        $user_id
-    );
-
+    $stmt->bind_param("i", $user_id);
     $stmt->execute();
 
-    $result =
-        $stmt->get_result();
+    $result = $stmt->get_result();
 
     $notices = [];
 
     /*
-     * Recipient count
+     * Target summary query
      */
-    $countQuery = "
-        SELECT COUNT(*) AS total
-        FROM notifications
-        WHERE notice_id = ?
+    $targetQuery = "
+        SELECT
+            nt.target_type,
+            nt.target_role,
+            nt.target_id,
+            s.class,
+            s.section
+        FROM notice_targets nt
+
+        LEFT JOIN students s
+            ON s.id = nt.target_id
+
+        WHERE nt.notice_id = ?
     ";
 
-    $countStmt =
-        $conn->prepare($countQuery);
+    $targetStmt = $conn->prepare($targetQuery);
 
-    if (!$countStmt) {
+    if (!$targetStmt) {
         throw new Exception(
-            "Unable to prepare count query"
+            "Unable to prepare target query: " .
+            $conn->error
         );
     }
 
-    /*
-     * Target label
-     */
-    while (
-        $row =
-            $result->fetch_assoc()
-    ) {
+    while ($row = $result->fetch_assoc()) {
 
-        $noticeId =
-            (int)$row["id"];
+        $noticeId = (int)$row["id"];
 
-        $countStmt->bind_param(
+        /*
+         * Get target details
+         */
+        $targetStmt->bind_param(
             "i",
             $noticeId
         );
 
-        $countStmt->execute();
+        $targetStmt->execute();
 
-        $count =
-            $countStmt
-                ->get_result()
-                ->fetch_assoc();
+        $targetResult =
+            $targetStmt->get_result();
 
-        $row["recipient_count"] =
-            (int)($count["total"] ?? 0);
+        $classesFound = [];
+        $sectionsFound = [];
+
+        while (
+            $target = $targetResult->fetch_assoc()
+        ) {
+
+            if (
+                !empty($target["class"]) &&
+                !empty($target["section"])
+            ) {
+
+                $group =
+                    "Class " .
+                    $target["class"] .
+                    " - Section " .
+                    $target["section"];
+
+                $classesFound[$group] = true;
+                $sectionsFound[
+                    $target["class"] . "-" .
+                    $target["section"]
+                ] = true;
+            }
+        }
 
         /*
          * Build audience label
          */
-        if (
-            $row["notice_for"] ===
-            "Student"
-        ) {
+        if ($row["notice_for"] === "Student") {
 
-            $targetQuery = "
-                SELECT
-                    target_type,
-                    target_id
-                FROM notice_targets
-                WHERE notice_id = ?
-                LIMIT 1
-            ";
+            if (count($classesFound) === 0) {
 
-            $targetStmt =
-                $conn->prepare(
-                    $targetQuery
-                );
+                $row["target_label"] =
+                    "All Students";
 
-            if ($targetStmt) {
+            } else {
 
-                $targetStmt->bind_param(
-                    "i",
-                    $noticeId
-                );
+                $groups =
+                    array_keys($classesFound);
 
-                $targetStmt->execute();
-
-                $target =
-                    $targetStmt
-                        ->get_result()
-                        ->fetch_assoc();
-
-                if (
-                    $target &&
-                    $target["target_type"] ===
-                    "class"
-                ) {
+                if (count($groups) === 1) {
 
                     $row["target_label"] =
-                        "Students";
+                        "Students - " .
+                        $groups[0];
 
                 } else {
 
                     $row["target_label"] =
-                        "Students";
+                        "Students - " .
+                        count($groups) .
+                        " Class/Section Groups";
                 }
-
-                $targetStmt->close();
             }
 
-        } elseif (
-            $row["notice_for"] ===
-            "Parent"
-        ) {
+        } elseif ($row["notice_for"] === "Parent") {
+
+            if (count($classesFound) === 0) {
+
+                $row["target_label"] =
+                    "All Parents";
+
+            } else {
+
+                $groups =
+                    array_keys($classesFound);
+
+                if (count($groups) === 1) {
+
+                    $row["target_label"] =
+                        "Parents - " .
+                        $groups[0];
+
+                } else {
+
+                    $row["target_label"] =
+                        "Parents - " .
+                        count($groups) .
+                        " Class/Section Groups";
+                }
+            }
+
+        } elseif ($row["notice_for"] === "Teacher") {
 
             $row["target_label"] =
-                "Parents";
+                "All Teachers";
 
-        } elseif (
-            $row["notice_for"] ===
-            "Teacher"
-        ) {
-
-            $row["target_label"] =
-                "Teachers";
-
-        } elseif (
-            $row["notice_for"] ===
-            "All"
-        ) {
+        } elseif ($row["notice_for"] === "All") {
 
             $row["target_label"] =
                 "Entire School";
+
+        } else {
+
+            $row["target_label"] =
+                $row["notice_for"] ?? "-";
         }
+
+        /*
+         * Exact sender timestamp
+         */
+        $row["sent_at"] =
+            $row["created_at"];
+
+        /*
+         * Exact published timestamp
+         */
+        $row["published_at"] =
+            $row["publish_date"];
+
+        /*
+         * Convert counts to integer
+         */
+        $row["recipient_count"] =
+            (int)$row["recipient_count"];
+
+        $row["read_count"] =
+            (int)$row["read_count"];
+
+        $row["unread_count"] =
+            (int)$row["unread_count"];
 
         $notices[] = $row;
     }
 
-    $countStmt->close();
+    $targetStmt->close();
     $stmt->close();
 
     ob_clean();

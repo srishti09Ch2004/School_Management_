@@ -18,7 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 try {
 
     if ($_SERVER["REQUEST_METHOD"] !== "GET") {
-        throw new Exception("Only GET method is allowed");
+        throw new Exception(
+            "Only GET method is allowed"
+        );
     }
 
     $query = "
@@ -31,10 +33,13 @@ try {
           AND class != ''
           AND section IS NOT NULL
           AND section != ''
-        ORDER BY class, section
+        ORDER BY
+            class,
+            section
     ";
 
-    $stmt = $conn->prepare($query);
+    $stmt =
+        $conn->prepare($query);
 
     if (!$stmt) {
         throw new Exception(
@@ -45,15 +50,22 @@ try {
 
     $stmt->execute();
 
-    $result = $stmt->get_result();
+    $result =
+        $stmt->get_result();
 
     $classes = [];
 
-    while ($row = $result->fetch_assoc()) {
+    while (
+        $row =
+            $result->fetch_assoc()
+    ) {
 
         $classes[] = [
-            "class_name" => $row["class"],
-            "section" => $row["section"]
+            "class_name" =>
+                $row["class"],
+
+            "section" =>
+                $row["section"]
         ];
     }
 
@@ -63,8 +75,10 @@ try {
 
     echo json_encode([
         "status" => true,
-        "message" => "Principal classes fetched successfully",
-        "data" => $classes
+        "message" =>
+            "Principal classes fetched successfully",
+        "data" =>
+            $classes
     ]);
 
 } catch (Exception $e) {
@@ -75,7 +89,8 @@ try {
 
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" =>
+            $e->getMessage()
     ]);
 }
 ?>

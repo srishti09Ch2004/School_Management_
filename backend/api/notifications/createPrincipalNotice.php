@@ -18,7 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 try {
 
     if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-        throw new Exception("Only POST method is allowed");
+        throw new Exception(
+            "Only POST method is allowed"
+        );
     }
 
     $input = json_decode(
@@ -27,47 +29,54 @@ try {
     );
 
     if (!is_array($input)) {
-        throw new Exception("Invalid request data");
+        throw new Exception(
+            "Invalid request data"
+        );
     }
 
-    $user_id = $input["user_id"] ?? null;
+    $user_id =
+        $input["user_id"] ?? null;
 
-    $title = trim($input["title"] ?? "");
-    $audience = trim($input["audience"] ?? "Students");
+    $title =
+        trim($input["title"] ?? "");
 
-    $class_name = trim(
-        $input["class_name"] ?? "ALL"
-    );
+    $audience =
+        trim($input["audience"] ?? "Students");
 
-    $section = trim(
-        $input["section"] ?? "ALL"
-    );
+    $class_name =
+        trim($input["class_name"] ?? "ALL");
 
-    $notice_type = trim(
-        $input["notice_type"] ?? "General"
-    );
+    $section =
+        trim($input["section"] ?? "ALL");
 
-    $priority = trim(
-        $input["priority"] ?? "Medium"
-    );
+    $notice_type =
+        trim($input["notice_type"] ?? "General");
 
-    $description = trim(
-        $input["description"] ?? ""
-    );
+    $priority =
+        trim($input["priority"] ?? "Medium");
 
-    $expiry_date = !empty($input["expiry_date"])
-        ? trim($input["expiry_date"])
-        : null;
+    $description =
+        trim($input["description"] ?? "");
+
+    $expiry_date =
+        !empty($input["expiry_date"])
+            ? trim($input["expiry_date"])
+            : null;
 
     /*
-     * Validate Principal
+     * Validate User ID
      */
     if (!$user_id || !is_numeric($user_id)) {
-        throw new Exception("Invalid user ID");
+        throw new Exception(
+            "Invalid user ID"
+        );
     }
 
     $user_id = (int)$user_id;
 
+    /*
+     * Verify Principal
+     */
     $userQuery = "
         SELECT
             id,
@@ -78,7 +87,8 @@ try {
         LIMIT 1
     ";
 
-    $userStmt = $conn->prepare($userQuery);
+    $userStmt =
+        $conn->prepare($userQuery);
 
     if (!$userStmt) {
         throw new Exception(
@@ -94,18 +104,23 @@ try {
 
     $userStmt->execute();
 
-    $userResult = $userStmt->get_result();
-    $user = $userResult->fetch_assoc();
+    $user =
+        $userStmt
+            ->get_result()
+            ->fetch_assoc();
 
     $userStmt->close();
 
     if (!$user) {
-        throw new Exception("User not found");
+        throw new Exception(
+            "User not found"
+        );
     }
 
     if (
-        strtolower(trim($user["role"])) !==
-        "principal"
+        strtolower(
+            trim($user["role"])
+        ) !== "principal"
     ) {
         throw new Exception(
             "Only principals can create school notices"
@@ -113,7 +128,7 @@ try {
     }
 
     /*
-     * Validate notice
+     * Validate Notice
      */
     if ($title === "") {
         throw new Exception(
@@ -128,7 +143,26 @@ try {
     }
 
     /*
-     * Validate priority
+     * Validate Audience
+     */
+    $audienceMap = [
+        "Students" => "Student",
+        "Parents" => "Parent",
+        "Teachers" => "Teacher",
+        "All" => "All"
+    ];
+
+    if (!isset($audienceMap[$audience])) {
+        throw new Exception(
+            "Invalid notice audience"
+        );
+    }
+
+    $noticeFor =
+        $audienceMap[$audience];
+
+    /*
+     * Validate Priority
      */
     $allowedPriorities = [
         "Low",
@@ -147,44 +181,47 @@ try {
     }
 
     /*
-     * Convert frontend audience
-     * to notices.notice_for enum
-     */
-    $audienceMap = [
-        "Students" => "Student",
-        "Parents" => "Parent",
-        "Teachers" => "Teacher",
-        "All" => "All"
-    ];
-
-    if (
-        !isset($audienceMap[$audience])
-    ) {
-        throw new Exception(
-            "Invalid notice audience"
-        );
-    }
-
-    $noticeFor =
-        $audienceMap[$audience];
-
-    /*
-     * Normalize class / section
+     * Normalize Class
      */
     $class_name =
         strtoupper($class_name) === "ALL"
             ? "ALL"
             : $class_name;
 
+    /*
+     * Normalize Section
+     */
     $section =
         strtoupper($section) === "ALL"
             ? "ALL"
             : $section;
 
+    /*
+     * Class/Section required only
+     * for Students and Parents
+     */
+    if (
+        (
+            $noticeFor === "Student" ||
+            $noticeFor === "Parent"
+        ) &&
+        $class_name === ""
+    ) {
+        throw new Exception(
+            "Class is required"
+        );
+    }
+
+    /*
+     * Begin transaction
+     */
     $conn->begin_transaction();
 
     /*
-     * Create notice
+     * Create Notice
+     *
+     * created_at is automatically
+     * generated by MySQL.
      */
     $noticeQuery = "
         INSERT INTO notices
@@ -249,7 +286,7 @@ try {
     $noticeStmt->close();
 
     /*
-     * Get target users
+     * Recipient list
      */
     $recipients = [];
 
@@ -345,12 +382,7 @@ try {
 
             $recipients[] = [
                 "target_type" =>
-                    (
-                        $class_name === "ALL" ||
-                        $section === "ALL"
-                    )
-                    ? "class"
-                    : "student",
+                    "student",
 
                 "target_role" =>
                     "student",
@@ -464,12 +496,7 @@ try {
 
             $recipients[] = [
                 "target_type" =>
-                    (
-                        $class_name === "ALL" ||
-                        $section === "ALL"
-                    )
-                    ? "class"
-                    : "student",
+                    "student",
 
                 "target_role" =>
                     "parent",
@@ -492,10 +519,9 @@ try {
 
         $query = "
             SELECT
-                id,
-                user_id
-            FROM teachers
-            WHERE user_id IS NOT NULL
+                id
+            FROM users
+            WHERE LOWER(role) = 'teacher'
         ";
 
         $stmt =
@@ -518,18 +544,25 @@ try {
                 $result->fetch_assoc()
         ) {
 
+            $teacherUserId =
+                (int)$row["id"];
+
+            if ($teacherUserId === $user_id) {
+                continue;
+            }
+
             $recipients[] = [
                 "target_type" =>
-                    "role",
+                    "teacher",
 
                 "target_role" =>
                     "teacher",
 
                 "target_id" =>
-                    (int)$row["id"],
+                    $teacherUserId,
 
                 "user_id" =>
-                    (int)$row["user_id"]
+                    $teacherUserId
             ];
         }
 
@@ -545,7 +578,9 @@ try {
          * Students
          */
         $query = "
-            SELECT user_id
+            SELECT
+                id,
+                user_id
             FROM students
             WHERE status = 'Active'
               AND user_id IS NOT NULL
@@ -556,7 +591,7 @@ try {
 
         if (!$stmt) {
             throw new Exception(
-                "Unable to find school users"
+                "Unable to find students"
             );
         }
 
@@ -572,13 +607,13 @@ try {
 
             $recipients[] = [
                 "target_type" =>
-                    "role",
+                    "student",
 
                 "target_role" =>
                     "student",
 
                 "target_id" =>
-                    null,
+                    (int)$row["id"],
 
                 "user_id" =>
                     (int)$row["user_id"]
@@ -592,6 +627,7 @@ try {
          */
         $query = "
             SELECT DISTINCT
+                p.student_id,
                 p.user_id
             FROM parents p
             INNER JOIN students s
@@ -621,13 +657,13 @@ try {
 
             $recipients[] = [
                 "target_type" =>
-                    "role",
+                    "student",
 
                 "target_role" =>
                     "parent",
 
                 "target_id" =>
-                    null,
+                    (int)$row["student_id"],
 
                 "user_id" =>
                     (int)$row["user_id"]
@@ -640,9 +676,10 @@ try {
          * Teachers
          */
         $query = "
-            SELECT user_id
-            FROM teachers
-            WHERE user_id IS NOT NULL
+            SELECT
+                id
+            FROM users
+            WHERE LOWER(role) = 'teacher'
         ";
 
         $stmt =
@@ -664,18 +701,25 @@ try {
                 $result->fetch_assoc()
         ) {
 
+            $teacherUserId =
+                (int)$row["id"];
+
+            if ($teacherUserId === $user_id) {
+                continue;
+            }
+
             $recipients[] = [
                 "target_type" =>
-                    "role",
+                    "teacher",
 
                 "target_role" =>
                     "teacher",
 
                 "target_id" =>
-                    null,
+                    $teacherUserId,
 
                 "user_id" =>
-                    (int)$row["user_id"]
+                    $teacherUserId
             ];
         }
 
@@ -685,7 +729,8 @@ try {
          * Admins
          */
         $query = "
-            SELECT id
+            SELECT
+                id
             FROM users
             WHERE LOWER(role) = 'admin'
         ";
@@ -705,6 +750,13 @@ try {
                     $result->fetch_assoc()
             ) {
 
+                $adminUserId =
+                    (int)$row["id"];
+
+                if ($adminUserId === $user_id) {
+                    continue;
+                }
+
                 $recipients[] = [
                     "target_type" =>
                         "role",
@@ -713,10 +765,10 @@ try {
                         "admin",
 
                     "target_id" =>
-                        null,
+                        $adminUserId,
 
                     "user_id" =>
-                        (int)$row["id"]
+                        $adminUserId
                 ];
             }
 
@@ -725,21 +777,26 @@ try {
     }
 
     /*
-     * Remove duplicate users
+     * Remove duplicate recipients
      */
     $uniqueRecipients = [];
 
     foreach ($recipients as $recipient) {
 
-        $key =
-            $recipient["user_id"];
+        $recipientUserId =
+            (int)$recipient["user_id"];
 
-        if (!isset(
-            $uniqueRecipients[$key]
-        )) {
+        if (
+            !isset(
+                $uniqueRecipients[
+                    $recipientUserId
+                ]
+            )
+        ) {
 
-            $uniqueRecipients[$key] =
-                $recipient;
+            $uniqueRecipients[
+                $recipientUserId
+            ] = $recipient;
         }
     }
 
@@ -759,7 +816,7 @@ try {
     }
 
     /*
-     * Prepare target insert
+     * Target insert
      */
     $targetQuery = "
         INSERT INTO notice_targets
@@ -784,7 +841,10 @@ try {
     }
 
     /*
-     * Prepare notification insert
+     * Notification insert
+     *
+     * created_at will automatically
+     * store actual received time.
      */
     $notificationQuery = "
         INSERT INTO notifications
@@ -811,7 +871,7 @@ try {
     }
 
     /*
-     * Insert recipients
+     * Save targets + notifications
      */
     foreach ($recipients as $recipient) {
 
@@ -833,10 +893,13 @@ try {
             );
         }
 
+        $recipientUserId =
+            (int)$recipient["user_id"];
+
         $notificationStmt->bind_param(
             "ii",
             $noticeId,
-            $recipient["user_id"]
+            $recipientUserId
         );
 
         if (!$notificationStmt->execute()) {
@@ -850,6 +913,53 @@ try {
     $targetStmt->close();
     $notificationStmt->close();
 
+    /*
+     * Get actual DB timestamp
+     */
+    $timeQuery = "
+        SELECT
+            created_at,
+            publish_date
+        FROM notices
+        WHERE id = ?
+        LIMIT 1
+    ";
+
+    $timeStmt =
+        $conn->prepare($timeQuery);
+
+    $createdAt = null;
+    $publishDate = null;
+
+    if ($timeStmt) {
+
+        $timeStmt->bind_param(
+            "i",
+            $noticeId
+        );
+
+        $timeStmt->execute();
+
+        $timeRow =
+            $timeStmt
+                ->get_result()
+                ->fetch_assoc();
+
+        if ($timeRow) {
+
+            $createdAt =
+                $timeRow["created_at"];
+
+            $publishDate =
+                $timeRow["publish_date"];
+        }
+
+        $timeStmt->close();
+    }
+
+    /*
+     * Commit
+     */
     $conn->commit();
 
     ob_clean();
@@ -858,9 +968,14 @@ try {
         "status" => true,
         "message" =>
             "Principal notice published successfully",
-        "notice_id" => $noticeId,
+        "notice_id" =>
+            $noticeId,
         "recipient_count" =>
-            count($recipients)
+            count($recipients),
+        "sent_at" =>
+            $createdAt,
+        "published_at" =>
+            $publishDate
     ]);
 
 } catch (Exception $e) {
@@ -878,7 +993,8 @@ try {
 
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" =>
+            $e->getMessage()
     ]);
 }
 ?>

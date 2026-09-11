@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import {
   Bell,
   AlertTriangle,
@@ -28,11 +29,14 @@ export default function PrincipalNotice() {
   const [showModal, setShowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
 
-  const [selectedNotice, setSelectedNotice] = useState(null);
+  const [selectedNotice, setSelectedNotice] =
+    useState(null);
 
   const [search, setSearch] = useState("");
-  const [audienceFilter, setAudienceFilter] = useState("All");
-  const [priorityFilter, setPriorityFilter] = useState("All");
+  const [audienceFilter, setAudienceFilter] =
+    useState("All");
+  const [priorityFilter, setPriorityFilter] =
+    useState("All");
 
   const [form, setForm] = useState({
     title: "",
@@ -47,30 +51,70 @@ export default function PrincipalNotice() {
 
   const user = useMemo(() => {
     try {
-      return JSON.parse(localStorage.getItem("user") || "null");
+      return JSON.parse(
+        localStorage.getItem("user") || "null"
+      );
     } catch {
       return null;
     }
   }, []);
 
   /*
-   * Fetch classes and sections
+   * Format exact date and time
+   */
+  const formatDateTime = (value) => {
+    if (!value) return "-";
+
+    const raw = String(value);
+
+    const normalized = raw.includes("T")
+      ? raw
+      : raw.replace(" ", "T");
+
+    const date = new Date(normalized);
+
+    if (Number.isNaN(date.getTime())) {
+      return raw;
+    }
+
+    return date.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  /*
+   * Fetch classes
    */
   const fetchClasses = async () => {
     try {
       const response = await fetch(
-        `${API}/getPrincipalClasses.php?_=${Date.now()}`
+        `${API}/getPrincipalClasses.php?_=${Date.now()}`,
+        {
+          cache: "no-store",
+        }
       );
 
-      const text = await response.text();
+      const text =
+        await response.text();
 
       let result;
 
       try {
         result = JSON.parse(text);
       } catch {
-        console.error("Classes API response:", text);
-        throw new Error("Invalid classes API response");
+        console.error(
+          "Classes API response:",
+          text
+        );
+
+        throw new Error(
+          "Invalid classes API response"
+        );
       }
 
       if (result.status) {
@@ -81,12 +125,20 @@ export default function PrincipalNotice() {
         );
       } else {
         throw new Error(
-          result.message || "Unable to fetch classes"
+          result.message ||
+            "Unable to fetch classes"
         );
       }
     } catch (error) {
-      console.error("Fetch classes error:", error);
-      toast.error(error.message || "Unable to load classes");
+      console.error(
+        "Fetch classes error:",
+        error
+      );
+
+      toast.error(
+        error.message ||
+          "Unable to load classes"
+      );
     }
   };
 
@@ -94,7 +146,10 @@ export default function PrincipalNotice() {
    * Fetch Principal notices
    */
   const fetchNotices = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -102,18 +157,28 @@ export default function PrincipalNotice() {
       const response = await fetch(
         `${API}/getPrincipalNotices.php?user_id=${encodeURIComponent(
           user.id
-        )}&_=${Date.now()}`
+        )}&_=${Date.now()}`,
+        {
+          cache: "no-store",
+        }
       );
 
-      const text = await response.text();
+      const text =
+        await response.text();
 
       let result;
 
       try {
         result = JSON.parse(text);
       } catch {
-        console.error("Principal notices response:", text);
-        throw new Error("Invalid server response");
+        console.error(
+          "Principal notices response:",
+          text
+        );
+
+        throw new Error(
+          "Invalid server response"
+        );
       }
 
       if (result.status) {
@@ -124,40 +189,62 @@ export default function PrincipalNotice() {
         );
       } else {
         throw new Error(
-          result.message || "Unable to load notices"
+          result.message ||
+            "Unable to load notices"
         );
       }
     } catch (error) {
-      console.error("Fetch notices error:", error);
+      console.error(
+        "Fetch notices error:",
+        error
+      );
+
       setNotices([]);
+
       toast.error(
-        error.message || "Unable to load notices"
+        error.message ||
+          "Unable to load notices"
       );
     } finally {
       setLoading(false);
     }
   };
 
+  /*
+   * Initial load + live refresh
+   */
   useEffect(() => {
     fetchClasses();
     fetchNotices();
+
+    const interval =
+      setInterval(() => {
+        fetchNotices();
+      }, 10000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [user?.id]);
 
   /*
-   * Get unique classes
+   * Unique classes
    */
   const classNames = useMemo(() => {
     return [
       ...new Set(
         classes
-          .map((item) => item.class_name)
+          .map(
+            (item) =>
+              item.class_name
+          )
           .filter(Boolean)
       ),
     ];
   }, [classes]);
 
   /*
-   * Sections for selected class
+   * Sections
    */
   const sectionNames = useMemo(() => {
     if (
@@ -172,27 +259,35 @@ export default function PrincipalNotice() {
         classes
           .filter(
             (item) =>
-              String(item.class_name) ===
-              String(form.class_name)
+              String(
+                item.class_name
+              ) ===
+              String(
+                form.class_name
+              )
           )
-          .map((item) => item.section)
+          .map(
+            (item) =>
+              item.section
+          )
           .filter(Boolean)
       ),
     ];
-  }, [classes, form.class_name]);
+  }, [
+    classes,
+    form.class_name,
+  ]);
 
   /*
    * Audience change
    */
-  const handleAudienceChange = (value) => {
+  const handleAudienceChange = (
+    value
+  ) => {
     setForm((prev) => ({
       ...prev,
       audience: value,
-      class_name:
-        value === "Students" ||
-        value === "Parents"
-          ? "ALL"
-          : "ALL",
+      class_name: "ALL",
       section: "ALL",
     }));
   };
@@ -200,7 +295,9 @@ export default function PrincipalNotice() {
   /*
    * Class change
    */
-  const handleClassChange = (value) => {
+  const handleClassChange = (
+    value
+  ) => {
     setForm((prev) => ({
       ...prev,
       class_name: value,
@@ -211,72 +308,106 @@ export default function PrincipalNotice() {
   /*
    * Submit notice
    */
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e
+  ) => {
     e.preventDefault();
 
     if (!user?.id) {
-      toast.error("Principal session not found");
+      toast.error(
+        "Principal session not found"
+      );
       return;
     }
 
     if (!form.title.trim()) {
-      toast.error("Notice title is required");
-      return;
-    }
-
-    if (!form.description.trim()) {
-      toast.error("Notice content is required");
+      toast.error(
+        "Notice title is required"
+      );
       return;
     }
 
     if (
-      (form.audience === "Students" ||
-        form.audience === "Parents") &&
+      !form.description.trim()
+    ) {
+      toast.error(
+        "Notice content is required"
+      );
+      return;
+    }
+
+    if (
+      (
+        form.audience ===
+          "Students" ||
+        form.audience ===
+          "Parents"
+      ) &&
       !form.class_name
     ) {
-      toast.error("Please select a class");
+      toast.error(
+        "Please select a class"
+      );
       return;
     }
 
     try {
       setSaving(true);
 
-      const response = await fetch(
-        `${API}/createPrincipalNotice.php`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: user.id,
-            title: form.title,
-            audience: form.audience,
-            class_name: form.class_name,
-            section: form.section,
-            notice_type: form.notice_type,
-            priority: form.priority,
-            description: form.description,
-            expiry_date:
-              form.expiry_date || null,
-          }),
-        }
-      );
+      const response =
+        await fetch(
+          `${API}/createPrincipalNotice.php`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              user_id: user.id,
+              title:
+                form.title.trim(),
+              audience:
+                form.audience,
+              class_name:
+                form.class_name,
+              section:
+                form.section,
+              notice_type:
+                form.notice_type,
+              priority:
+                form.priority,
+              description:
+                form.description.trim(),
+              expiry_date:
+                form.expiry_date ||
+                null,
+            }),
+          }
+        );
 
-      const text = await response.text();
+      const text =
+        await response.text();
 
       let result;
 
       try {
         result = JSON.parse(text);
       } catch {
-        console.error("Create notice response:", text);
-        throw new Error("Invalid server response");
+        console.error(
+          "Create notice response:",
+          text
+        );
+
+        throw new Error(
+          "Invalid server response"
+        );
       }
 
       if (!result.status) {
         throw new Error(
-          result.message || "Unable to create notice"
+          result.message ||
+            "Unable to create notice"
         );
       }
 
@@ -297,12 +428,16 @@ export default function PrincipalNotice() {
         expiry_date: "",
       });
 
-      fetchNotices();
+      await fetchNotices();
     } catch (error) {
-      console.error("Create notice error:", error);
+      console.error(
+        "Create notice error:",
+        error
+      );
 
       toast.error(
-        error.message || "Unable to create notice"
+        error.message ||
+          "Unable to create notice"
       );
     } finally {
       setSaving(false);
@@ -312,58 +447,90 @@ export default function PrincipalNotice() {
   /*
    * Delete notice
    */
-  const handleDelete = async (noticeId) => {
+  const handleDelete = async (
+    noticeId
+  ) => {
     if (!user?.id) {
-      toast.error("Principal session not found");
+      toast.error(
+        "Principal session not found"
+      );
       return;
     }
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this notice?"
-    );
-
-    if (!confirmed) return;
-
-    try {
-      const response = await fetch(
-        `${API}/deletePrincipalNotice.php`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: user.id,
-            notice_id: noticeId,
-          }),
-        }
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to delete this notice?"
       );
 
-      const text = await response.text();
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response =
+        await fetch(
+          `${API}/deletePrincipalNotice.php`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              user_id: user.id,
+              notice_id:
+                noticeId,
+            }),
+          }
+        );
+
+      const text =
+        await response.text();
 
       let result;
 
       try {
         result = JSON.parse(text);
       } catch {
-        console.error("Delete response:", text);
-        throw new Error("Invalid server response");
+        console.error(
+          "Delete response:",
+          text
+        );
+
+        throw new Error(
+          "Invalid server response"
+        );
       }
 
       if (!result.status) {
         throw new Error(
-          result.message || "Unable to delete notice"
+          result.message ||
+            "Unable to delete notice"
         );
       }
 
-      toast.success("Notice deleted successfully");
+      toast.success(
+        "Notice deleted successfully"
+      );
 
-      fetchNotices();
+      if (
+        selectedNotice?.id ===
+        noticeId
+      ) {
+        setSelectedNotice(null);
+        setShowViewModal(false);
+      }
+
+      await fetchNotices();
     } catch (error) {
-      console.error("Delete notice error:", error);
+      console.error(
+        "Delete notice error:",
+        error
+      );
 
       toast.error(
-        error.message || "Unable to delete notice"
+        error.message ||
+          "Unable to delete notice"
       );
     }
   };
@@ -371,111 +538,160 @@ export default function PrincipalNotice() {
   /*
    * Filter notices
    */
-  const filteredNotices = useMemo(() => {
-    return notices.filter((notice) => {
-      const searchText = search
-        .trim()
-        .toLowerCase();
+  const filteredNotices =
+    useMemo(() => {
+      return notices.filter(
+        (notice) => {
+          const searchText =
+            search
+              .trim()
+              .toLowerCase();
 
-      const matchesSearch =
-        !searchText ||
-        String(notice.title || "")
-          .toLowerCase()
-          .includes(searchText) ||
-        String(notice.description || "")
-          .toLowerCase()
-          .includes(searchText) ||
-        String(notice.notice_type || "")
-          .toLowerCase()
-          .includes(searchText) ||
-        String(notice.notice_for || "")
-          .toLowerCase()
-          .includes(searchText);
+          const matchesSearch =
+            !searchText ||
+            String(
+              notice.title || ""
+            )
+              .toLowerCase()
+              .includes(
+                searchText
+              ) ||
+            String(
+              notice.description ||
+                ""
+            )
+              .toLowerCase()
+              .includes(
+                searchText
+              ) ||
+            String(
+              notice.notice_type ||
+                ""
+            )
+              .toLowerCase()
+              .includes(
+                searchText
+              ) ||
+            String(
+              notice.notice_for ||
+                ""
+            )
+              .toLowerCase()
+              .includes(
+                searchText
+              ) ||
+            String(
+              notice.target_label ||
+                ""
+            )
+              .toLowerCase()
+              .includes(
+                searchText
+              );
 
-      const matchesAudience =
-        audienceFilter === "All" ||
-        notice.notice_for === audienceFilter;
+          const matchesAudience =
+            audienceFilter ===
+              "All" ||
+            notice.notice_for ===
+              audienceFilter;
 
-      const matchesPriority =
-        priorityFilter === "All" ||
-        notice.priority === priorityFilter;
+          const matchesPriority =
+            priorityFilter ===
+              "All" ||
+            notice.priority ===
+              priorityFilter;
 
-      return (
-        matchesSearch &&
-        matchesAudience &&
-        matchesPriority
+          return (
+            matchesSearch &&
+            matchesAudience &&
+            matchesPriority
+          );
+        }
       );
-    });
-  }, [
-    notices,
-    search,
-    audienceFilter,
-    priorityFilter,
-  ]);
+    }, [
+      notices,
+      search,
+      audienceFilter,
+      priorityFilter,
+    ]);
 
   /*
    * Stats
    */
-  const totalNotices = notices.length;
+  const totalNotices =
+    notices.length;
 
-  const activeNotices = notices.filter(
-    (item) =>
-      String(item.status).toLowerCase() ===
-      "published"
-  ).length;
+  const activeNotices =
+    notices.filter(
+      (item) =>
+        String(
+          item.status
+        ).toLowerCase() ===
+        "published"
+    ).length;
 
-  const highPriority = notices.filter(
-    (item) =>
-      item.priority === "High"
-  ).length;
+  const highPriority =
+    notices.filter(
+      (item) =>
+        item.priority ===
+        "High"
+    ).length;
 
-  const totalReach = notices.reduce(
-    (sum, item) =>
-      sum + Number(item.recipient_count || 0),
-    0
-  );
-
-  const formatDate = (date) => {
-    if (!date) return "-";
-
-    const parsed = new Date(
-      String(date).replace(" ", "T")
+  const totalReach =
+    notices.reduce(
+      (sum, item) =>
+        sum +
+        Number(
+          item.recipient_count ||
+            0
+        ),
+      0
     );
 
-    if (Number.isNaN(parsed.getTime())) {
-      return date;
+  /*
+   * Audience label
+   */
+  const getAudienceLabel = (
+    notice
+  ) => {
+    if (
+      notice.target_label
+    ) {
+      return notice.target_label;
     }
 
-    return parsed.toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
-  };
-
-  const getAudienceLabel = (notice) => {
-    if (notice.notice_for === "Student") {
-      return notice.target_label ||
-        "Students";
+    if (
+      notice.notice_for ===
+      "Student"
+    ) {
+      return "All Students";
     }
 
-    if (notice.notice_for === "Parent") {
-      return notice.target_label ||
-        "Parents";
+    if (
+      notice.notice_for ===
+      "Parent"
+    ) {
+      return "All Parents";
     }
 
-    if (notice.notice_for === "Teacher") {
+    if (
+      notice.notice_for ===
+      "Teacher"
+    ) {
       return "All Teachers";
     }
 
-    if (notice.notice_for === "All") {
+    if (
+      notice.notice_for ===
+      "All"
+    ) {
       return "Entire School";
     }
 
-    return notice.notice_for || "-";
+    return (
+      notice.notice_for ||
+      "-"
+    );
   };
 
   return (
@@ -505,7 +721,9 @@ export default function PrincipalNotice() {
           </button>
 
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() =>
+              setShowModal(true)
+            }
             className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-blue-700"
           >
             <Plus size={18} />
@@ -633,7 +851,9 @@ export default function PrincipalNotice() {
               placeholder="Search notice..."
               value={search}
               onChange={(e) =>
-                setSearch(e.target.value)
+                setSearch(
+                  e.target.value
+                )
               }
               className="outline-none w-full text-sm"
             />
@@ -641,9 +861,13 @@ export default function PrincipalNotice() {
           </div>
 
           <select
-            value={audienceFilter}
+            value={
+              audienceFilter
+            }
             onChange={(e) =>
-              setAudienceFilter(e.target.value)
+              setAudienceFilter(
+                e.target.value
+              )
             }
             className="border rounded-2xl px-4 py-3 text-sm outline-none"
           >
@@ -663,15 +887,16 @@ export default function PrincipalNotice() {
               Teachers
             </option>
 
-            <option value="All">
-              Entire School
-            </option>
           </select>
 
           <select
-            value={priorityFilter}
+            value={
+              priorityFilter
+            }
             onChange={(e) =>
-              setPriorityFilter(e.target.value)
+              setPriorityFilter(
+                e.target.value
+              )
             }
             className="border rounded-2xl px-4 py-3 text-sm outline-none"
           >
@@ -704,6 +929,7 @@ export default function PrincipalNotice() {
           </div>
         ) : filteredNotices.length === 0 ? (
           <div className="bg-white rounded-3xl p-10 text-center text-gray-500">
+
             <Bell
               size={35}
               className="mx-auto mb-3 text-gray-300"
@@ -716,112 +942,140 @@ export default function PrincipalNotice() {
             <p className="text-sm mt-1">
               Create your first school notice.
             </p>
+
           </div>
         ) : (
-          filteredNotices.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
-            >
+          filteredNotices.map(
+            (item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+              >
 
-              <div className="flex flex-col lg:flex-row justify-between gap-5">
+                <div className="flex flex-col lg:flex-row justify-between gap-5">
 
-                <div className="flex gap-4">
+                  <div className="flex gap-4">
 
-                  <div className="w-11 h-11 rounded-2xl bg-blue-100 flex items-center justify-center shrink-0">
-                    <Bell
-                      size={20}
-                      className="text-blue-600"
-                    />
+                    <div className="w-11 h-11 rounded-2xl bg-blue-100 flex items-center justify-center shrink-0">
+                      <Bell
+                        size={20}
+                        className="text-blue-600"
+                      />
+                    </div>
+
+                    <div>
+
+                      <h3 className="font-bold text-lg text-gray-800">
+                        {item.title}
+                      </h3>
+
+                      <p className="text-sm text-gray-500 mt-2 leading-6">
+                        {item.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 mt-4">
+
+                        <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs">
+                          {item.notice_type ||
+                            "General"}
+                        </span>
+
+                        <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs">
+                          {getAudienceLabel(
+                            item
+                          )}
+                        </span>
+
+                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
+                          Sent:{" "}
+                          {formatDateTime(
+                            item.created_at
+                          )}
+                        </span>
+
+                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
+                          {item.recipient_count ||
+                            0}{" "}
+                          recipients
+                        </span>
+
+                      </div>
+
+                    </div>
                   </div>
 
-                  <div>
+                  <div className="flex lg:flex-col items-center lg:items-end gap-2">
 
-                    <h3 className="font-bold text-lg text-gray-800">
-                      {item.title}
-                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        item.priority ===
+                        "High"
+                          ? "bg-red-100 text-red-700"
+                          : item.priority ===
+                            "Medium"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {item.priority}
+                    </span>
 
-                    <p className="text-sm text-gray-500 mt-2 leading-6">
-                      {item.description}
-                    </p>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        item.status ===
+                        "Published"
+                          ? "bg-green-100 text-green-700"
+                          : item.status ===
+                            "Expired"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
 
-                    <div className="flex flex-wrap gap-2 mt-4">
+                    <div className="flex gap-2 mt-1">
 
-                      <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs">
-                        {item.notice_type || "General"}
-                      </span>
+                      <button
+                        onClick={() => {
+                          setSelectedNotice(
+                            item
+                          );
 
-                      <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs">
-                        {getAudienceLabel(item)}
-                      </span>
+                          setShowViewModal(
+                            true
+                          );
+                        }}
+                        className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200"
+                        title="View"
+                      >
+                        <Eye
+                          size={17}
+                        />
+                      </button>
 
-                      <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
-                        {formatDate(item.publish_date)}
-                      </span>
-
-                      <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
-                        {item.recipient_count || 0} recipients
-                      </span>
+                      <button
+                        onClick={() =>
+                          handleDelete(
+                            item.id
+                          )
+                        }
+                        className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100"
+                        title="Delete"
+                      >
+                        <Trash2
+                          size={17}
+                        />
+                      </button>
 
                     </div>
 
                   </div>
-                </div>
-
-                <div className="flex lg:flex-col items-center lg:items-end gap-2">
-
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      item.priority === "High"
-                        ? "bg-red-100 text-red-700"
-                        : item.priority === "Medium"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
-                    {item.priority}
-                  </span>
-
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      item.status === "Published"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-orange-100 text-orange-700"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-
-                  <div className="flex gap-2 mt-1">
-
-                    <button
-                      onClick={() => {
-                        setSelectedNotice(item);
-                        setShowViewModal(true);
-                      }}
-                      className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200"
-                      title="View"
-                    >
-                      <Eye size={17} />
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        handleDelete(item.id)
-                      }
-                      className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100"
-                      title="Delete"
-                    >
-                      <Trash2 size={17} />
-                    </button>
-
-                  </div>
 
                 </div>
-
               </div>
-            </div>
-          ))
+            )
+          )
         )}
 
       </div>
@@ -845,7 +1099,9 @@ export default function PrincipalNotice() {
               </div>
 
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() =>
+                  setShowModal(false)
+                }
                 className="p-2 rounded-xl hover:bg-gray-100"
               >
                 <X size={20} />
@@ -854,38 +1110,48 @@ export default function PrincipalNotice() {
             </div>
 
             <form
-              onSubmit={handleSubmit}
+              onSubmit={
+                handleSubmit
+              }
               className="p-6 space-y-5"
             >
 
               {/* Title */}
               <div>
+
                 <label className="text-sm font-medium text-gray-700">
                   Notice Title
                 </label>
 
                 <input
                   type="text"
-                  value={form.title}
+                  value={
+                    form.title
+                  }
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      title: e.target.value,
+                      title:
+                        e.target.value,
                     })
                   }
                   placeholder="e.g. Parent Teacher Meeting"
                   className="w-full border rounded-2xl px-4 py-3 mt-2 outline-none focus:ring-2 focus:ring-blue-100"
                 />
+
               </div>
 
               {/* Audience */}
               <div>
+
                 <label className="text-sm font-medium text-gray-700">
                   Send To
                 </label>
 
                 <select
-                  value={form.audience}
+                  value={
+                    form.audience
+                  }
                   onChange={(e) =>
                     handleAudienceChange(
                       e.target.value
@@ -909,20 +1175,28 @@ export default function PrincipalNotice() {
                     Entire School
                   </option>
                 </select>
+
               </div>
 
               {/* Class */}
-              {(form.audience === "Students" ||
-                form.audience === "Parents") && (
+              {(
+                form.audience ===
+                  "Students" ||
+                form.audience ===
+                  "Parents"
+              ) && (
                 <div className="grid md:grid-cols-2 gap-4">
 
                   <div>
+
                     <label className="text-sm font-medium text-gray-700">
                       Class
                     </label>
 
                     <select
-                      value={form.class_name}
+                      value={
+                        form.class_name
+                      }
                       onChange={(e) =>
                         handleClassChange(
                           e.target.value
@@ -934,32 +1208,50 @@ export default function PrincipalNotice() {
                         All Classes
                       </option>
 
-                      {classNames.map((className) => (
-                        <option
-                          key={className}
-                          value={className}
-                        >
-                          Class {className}
-                        </option>
-                      ))}
+                      {classNames.map(
+                        (
+                          className
+                        ) => (
+                          <option
+                            key={
+                              className
+                            }
+                            value={
+                              className
+                            }
+                          >
+                            Class{" "}
+                            {
+                              className
+                            }
+                          </option>
+                        )
+                      )}
+
                     </select>
+
                   </div>
 
                   <div>
+
                     <label className="text-sm font-medium text-gray-700">
                       Section
                     </label>
 
                     <select
-                      value={form.section}
+                      value={
+                        form.section
+                      }
                       onChange={(e) =>
                         setForm({
                           ...form,
-                          section: e.target.value,
+                          section:
+                            e.target.value,
                         })
                       }
                       disabled={
-                        form.class_name === "ALL"
+                        form.class_name ===
+                        "ALL"
                       }
                       className="w-full border rounded-2xl px-4 py-3 mt-2 outline-none disabled:bg-gray-100"
                     >
@@ -967,15 +1259,28 @@ export default function PrincipalNotice() {
                         All Sections
                       </option>
 
-                      {sectionNames.map((section) => (
-                        <option
-                          key={section}
-                          value={section}
-                        >
-                          Section {section}
-                        </option>
-                      ))}
+                      {sectionNames.map(
+                        (
+                          section
+                        ) => (
+                          <option
+                            key={
+                              section
+                            }
+                            value={
+                              section
+                            }
+                          >
+                            Section{" "}
+                            {
+                              section
+                            }
+                          </option>
+                        )
+                      )}
+
                     </select>
+
                   </div>
 
                 </div>
@@ -985,12 +1290,15 @@ export default function PrincipalNotice() {
               <div className="grid md:grid-cols-2 gap-4">
 
                 <div>
+
                   <label className="text-sm font-medium text-gray-700">
                     Notice Type
                   </label>
 
                   <select
-                    value={form.notice_type}
+                    value={
+                      form.notice_type
+                    }
                     onChange={(e) =>
                       setForm({
                         ...form,
@@ -1000,26 +1308,59 @@ export default function PrincipalNotice() {
                     }
                     className="w-full border rounded-2xl px-4 py-3 mt-2 outline-none"
                   >
-                    <option>General</option>
-                    <option>Academic</option>
-                    <option>Meeting</option>
-                    <option>Exam</option>
-                    <option>Event</option>
-                    <option>Holiday</option>
-                    <option>Attendance</option>
-                    <option>Fee</option>
-                    <option>Emergency</option>
-                    <option>Reminder</option>
+                    <option>
+                      General
+                    </option>
+
+                    <option>
+                      Academic
+                    </option>
+
+                    <option>
+                      Meeting
+                    </option>
+
+                    <option>
+                      Exam
+                    </option>
+
+                    <option>
+                      Event
+                    </option>
+
+                    <option>
+                      Holiday
+                    </option>
+
+                    <option>
+                      Attendance
+                    </option>
+
+                    <option>
+                      Fee
+                    </option>
+
+                    <option>
+                      Emergency
+                    </option>
+
+                    <option>
+                      Reminder
+                    </option>
                   </select>
+
                 </div>
 
                 <div>
+
                   <label className="text-sm font-medium text-gray-700">
                     Priority
                   </label>
 
                   <select
-                    value={form.priority}
+                    value={
+                      form.priority
+                    }
                     onChange={(e) =>
                       setForm({
                         ...form,
@@ -1029,23 +1370,35 @@ export default function PrincipalNotice() {
                     }
                     className="w-full border rounded-2xl px-4 py-3 mt-2 outline-none"
                   >
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option>High</option>
+                    <option>
+                      Low
+                    </option>
+
+                    <option>
+                      Medium
+                    </option>
+
+                    <option>
+                      High
+                    </option>
                   </select>
+
                 </div>
 
               </div>
 
               {/* Expiry */}
               <div>
+
                 <label className="text-sm font-medium text-gray-700">
                   Expiry Date
                 </label>
 
                 <input
                   type="datetime-local"
-                  value={form.expiry_date}
+                  value={
+                    form.expiry_date
+                  }
                   onChange={(e) =>
                     setForm({
                       ...form,
@@ -1055,17 +1408,21 @@ export default function PrincipalNotice() {
                   }
                   className="w-full border rounded-2xl px-4 py-3 mt-2 outline-none"
                 />
+
               </div>
 
               {/* Description */}
               <div>
+
                 <label className="text-sm font-medium text-gray-700">
                   Notice Content
                 </label>
 
                 <textarea
                   rows={5}
-                  value={form.description}
+                  value={
+                    form.description
+                  }
                   onChange={(e) =>
                     setForm({
                       ...form,
@@ -1076,6 +1433,7 @@ export default function PrincipalNotice() {
                   placeholder="Write the complete notice..."
                   className="w-full border rounded-2xl px-4 py-3 mt-2 outline-none resize-none"
                 />
+
               </div>
 
               {/* Submit */}
@@ -1084,7 +1442,9 @@ export default function PrincipalNotice() {
                 <button
                   type="button"
                   onClick={() =>
-                    setShowModal(false)
+                    setShowModal(
+                      false
+                    )
                   }
                   className="px-5 py-3 rounded-2xl border text-sm font-medium"
                 >
@@ -1106,6 +1466,7 @@ export default function PrincipalNotice() {
               </div>
 
             </form>
+
           </div>
         </div>
       )}
@@ -1115,7 +1476,7 @@ export default function PrincipalNotice() {
         selectedNotice && (
           <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
 
-            <div className="bg-white w-full max-w-xl rounded-3xl shadow-xl">
+            <div className="bg-white w-full max-w-xl rounded-3xl shadow-xl max-h-[90vh] overflow-y-auto">
 
               <div className="flex justify-between items-center p-6 border-b">
 
@@ -1123,11 +1484,17 @@ export default function PrincipalNotice() {
                   <h3 className="text-xl font-bold text-gray-800">
                     Notice Details
                   </h3>
+
+                  <p className="text-xs text-gray-400 mt-1">
+                    Official school communication
+                  </p>
                 </div>
 
                 <button
                   onClick={() =>
-                    setShowViewModal(false)
+                    setShowViewModal(
+                      false
+                    )
                   }
                   className="p-2 rounded-xl hover:bg-gray-100"
                 >
@@ -1139,32 +1506,79 @@ export default function PrincipalNotice() {
               <div className="p-6 space-y-5">
 
                 <div>
+
                   <h2 className="text-xl font-bold text-gray-800">
-                    {selectedNotice.title}
+                    {
+                      selectedNotice.title
+                    }
                   </h2>
 
                   <div className="flex flex-wrap gap-2 mt-3">
 
                     <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs">
-                      {selectedNotice.notice_type ||
-                        "General"}
+                      {
+                        selectedNotice.notice_type ||
+                        "General"
+                      }
                     </span>
 
                     <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs">
-                      {getAudienceLabel(
-                        selectedNotice
-                      )}
+                      {
+                        getAudienceLabel(
+                          selectedNotice
+                        )
+                      }
                     </span>
 
-                    <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
-                      {selectedNotice.priority}
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs ${
+                        selectedNotice.priority ===
+                        "High"
+                          ? "bg-red-100 text-red-700"
+                          : selectedNotice.priority ===
+                            "Medium"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {
+                        selectedNotice.priority
+                      }
+                    </span>
+
+                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">
+                      {
+                        selectedNotice.status
+                      }
                     </span>
 
                   </div>
+
                 </div>
 
                 <div className="bg-gray-50 rounded-2xl p-4 text-sm text-gray-700 leading-7">
-                  {selectedNotice.description}
+                  {
+                    selectedNotice.description
+                  }
+                </div>
+
+                {/* Timestamp */}
+                <div className="bg-blue-50 rounded-2xl p-4">
+
+                  <p className="text-xs text-gray-500">
+                    Notice Sent
+                  </p>
+
+                  <p className="font-semibold text-gray-800 mt-1">
+                    {formatDateTime(
+                      selectedNotice.created_at
+                    )}
+                  </p>
+
+                  <p className="text-xs text-gray-400 mt-1">
+                    Exact time recorded by the school system
+                  </p>
+
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -1175,7 +1589,7 @@ export default function PrincipalNotice() {
                     </p>
 
                     <p className="font-medium mt-1">
-                      {formatDate(
+                      {formatDateTime(
                         selectedNotice.publish_date
                       )}
                     </p>
@@ -1187,18 +1601,63 @@ export default function PrincipalNotice() {
                     </p>
 
                     <p className="font-medium mt-1">
-                      {selectedNotice.recipient_count ||
-                        0}
+                      {
+                        selectedNotice.recipient_count ||
+                        0
+                      }
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-400">
+                      Read
+                    </p>
+
+                    <p className="font-medium mt-1">
+                      {
+                        selectedNotice.read_count ||
+                        0
+                      }
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-400">
+                      Unread
+                    </p>
+
+                    <p className="font-medium mt-1">
+                      {
+                        selectedNotice.unread_count ||
+                        0
+                      }
                     </p>
                   </div>
 
                 </div>
+
+                {selectedNotice.expiry_date && (
+                  <div className="text-sm">
+
+                    <p className="text-gray-400">
+                      Expires
+                    </p>
+
+                    <p className="font-medium mt-1">
+                      {formatDateTime(
+                        selectedNotice.expiry_date
+                      )}
+                    </p>
+
+                  </div>
+                )}
 
               </div>
 
             </div>
           </div>
         )}
+
     </div>
   );
 }

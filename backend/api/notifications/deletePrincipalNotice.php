@@ -65,7 +65,9 @@ try {
      * Verify Principal
      */
     $userQuery = "
-        SELECT id, role
+        SELECT
+            id,
+            role
         FROM users
         WHERE id = ?
         LIMIT 1
@@ -111,10 +113,11 @@ try {
     }
 
     /*
-     * Verify ownership
+     * Verify Notice Ownership
      */
     $checkQuery = "
-        SELECT id
+        SELECT
+            id
         FROM notices
         WHERE id = ?
           AND created_by = ?
@@ -155,87 +158,107 @@ try {
     $conn->begin_transaction();
 
     /*
-     * Delete notifications
+     * Delete Notifications
      */
-    $query = "
+    $notificationQuery = "
         DELETE FROM notifications
         WHERE notice_id = ?
     ";
 
-    $stmt =
-        $conn->prepare($query);
+    $notificationStmt =
+        $conn->prepare(
+            $notificationQuery
+        );
 
-    if (!$stmt) {
+    if (!$notificationStmt) {
         throw new Exception(
             "Unable to delete notifications"
         );
     }
 
-    $stmt->bind_param(
+    $notificationStmt->bind_param(
         "i",
         $notice_id
     );
 
-    $stmt->execute();
-    $stmt->close();
+    if (!$notificationStmt->execute()) {
+        throw new Exception(
+            "Failed to delete notifications"
+        );
+    }
+
+    $notificationStmt->close();
 
     /*
-     * Delete targets
+     * Delete Notice Targets
      */
-    $query = "
+    $targetQuery = "
         DELETE FROM notice_targets
         WHERE notice_id = ?
     ";
 
-    $stmt =
-        $conn->prepare($query);
+    $targetStmt =
+        $conn->prepare(
+            $targetQuery
+        );
 
-    if (!$stmt) {
+    if (!$targetStmt) {
         throw new Exception(
             "Unable to delete notice targets"
         );
     }
 
-    $stmt->bind_param(
+    $targetStmt->bind_param(
         "i",
         $notice_id
     );
 
-    $stmt->execute();
-    $stmt->close();
+    if (!$targetStmt->execute()) {
+        throw new Exception(
+            "Failed to delete notice targets"
+        );
+    }
+
+    $targetStmt->close();
 
     /*
-     * Delete notice
+     * Delete Notice
      */
-    $query = "
+    $deleteQuery = "
         DELETE FROM notices
         WHERE id = ?
           AND created_by = ?
           AND created_role = 'principal'
     ";
 
-    $stmt =
-        $conn->prepare($query);
+    $deleteStmt =
+        $conn->prepare($deleteQuery);
 
-    if (!$stmt) {
+    if (!$deleteStmt) {
         throw new Exception(
             "Unable to delete notice"
         );
     }
 
-    $stmt->bind_param(
+    $deleteStmt->bind_param(
         "ii",
         $notice_id,
         $user_id
     );
 
-    if (!$stmt->execute()) {
+    if (!$deleteStmt->execute()) {
         throw new Exception(
             "Failed to delete notice"
         );
     }
 
-    $stmt->close();
+    if ($deleteStmt->affected_rows === 0) {
+        throw new Exception(
+            "Notice could not be deleted"
+        );
+    }
+
+    $deleteStmt->close();
 
     $conn->commit();
 
@@ -262,7 +285,8 @@ try {
 
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
+        "message" =>
+            $e->getMessage()
     ]);
 }
 ?>
