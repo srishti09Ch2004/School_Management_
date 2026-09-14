@@ -1,6 +1,6 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
@@ -8,10 +8,13 @@ header("Content-Type: application/json");
 include("../../config/db.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
     exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    http_response_code(405);
+
     echo json_encode([
         "status" => false,
         "message" => "Invalid request method"
@@ -24,20 +27,46 @@ $data = json_decode(
     true
 );
 
-if (!$data) {
+if (!is_array($data)) {
+    http_response_code(400);
+
     echo json_encode([
         "status" => false,
-        "message" => "No data received"
+        "message" => "Invalid JSON data"
     ]);
     exit;
 }
 
-$teacher_id = intval($data["teacher_id"] ?? 0);
-$attendance_date = $data["attendance_date"] ?? date("Y-m-d");
-$status = trim($data["status"] ?? "Present");
-$attendance_type = trim($data["attendance_type"] ?? "Manual");
+/*
+|--------------------------------------------------------------------------
+| Frontend sends USERS.ID
+|--------------------------------------------------------------------------
+*/
+
+$teacher_id = (int)($data["teacher_id"] ?? 0);
+
+$attendance_date = trim(
+    $data["attendance_date"] ?? date("Y-m-d")
+);
+
+$status = trim(
+    $data["status"] ?? "Present"
+);
+
+$attendance_type = trim(
+    $data["attendance_type"] ?? "Face"
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Basic validation
+|--------------------------------------------------------------------------
+*/
 
 if ($teacher_id <= 0) {
+    http_response_code(400);
+
     echo json_encode([
         "status" => false,
         "message" => "Invalid teacher ID"
@@ -45,13 +74,125 @@ if ($teacher_id <= 0) {
     exit;
 }
 
-if (!in_array($status, ["Present", "Absent", "Leave"])) {
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $attendance_date)) {
+    http_response_code(400);
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Invalid attendance date"
+    ]);
+    exit;
+}
+
+if (!in_array(
+    $status,
+    ["Present", "Absent", "Leave"],
+    true
+)) {
+    http_response_code(400);
+
     echo json_encode([
         "status" => false,
         "message" => "Invalid attendance status"
     ]);
     exit;
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Teacher attendance type
+|--------------------------------------------------------------------------
+|
+| Teacher's own attendance can be:
+| Face / Fingerprint
+|
+| Manual is also accepted because the frontend may currently
+| send Manual. We keep it safe for now.
+|
+*/
+
+if (!in_array(
+    $attendance_type,
+    ["Manual", "Face", "Fingerprint"],
+    true
+)) {
+    http_response_code(400);
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Invalid attendance type"
+    ]);
+    exit;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Verify teacher
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+| teacher_attendance.teacher_id references users.id
+|
+*/
+
+$teacherCheck = mysqli_prepare(
+    $conn,
+    "
+    SELECT id, full_name, role
+    FROM users
+    WHERE id = ?
+      AND role = 'teacher'
+    LIMIT 1
+    "
+);
+
+if (!$teacherCheck) {
+    http_response_code(500);
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Teacher validation query failed"
+    ]);
+    exit;
+}
+
+mysqli_stmt_bind_param(
+    $teacherCheck,
+    "i",
+    $teacher_id
+);
+
+mysqli_stmt_execute($teacherCheck);
+
+$teacherResult = mysqli_stmt_get_result(
+    $teacherCheck
+);
+
+if (!$teacherResult || mysqli_num_rows($teacherResult) === 0) {
+
+    mysqli_stmt_close($teacherCheck);
+
+    http_response_code(404);
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Teacher account not found"
+    ]);
+    exit;
+}
+
+$teacher = mysqli_fetch_assoc($teacherResult);
+
+mysqli_stmt_close($teacherCheck);
+
+
+/*
+|--------------------------------------------------------------------------
+| Save teacher attendance
+|--------------------------------------------------------------------------
+*/
 
 $sql = "
     INSERT INTO teacher_attendance
@@ -71,9 +212,12 @@ $sql = "
 $stmt = mysqli_prepare($conn, $sql);
 
 if (!$stmt) {
+    http_response_code(500);
+
     echo json_encode([
         "status" => false,
-        "message" => mysqli_error($conn)
+        "message" => "Attendance query preparation failed",
+        "error" => mysqli_error($conn)
     ]);
     exit;
 }
@@ -88,17 +232,38 @@ mysqli_stmt_bind_param(
 );
 
 if (!mysqli_stmt_execute($stmt)) {
+
+    $error = mysqli_stmt_error($stmt);
+
+    mysqli_stmt_close($stmt);
+
+    http_response_code(500);
+
     echo json_encode([
         "status" => false,
-        "message" => mysqli_stmt_error($stmt)
+        "message" => "Failed to save teacher attendance",
+        "error" => $error
     ]);
     exit;
 }
 
+mysqli_stmt_close($stmt);
+
+
+/*
+|--------------------------------------------------------------------------
+| Success
+|--------------------------------------------------------------------------
+*/
+
 echo json_encode([
     "status" => true,
-    "message" => "Teacher attendance saved successfully"
+    "message" => "Teacher attendance saved successfully",
+    "teacher_id" => $teacher_id,
+    "teacher_name" => $teacher["full_name"],
+    "attendance_date" => $attendance_date,
+    "attendance_status" => $status,
+    "attendance_type" => $attendance_type
 ]);
 
-mysqli_stmt_close($stmt);
 ?>

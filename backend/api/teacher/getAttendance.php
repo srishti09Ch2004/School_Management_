@@ -78,15 +78,6 @@ try {
         exit;
     }
 
-    // FETCH STUDENTS
-    
-    // students = MASTER TABLE
-    // attendance = attendance history
-    //
-    // LEFT JOIN is important because
-    // a new student may not have
-    // attendance yet.
-
     $sql = "
         SELECT
             s.id AS student_id,
@@ -104,7 +95,7 @@ try {
             s.status AS student_status,
 
             a.id AS attendance_id,
-            a.teacher_id,
+            a.marked_by_teacher_id,
             a.attendance_date,
             a.status AS attendance_status,
             a.attendance_type,
@@ -190,9 +181,10 @@ try {
                 ? (int)$row["attendance_id"]
                 : null,
 
-            "teacher_id" => $row["teacher_id"] !== null
-                ? (int)$row["teacher_id"]
-                : null,
+            "marked_by_teacher_id" =>
+                $row["marked_by_teacher_id"] !== null
+                    ? (int)$row["marked_by_teacher_id"]
+                    : null,
 
             "attendance_date" => $row["attendance_date"] ?? null,
 

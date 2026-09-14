@@ -19,16 +19,29 @@ if ($_SERVER["REQUEST_METHOD"] !== "GET") {
     exit;
 }
 
-$date = $_GET["date"] ?? date("Y-m-d");
+$month = $_GET["month"] ?? date("Y-m");
+
+
+// Validate YYYY-MM
+if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Invalid month format. Use YYYY-MM"
+    ]);
+    exit;
+}
+
+$monthStart = $month . "-01";
+$monthEnd = date(
+    "Y-m-t",
+    strtotime($monthStart)
+);
 
 
 /*
 |--------------------------------------------------------------------------
-| STUDENT DAILY SUMMARY
+| STUDENT MONTHLY SUMMARY
 |--------------------------------------------------------------------------
-|
-| Only attendance records for the selected date are counted.
-|
 */
 
 $studentSql = "
@@ -38,7 +51,7 @@ $studentSql = "
         COALESCE(SUM(status = 'Leave'), 0) AS leave_count,
         COUNT(*) AS total
     FROM attendance
-    WHERE attendance_date = ?
+    WHERE attendance_date BETWEEN ? AND ?
       AND student_id IS NOT NULL
 ";
 
@@ -46,8 +59,9 @@ $stmt = mysqli_prepare($conn, $studentSql);
 
 mysqli_stmt_bind_param(
     $stmt,
-    "s",
-    $date
+    "ss",
+    $monthStart,
+    $monthEnd
 );
 
 mysqli_stmt_execute($stmt);
@@ -61,7 +75,7 @@ mysqli_stmt_close($stmt);
 
 /*
 |--------------------------------------------------------------------------
-| TEACHER DAILY SUMMARY
+| TEACHER MONTHLY SUMMARY
 |--------------------------------------------------------------------------
 */
 
@@ -72,7 +86,7 @@ $teacherSql = "
         COALESCE(SUM(status = 'Leave'), 0) AS leave_count,
         COUNT(*) AS total
     FROM teacher_attendance
-    WHERE attendance_date = ?
+    WHERE attendance_date BETWEEN ? AND ?
       AND teacher_id IS NOT NULL
 ";
 
@@ -80,8 +94,9 @@ $stmt = mysqli_prepare($conn, $teacherSql);
 
 mysqli_stmt_bind_param(
     $stmt,
-    "s",
-    $date
+    "ss",
+    $monthStart,
+    $monthEnd
 );
 
 mysqli_stmt_execute($stmt);
@@ -102,7 +117,9 @@ mysqli_stmt_close($stmt);
 echo json_encode([
     "status" => true,
 
-    "date" => $date,
+    "month" => $month,
+    "month_start" => $monthStart,
+    "month_end" => $monthEnd,
 
     "students" => [
         "present" => intval($student["present"] ?? 0),

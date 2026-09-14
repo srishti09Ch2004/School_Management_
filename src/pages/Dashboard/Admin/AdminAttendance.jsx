@@ -121,6 +121,13 @@ const loadAttendance = async () => {
   useEffect(() => {
   loadAttendance();
   loadSummary();
+
+  const interval = setInterval(() => {
+    loadAttendance();
+    loadSummary();
+  }, 10000);
+
+  return () => clearInterval(interval);
 }, [selectedDate, activeTab]);
 
   const data =
@@ -284,7 +291,7 @@ const loadAttendance = async () => {
           </p>
 
           <h2 className="text-2xl font-bold text-green-600 mt-2">
-            {totalPresent}
+            {summary[activeTab].present}
           </h2>
         </div>
 
@@ -294,7 +301,7 @@ const loadAttendance = async () => {
           </p>
 
           <h2 className="text-2xl font-bold text-red-600 mt-2">
-            {totalAbsent}
+            {summary[activeTab].absent}
           </h2>
         </div>
 
@@ -304,7 +311,7 @@ const loadAttendance = async () => {
           </p>
 
           <h2 className="text-2xl font-bold text-yellow-500 mt-2">
-            {totalLeave}
+            {summary[activeTab].leave}
           </h2>
         </div>
       </div>

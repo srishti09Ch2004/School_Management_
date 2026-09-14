@@ -1,567 +1,236 @@
 <?php
 
-// header("Access-Control-Allow-Origin: *");
-// header("Access-Control-Allow-Headers: Content-Type");
-// header("Access-Control-Allow-Methods: POST");
-// header("Content-Type: application/json");
-
-// include("../../config/db.php");
-
-
-// if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "Invalid request method"
-//     ]);
-
-//     exit;
-// }
-
-// $data = json_decode(
-//     file_get_contents("php://input"),
-//     true
-// );
-
-// if (!$data) {
-
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "No data received"
-//     ]);
-
-//     exit;
-// }
-
-// $teacher_id = intval($data["teacher_id"] ?? 0);
-
-// $attendance_date = $data["attendance_date"] ?? "";
-
-// $attendance = $data["attendance"] ?? [];
-
-// if ($teacher_id <= 0) {
-
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "Invalid teacher ID"
-//     ]);
-
-//     exit;
-// }
-
-// if (empty($attendance_date)) {
-
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "Attendance date is required"
-//     ]);
-
-//     exit;
-// }
-
-// if (empty($attendance)) {
-
-//     echo json_encode([
-//         "status" => false,
-//         "message" => "No attendance records received"
-//     ]);
-
-//     exit;
-// }
-
-// mysqli_begin_transaction($conn);
-
-// try {
-
-//     foreach ($attendance as $record) {
-
-//         $student_id = intval(
-//             $record["student_id"] ?? 0
-//         );
-
-//         $status = trim(
-//             $record["status"] ?? ""
-//         );
-
-//         $attendance_type = trim(
-//             $record["attendance_type"] ?? "Manual"
-//         );
-
-//         if ($student_id <= 0) {
-
-//             throw new Exception(
-//                 "Invalid student ID"
-//             );
-//         }
-//         if ($status === "") {
-
-//             throw new Exception(
-//                 "Attendance status is required"
-//             );
-//         }
-
-//         $checkSql = "
-//             SELECT id
-//             FROM attendance
-//             WHERE student_id = ?
-//             AND attendance_date = ?
-//             LIMIT 1
-//         ";
-
-//         $checkStmt = mysqli_prepare(
-//             $conn,
-//             $checkSql
-//         );
-
-//         mysqli_stmt_bind_param(
-//             $checkStmt,
-//             "is",
-//             $student_id,
-//             $attendance_date
-//         );
-
-//         mysqli_stmt_execute(
-//             $checkStmt
-//         );
-
-//         $checkResult =
-//             mysqli_stmt_get_result(
-//                 $checkStmt
-//             );
-
-//         if (
-//             $checkResult &&
-//             mysqli_num_rows($checkResult) > 0
-//         ) {
-
-//             $existing =
-//                 mysqli_fetch_assoc(
-//                     $checkResult
-//                 );
-
-//             $attendance_id =
-//                 intval($existing["id"]);
-
-//             $updateSql = "
-//                 UPDATE attendance
-//                 SET
-//                     teacher_id = ?,
-//                     status = ?,
-//                     attendance_type = ?
-//                 WHERE id = ?
-//             ";
-
-//             $updateStmt = mysqli_prepare(
-//                 $conn,
-//                 $updateSql
-//             );
-
-//             mysqli_stmt_bind_param(
-//                 $updateStmt,
-//                 "issi",
-//                 $teacher_id,
-//                 $status,
-//                 $attendance_type,
-//                 $attendance_id
-//             );
-
-//             if (
-//                 !mysqli_stmt_execute(
-//                     $updateStmt
-//                 )
-//             ) {
-
-//                 throw new Exception(
-//                     mysqli_stmt_error(
-//                         $updateStmt
-//                     )
-//                 );
-//             }
-
-//             mysqli_stmt_close(
-//                 $updateStmt
-//             );
-//         }
-
-//         else {
-
-//             $insertSql = "
-//                 INSERT INTO attendance
-//                 (
-//                     student_id,
-//                     teacher_id,
-//                     attendance_date,
-//                     status,
-//                     attendance_type,
-//                     created_at
-//                 )
-//                 VALUES
-//                 (
-//                     ?,
-//                     ?,
-//                     ?,
-//                     ?,
-//                     ?,
-//                     NOW()
-//                 )
-//             ";
-
-//             $insertStmt = mysqli_prepare(
-//                 $conn,
-//                 $insertSql
-//             );
-
-//             mysqli_stmt_bind_param(
-//                 $insertStmt,
-//                 "iisss",
-//                 $student_id,
-//                 $teacher_id,
-//                 $attendance_date,
-//                 $status,
-//                 $attendance_type
-//             );
-
-//             if (
-//                 !mysqli_stmt_execute(
-//                     $insertStmt
-//                 )
-//             ) {
-
-//                 throw new Exception(
-//                     mysqli_stmt_error(
-//                         $insertStmt
-//                     )
-//                 );
-//             }
-
-//             mysqli_stmt_close(
-//                 $insertStmt
-//             );
-//         }
-
-//         mysqli_stmt_close(
-//             $checkStmt
-//         );
-//     }
-
-//     mysqli_commit($conn);
-
-//     echo json_encode([
-
-//         "status" => true,
-
-//         "message" =>
-//             "Attendance saved successfully"
-
-//     ]);
-
-// } catch (Exception $e) {    
-
-//     mysqli_rollback($conn);
-
-//     http_response_code(500);
-
-//     echo json_encode([
-
-//         "status" => false,
-
-//         "message" =>
-//             $e->getMessage()
-
-//     ]);
-// }
-// ?> 
-
-
-
-<?php
-
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
 
+ob_start();
+ini_set("display_errors", 0);
+
 include("../../config/db.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
     exit;
 }
-
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    echo json_encode([
-        "status" => false,
-        "message" => "Invalid request method"
-    ]);
-    exit;
-}
-
-$data = json_decode(file_get_contents("php://input"), true);
-
-$teacher_id = intval($data["teacher_id"] ?? 0);
-$attendance_date = trim($data["attendance_date"] ?? "");
-$attendance = $data["attendance"] ?? [];
-
-// BASIC VALIDATION
-
-if ($teacher_id <= 0) {
-    echo json_encode([
-        "status" => false,
-        "message" => "Invalid teacher ID"
-    ]);
-    exit;
-}
-
-if (
-    empty($attendance_date) ||
-    !preg_match("/^\d{4}-\d{2}-\d{2}$/", $attendance_date)
-) {
-    echo json_encode([
-        "status" => false,
-        "message" => "Invalid attendance date"
-    ]);
-    exit;
-}
-
-if (!is_array($attendance) || count($attendance) === 0) {
-    echo json_encode([
-        "status" => false,
-        "message" => "Attendance data is required"
-    ]);
-    exit;
-}
-
-// VERIFY TEACHER
-
-$teacherSql = "
-    SELECT id
-    FROM users
-    WHERE id = ?
-      AND role = 'teacher'
-    LIMIT 1
-";
-
-$teacherStmt = mysqli_prepare($conn, $teacherSql);
-
-if (!$teacherStmt) {
-    echo json_encode([
-        "status" => false,
-        "message" => "Teacher verification failed"
-    ]);
-    exit;
-}
-
-mysqli_stmt_bind_param(
-    $teacherStmt,
-    "i",
-    $teacher_id
-);
-
-mysqli_stmt_execute($teacherStmt);
-
-$teacherResult = mysqli_stmt_get_result($teacherStmt);
-
-if (
-    !$teacherResult ||
-    mysqli_num_rows($teacherResult) === 0
-) {
-    mysqli_stmt_close($teacherStmt);
-
-    echo json_encode([
-        "status" => false,
-        "message" => "Teacher account not found"
-    ]);
-    exit;
-}
-
-mysqli_stmt_close($teacherStmt);
-
-// START TRANSACTION
-
-mysqli_begin_transaction($conn);
 
 try {
 
-    /*
-     * One student + one date = one attendance.
+    $data = json_decode(file_get_contents("php://input"), true);
 
-     * Database already has:
-     
-     * UNIQUE(student_id, attendance_date)
-     
-     * So this safely INSERTS new attendance
-     * or UPDATES existing attendance.
-     */
-
-    $sql = "
-        INSERT INTO attendance (
-            student_id,
-            teacher_id,
-            attendance_date,
-            status,
-            attendance_type,
-            created_at
-        )
-        VALUES (?, ?, ?, ?, ?, NOW())
-
-        ON DUPLICATE KEY UPDATE
-            teacher_id = VALUES(teacher_id),
-            status = VALUES(status),
-            attendance_type = VALUES(attendance_type)
-    ";
-
-    $stmt = mysqli_prepare($conn, $sql);
-
-    if (!$stmt) {
-        throw new Exception(
-            "Unable to prepare attendance query"
-        );
+    if (!$data) {
+        throw new Exception("Invalid JSON data");
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Frontend sends users.id
+    |--------------------------------------------------------------------------
+    */
+    $teacher_user_id = isset($data["teacher_id"])
+        ? (int)$data["teacher_id"]
+        : 0;
 
-    $saved = 0;
-    $updated = 0;
+    $attendance_date = trim($data["attendance_date"] ?? "");
+    $attendance = $data["attendance"] ?? [];
 
-    // PROCESS ATTENDANCE
+    if ($teacher_user_id <= 0) {
+        throw new Exception("Invalid teacher ID");
+    }
+
+    if (!$attendance_date) {
+        throw new Exception("Attendance date is required");
+    }
+
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $attendance_date)) {
+        throw new Exception("Invalid attendance date format");
+    }
+
+    if (!is_array($attendance) || count($attendance) === 0) {
+        throw new Exception("Attendance data is required");
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Convert users.id -> teachers.id
+    |--------------------------------------------------------------------------
+    */
+
+    $teacherStmt = $conn->prepare("
+        SELECT t.id AS teacher_id
+        FROM teachers t
+        INNER JOIN users u
+            ON t.user_id = u.id
+        WHERE u.id = ?
+          AND u.role = 'teacher'
+        LIMIT 1
+    ");
+
+    if (!$teacherStmt) {
+        throw new Exception("Teacher query preparation failed");
+    }
+
+    $teacherStmt->bind_param("i", $teacher_user_id);
+    $teacherStmt->execute();
+
+    $teacherResult = $teacherStmt->get_result();
+
+    if ($teacherResult->num_rows === 0) {
+        throw new Exception("Teacher account not found");
+    }
+
+    $teacherRow = $teacherResult->fetch_assoc();
+
+    $marked_by_teacher_id = (int)$teacherRow["teacher_id"];
+
+    $teacherStmt->close();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Start transaction
+    |--------------------------------------------------------------------------
+    */
+
+    $conn->begin_transaction();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attendance query
+    |--------------------------------------------------------------------------
+    */
+
+    $attendanceStmt = $conn->prepare("
+        INSERT INTO attendance
+        (
+            student_id,
+            marked_by_teacher_id,
+            attendance_date,
+            status,
+            attendance_type
+        )
+        VALUES (?, ?, ?, ?, ?)
+
+        ON DUPLICATE KEY UPDATE
+            marked_by_teacher_id = VALUES(marked_by_teacher_id),
+            status = VALUES(status),
+            attendance_type = VALUES(attendance_type)
+    ");
+
+    if (!$attendanceStmt) {
+        throw new Exception("Attendance query preparation failed");
+    }
 
     foreach ($attendance as $record) {
 
-        $student_id = intval(
-            $record["student_id"] ?? 0
-        );
+        $student_id = isset($record["student_id"])
+            ? (int)$record["student_id"]
+            : 0;
 
-        $status = trim(
-            $record["status"] ?? ""
-        );
-
-        $attendance_type = trim(
-            $record["attendance_type"] ?? "Manual"
-        );
-
+        $status = trim($record["status"] ?? "");
+        $attendance_type = trim($record["attendance_type"] ?? "Manual");
 
         if ($student_id <= 0) {
+            throw new Exception("Invalid student ID");
+        }
+
+        if (!in_array($status, ["Present", "Absent", "Leave"], true)) {
             throw new Exception(
-                "Invalid student ID"
+                "Invalid attendance status for student ID: " . $student_id
             );
         }
 
-        // ALLOWED STATUS
-
-        $allowedStatuses = [
-            "Present",
-            "Absent",
-            "Leave"
-        ];
-
-        if (!in_array($status, $allowedStatuses, true)) {
-            throw new Exception(
-                "Invalid attendance status for student ID "
-                . $student_id
-            );
+        if (!in_array(
+            $attendance_type,
+            ["Manual", "Face", "Fingerprint"],
+            true
+        )) {
+            $attendance_type = "Manual";
         }
 
-        // VERIFY ACTIVE STUDENT
+        /*
+        |--------------------------------------------------------------------------
+        | Make sure student is active
+        |--------------------------------------------------------------------------
+        */
 
-        $studentSql = "
+        $studentCheck = $conn->prepare("
             SELECT id
             FROM students
             WHERE id = ?
               AND status = 'Active'
             LIMIT 1
-        ";
+        ");
 
-        $studentStmt = mysqli_prepare(
-            $conn,
-            $studentSql
-        );
+        if (!$studentCheck) {
+            throw new Exception("Student validation failed");
+        }
 
-        if (!$studentStmt) {
+        $studentCheck->bind_param("i", $student_id);
+        $studentCheck->execute();
+
+        $studentResult = $studentCheck->get_result();
+
+        if ($studentResult->num_rows === 0) {
+            $studentCheck->close();
+
             throw new Exception(
-                "Student verification failed"
+                "Active student not found: " . $student_id
             );
         }
 
-        mysqli_stmt_bind_param(
-            $studentStmt,
-            "i",
-            $student_id
-        );
+        $studentCheck->close();
 
-        mysqli_stmt_execute(
-            $studentStmt
-        );
+        /*
+        |--------------------------------------------------------------------------
+        | Save / Update attendance
+        |--------------------------------------------------------------------------
+        */
 
-        $studentResult = mysqli_stmt_get_result(
-            $studentStmt
-        );
-
-        if (
-            !$studentResult ||
-            mysqli_num_rows($studentResult) === 0
-        ) {
-            mysqli_stmt_close(
-                $studentStmt
-            );
-
-            throw new Exception(
-                "Active student not found: "
-                . $student_id
-            );
-        }
-
-        mysqli_stmt_close(
-            $studentStmt
-        );
-
-        // INSERT / UPDATE
-
-        mysqli_stmt_bind_param(
-            $stmt,
+        $attendanceStmt->bind_param(
             "iisss",
             $student_id,
-            $teacher_id,
+            $marked_by_teacher_id,
             $attendance_date,
             $status,
             $attendance_type
         );
 
-        if (!mysqli_stmt_execute($stmt)) {
+        if (!$attendanceStmt->execute()) {
             throw new Exception(
-                mysqli_stmt_error($stmt)
+                "Failed to save attendance: " .
+                $attendanceStmt->error
             );
-        }
-
-
-        $affected = mysqli_stmt_affected_rows($stmt);
-
-        if ($affected === 1) {
-            $saved++;
-        } else {
-            $updated++;
         }
     }
 
-    mysqli_stmt_close($stmt);
+    $attendanceStmt->close();
 
-    mysqli_commit($conn);
+    $conn->commit();
 
     echo json_encode([
-        "status" => true,
-        "message" => "Attendance saved successfully",
-        "teacher_id" => $teacher_id,
-        "attendance_date" => $attendance_date,
-        "saved_records" => $saved,
-        "updated_records" => $updated,
-        "total_records" => count($attendance)
+        "success" => true,
+        "message" => "Student attendance saved successfully",
+        "teacher_user_id" => $teacher_user_id,
+        "marked_by_teacher_id" => $marked_by_teacher_id,
+        "attendance_date" => $attendance_date
     ]);
 
 } catch (Exception $e) {
 
-    mysqli_rollback($conn);
+    if (isset($conn) && $conn->connect_errno === 0) {
+        try {
+            $conn->rollback();
+        } catch (Exception $ignored) {
+        }
+    }
+
+    http_response_code(400);
 
     echo json_encode([
-        "status" => false,
+        "success" => false,
         "message" => $e->getMessage()
     ]);
 }
 
-?>
+ob_end_flush();
