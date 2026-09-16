@@ -1,6 +1,7 @@
 <?php
 
-$url = "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/login.php";
+// Live domain aur exact path yahan daal dein
+$url = "https://futureacademy.infy.click/SCHOOL_MANAGEMENT_SYSTEM/backend/api/login.php";
 
 $data = [
     "email" => "admin@gmail.com",

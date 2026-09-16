@@ -102,7 +102,7 @@ function LoginForm({ role }) {
       // SEND EMAIL + PASSWORD ONLY
 
       const response = await fetch(
-        "https://futureacademy.infy.click/SCHOOL_MANAGEMENT_SYSTEM/backend/api/login.php",
+        "https://futureacademy.wuaze.com/backend/api/login.php",
         {
           method: "POST",
 
