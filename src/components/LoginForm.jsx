@@ -101,25 +101,40 @@ function LoginForm({ role }) {
 
       // SEND EMAIL + PASSWORD ONLY
 
+      // const response = await fetch(
+      //   "https://futureacademy.wuaze.com/backend/api/login.php",
+      //   {
+      //     method: "POST",
+
+      //     headers: {
+      //       "Content-Type": "application/json"
+      //     },
+
+      //     credentials: "include",
+
+      //     body: JSON.stringify({
+
+      //       email: email.trim(),
+
+      //       password: password
+
+      //     })
+
+      //   }
+      // );
+
+
       const response = await fetch(
-        "https://futureacademy.wuaze.com/backend/api/login.php",
+        "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/login.php",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json"
           },
-
-          credentials: "include",
-
           body: JSON.stringify({
-
             email: email.trim(),
-
             password: password
-
           })
-
         }
       );
 

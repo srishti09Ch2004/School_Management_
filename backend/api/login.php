@@ -2,29 +2,38 @@
 
 session_start();
 
-// CORS Handling: Localhost aur Vercel dono ko allow karega
-$allowed_origins = [
-    "http://localhost:5173",
-    "http://localhost:3000"
-];
-
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-// Agar request aapke Vercel domain ya localhost se hai toh use allow karo (Apna Vercel domain yahan add kar sakti hain baad mein)
-if (!empty($origin)) {
+$allowed_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+
+    // Vercel
+    "https://school-management-two-lake.vercel.app",
+    "https://school-management-n2ew-kcp9nl0hv-futureacademy2026.vercel.app",
+    "https://school-management-n2ew-git-main-futureacademy2026.vercel.app",
+    "https://school-management-dpjv9epe0-futureacademy2026.vercel.app"
+];
+
+if (in_array($origin, $allowed_origins, true)) {
     header("Access-Control-Allow-Origin: " . $origin);
-} else {
-    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Credentials: true");
 }
 
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Content-Type: application/json; charset=UTF-8");
 
-// OPTIONS Request ke liye preflight response
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    echo json_encode([
+        "status" => false,
+        "message" => "Invalid Request Method"
+    ]);
     exit;
 }
 

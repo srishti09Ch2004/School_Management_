@@ -1,8 +1,8 @@
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Users,
   GraduationCap,
-  IndianRupee,
   CalendarCheck,
   UserPlus,
   RefreshCw,
@@ -10,7 +10,6 @@ import {
   Bell,
   CheckCircle2,
   School,
-  ClipboardCheck,
 } from "lucide-react";
 
 const API =
@@ -20,38 +19,13 @@ const getArrayFromResponse = (result) => {
   if (!result) return [];
 
   if (Array.isArray(result)) return result;
-
   if (Array.isArray(result.data)) return result.data;
-
-  if (Array.isArray(result.data?.students))
-    return result.data.students;
-
-  if (Array.isArray(result.data?.teachers))
-    return result.data.teachers;
-
-  if (Array.isArray(result.data?.fees))
-    return result.data.fees;
-
-  if (Array.isArray(result.data?.exams))
-    return result.data.exams;
-
-  if (Array.isArray(result.data?.attendance))
-    return result.data.attendance;
-
-  if (Array.isArray(result.students))
-    return result.students;
-
-  if (Array.isArray(result.teachers))
-    return result.teachers;
-
-  if (Array.isArray(result.fees))
-    return result.fees;
-
-  if (Array.isArray(result.exams))
-    return result.exams;
-
-  if (Array.isArray(result.attendance))
-    return result.attendance;
+  if (Array.isArray(result.data?.students)) return result.data.students;
+  if (Array.isArray(result.data?.teachers)) return result.data.teachers;
+  if (Array.isArray(result.data?.attendance)) return result.data.attendance;
+  if (Array.isArray(result.students)) return result.students;
+  if (Array.isArray(result.teachers)) return result.teachers;
+  if (Array.isArray(result.attendance)) return result.attendance;
 
   return [];
 };
@@ -70,16 +44,6 @@ const formatNumber = (value) => {
   return Number.isFinite(number)
     ? number.toLocaleString("en-IN")
     : "0";
-};
-
-const formatCurrency = (value) => {
-  const number = Number(value);
-
-  return Number.isFinite(number)
-    ? `₹${number.toLocaleString("en-IN", {
-        maximumFractionDigits: 0,
-      })}`
-    : "₹0";
 };
 
 const formatDate = (value) => {
@@ -105,23 +69,18 @@ const normalizeStudent = (student) => ({
     student?.name ||
     student?.student_name ||
     "Unknown Student",
-
   className:
     student?.class ||
     student?.class_name ||
     "-",
-
   section: student?.section || "",
-
   admissionNo:
     student?.admission_no ||
     student?.admission_number ||
     student?.admission ||
     student?.id ||
     "-",
-
   status: student?.status || "Active",
-
   admissionDate:
     student?.admission_date ||
     student?.admissionDate ||
@@ -132,21 +91,17 @@ const normalizeStudent = (student) => ({
 
 const normalizeAttendance = (item) => ({
   id: item?.id || "",
-
   studentId:
     item?.student_id ||
     item?.studentId ||
     "",
-
   date:
     item?.attendance_date ||
     item?.date ||
     "",
-
   status:
     item?.status ||
     "",
-
   type:
     item?.attendance_type ||
     item?.type ||
@@ -186,7 +141,6 @@ export default function PrincipalHome() {
 
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const [fees, setFees] = useState([]);
   const [attendance, setAttendance] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -236,7 +190,6 @@ export default function PrincipalHome() {
         const results = await Promise.allSettled([
           fetchAPI("students.php"),
           fetchAPI("teachers.php"),
-          fetchAPI("fees.php"),
           fetchAPI("attendance.php"),
         ]);
 
@@ -249,7 +202,6 @@ export default function PrincipalHome() {
             "Principal Students API:",
             results[0].reason
           );
-
           setStudents([]);
         }
 
@@ -262,33 +214,18 @@ export default function PrincipalHome() {
             "Principal Teachers API:",
             results[1].reason
           );
-
           setTeachers([]);
         }
 
         if (results[2].status === "fulfilled") {
-          setFees(
+          setAttendance(
             getArrayFromResponse(results[2].value)
           );
         } else {
           console.error(
-            "Principal Fees API:",
+            "Principal Attendance API:",
             results[2].reason
           );
-
-          setFees([]);
-        }
-
-        if (results[3].status === "fulfilled") {
-          setAttendance(
-            getArrayFromResponse(results[3].value)
-          );
-        } else {
-          console.error(
-            "Principal Attendance API:",
-            results[3].reason
-          );
-
           setAttendance([]);
         }
       } catch (error) {
@@ -308,7 +245,6 @@ export default function PrincipalHome() {
     loadDashboard(true);
   }, [loadDashboard]);
 
-  // Auto refresh every 10 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       loadDashboard(false);
@@ -326,10 +262,6 @@ export default function PrincipalHome() {
     () => attendance.map(normalizeAttendance),
     [attendance]
   );
-
-  // -----------------------------
-  // LIVE COUNTS
-  // -----------------------------
 
   const totalStudents = normalizedStudents.length;
 
@@ -351,12 +283,14 @@ export default function PrincipalHome() {
 
   const totalTeachers = teachers.length;
 
-  // Unique class + section combinations
   const totalClasses = useMemo(() => {
     const classes = new Set();
 
     normalizedStudents.forEach((student) => {
-      if (!student.className || student.className === "-") {
+      if (
+        !student.className ||
+        student.className === "-"
+      ) {
         return;
       }
 
@@ -368,48 +302,7 @@ export default function PrincipalHome() {
     return classes.size;
   }, [normalizedStudents]);
 
-  // Principal's "Staff Members"
-  // Currently using teachers count because
-  // teacher/staff are the available live staff records.
   const staffMembers = totalTeachers;
-
-  // -----------------------------
-  // FEES
-  // -----------------------------
-
-  const totalFeesCollected = useMemo(
-    () =>
-      fees.reduce((total, fee) => {
-        const paid = Number(
-          fee?.paid_fee ?? 0
-        );
-
-        return (
-          total +
-          (Number.isFinite(paid) ? paid : 0)
-        );
-      }, 0),
-    [fees]
-  );
-
-  const pendingFees = useMemo(
-    () =>
-      fees.reduce((total, fee) => {
-        const due = Number(
-          fee?.due_fee ??
-          fee?.pending_fee ??
-          0
-        );
-
-        return (
-          total +
-          (Number.isFinite(due) ? due : 0)
-        );
-      }, 0),
-    [fees]
-  );
-
-  // TODAY ATTENDANCE
 
   const todayAttendance = useMemo(() => {
     const today = getTodayString();
@@ -453,18 +346,12 @@ export default function PrincipalHome() {
       percentage: Math.round(
         (present / todayRecords.length) * 100
       ),
-
       present,
       absent,
       leave,
-
       total: todayRecords.length,
     };
   }, [normalizedAttendance]);
-
-  // -----------------------------
-  // TODAY ADMISSIONS
-  // -----------------------------
 
   const todayAdmissions = useMemo(() => {
     const today = getTodayString();
@@ -478,10 +365,6 @@ export default function PrincipalHome() {
         ) === today
     ).length;
   }, [normalizedStudents]);
-
-  // -----------------------------
-  // RECENT ADMISSIONS
-  // -----------------------------
 
   const recentAdmissions = useMemo(
     () =>
@@ -499,10 +382,6 @@ export default function PrincipalHome() {
     [normalizedStudents]
   );
 
-  // -----------------------------
-  // LOADING
-  // -----------------------------
-
   if (loading) {
     return (
       <div className="flex min-h-[420px] items-center justify-center">
@@ -517,17 +396,10 @@ export default function PrincipalHome() {
     );
   }
 
-  // -----------------------------
-  // UI
-  // -----------------------------
-
   return (
     <div className="space-y-5">
-
-      {/* HEADER */}
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-green-600">
               Principal Dashboard
@@ -564,13 +436,10 @@ export default function PrincipalHome() {
               ? "Refreshing..."
               : "Refresh"}
           </button>
-
         </div>
       </div>
 
-      {/* LIVE STATS */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-
         <StatCard
           title="Total Students"
           value={formatNumber(totalStudents)}
@@ -596,14 +465,6 @@ export default function PrincipalHome() {
         />
 
         <StatCard
-          title="Pending Fees"
-          value={formatCurrency(pendingFees)}
-          icon={IndianRupee}
-          iconBg="bg-orange-50"
-          iconColor="text-orange-600"
-        />
-
-        <StatCard
           title="Staff Members"
           value={formatNumber(staffMembers)}
           icon={GraduationCap}
@@ -619,16 +480,18 @@ export default function PrincipalHome() {
           iconColor="text-pink-600"
         />
 
+        <StatCard
+          title="Today's Admissions"
+          value={formatNumber(todayAdmissions)}
+          icon={UserPlus}
+          iconBg="bg-orange-50"
+          iconColor="text-orange-600"
+        />
       </div>
 
-      {/* ATTENDANCE + SUMMARY */}
       <div className="grid gap-5 lg:grid-cols-2">
-
-        {/* TODAY ATTENDANCE */}
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-
           <div className="flex items-center justify-between gap-3">
-
             <div>
               <h2 className="text-lg font-bold text-gray-800">
                 Today's Attendance
@@ -645,13 +508,10 @@ export default function PrincipalHome() {
                 className="text-teal-600"
               />
             </div>
-
           </div>
 
           {todayAttendance.total === 0 ? (
-
             <div className="mt-5 rounded-xl border border-dashed border-gray-200 p-7 text-center">
-
               <CalendarCheck
                 size={27}
                 className="mx-auto text-gray-300"
@@ -664,17 +524,11 @@ export default function PrincipalHome() {
               <p className="mt-1 text-xs text-gray-400">
                 Attendance will appear here once teachers record attendance.
               </p>
-
             </div>
-
           ) : (
-
             <div className="mt-5 space-y-4">
-
               <div className="rounded-xl bg-teal-50 p-4">
-
                 <div className="flex items-end justify-between">
-
                   <div>
                     <p className="text-xs text-gray-500">
                       Overall Attendance
@@ -689,11 +543,9 @@ export default function PrincipalHome() {
                     size={29}
                     className="text-teal-600"
                   />
-
                 </div>
 
                 <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white">
-
                   <div
                     className="h-full rounded-full bg-teal-500 transition-all"
                     style={{
@@ -703,13 +555,10 @@ export default function PrincipalHome() {
                       )}%`,
                     }}
                   />
-
                 </div>
-
               </div>
 
               <div className="grid grid-cols-3 gap-2.5">
-
                 <div className="rounded-xl bg-green-50 p-3">
                   <p className="text-[11px] text-gray-500">
                     Present
@@ -739,20 +588,13 @@ export default function PrincipalHome() {
                     {todayAttendance.leave}
                   </p>
                 </div>
-
               </div>
-
             </div>
-
           )}
-
         </div>
 
-        {/* TODAY SUMMARY */}
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-
           <div className="flex items-center justify-between">
-
             <div>
               <h2 className="text-lg font-bold text-gray-800">
                 Today's Summary
@@ -769,16 +611,11 @@ export default function PrincipalHome() {
                 className="text-orange-600"
               />
             </div>
-
           </div>
 
           <div className="mt-5 space-y-2.5">
-
-            {/* ADMISSIONS */}
             <div className="flex items-center justify-between rounded-xl bg-orange-50 p-3.5">
-
               <div className="flex items-center gap-3">
-
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white">
                   <UserPlus
                     size={17}
@@ -795,20 +632,15 @@ export default function PrincipalHome() {
                     New students
                   </p>
                 </div>
-
               </div>
 
               <span className="text-lg font-bold text-orange-600">
                 {todayAdmissions}
               </span>
-
             </div>
 
-            {/* TEACHERS */}
             <div className="flex items-center justify-between rounded-xl bg-blue-50 p-3.5">
-
               <div className="flex items-center gap-3">
-
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white">
                   <GraduationCap
                     size={17}
@@ -825,56 +657,43 @@ export default function PrincipalHome() {
                     Live teacher records
                   </p>
                 </div>
-
               </div>
 
               <span className="text-lg font-bold text-blue-600">
                 {totalTeachers}
               </span>
-
             </div>
 
-            {/* FEES */}
-            <div className="flex items-center justify-between rounded-xl bg-green-50 p-3.5">
-
+            <div className="flex items-center justify-between rounded-xl bg-purple-50 p-3.5">
               <div className="flex items-center gap-3">
-
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white">
-                  <IndianRupee
+                  <School
                     size={17}
-                    className="text-green-600"
+                    className="text-purple-600"
                   />
                 </div>
 
                 <div>
                   <p className="text-sm font-semibold text-gray-800">
-                    Fees Collected
+                    Total Classes
                   </p>
 
                   <p className="text-[11px] text-gray-500">
-                    Total paid amount
+                    Live class and section records
                   </p>
                 </div>
-
               </div>
 
-              <span className="text-base font-bold text-green-600">
-                {formatCurrency(totalFeesCollected)}
+              <span className="text-lg font-bold text-purple-600">
+                {totalClasses}
               </span>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
 
-      {/* RECENT ADMISSIONS */}
       <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-
         <div className="flex flex-col gap-2 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-
           <div>
             <h2 className="text-lg font-bold text-gray-800">
               Recent Admissions
@@ -888,13 +707,10 @@ export default function PrincipalHome() {
           <div className="w-fit rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
             {totalStudents} Students
           </div>
-
         </div>
 
         {recentAdmissions.length === 0 ? (
-
           <div className="py-10 text-center">
-
             <Users
               size={29}
               className="mx-auto text-gray-300"
@@ -903,19 +719,12 @@ export default function PrincipalHome() {
             <p className="mt-2 text-sm font-medium text-gray-600">
               No students found
             </p>
-
           </div>
-
         ) : (
-
           <div className="overflow-x-auto">
-
             <table className="w-full min-w-[680px]">
-
               <thead className="bg-gray-50/80">
-
                 <tr>
-
                   <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-gray-500">
                     Student
                   </th>
@@ -935,27 +744,20 @@ export default function PrincipalHome() {
                   <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-gray-500">
                     Status
                   </th>
-
                 </tr>
-
               </thead>
 
               <tbody>
-
                 {recentAdmissions.map(
                   (student, index) => (
-
                     <tr
                       key={
                         student.id || index
                       }
                       className="border-t border-gray-100 transition hover:bg-gray-50/70"
                     >
-
                       <td className="px-5 py-3.5">
-
                         <div className="flex items-center gap-2.5">
-
                           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-sm font-semibold text-green-600">
                             {student.name
                               .charAt(0)
@@ -963,7 +765,6 @@ export default function PrincipalHome() {
                           </div>
 
                           <div>
-
                             <p className="text-sm font-semibold text-gray-800">
                               {student.name}
                             </p>
@@ -971,11 +772,8 @@ export default function PrincipalHome() {
                             <p className="text-[11px] text-gray-400">
                               Student
                             </p>
-
                           </div>
-
                         </div>
-
                       </td>
 
                       <td className="px-5 py-3.5 text-sm text-gray-700">
@@ -996,7 +794,6 @@ export default function PrincipalHome() {
                       </td>
 
                       <td className="px-5 py-3.5">
-
                         <span
                           className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                             String(
@@ -1009,31 +806,19 @@ export default function PrincipalHome() {
                         >
                           {student.status}
                         </span>
-
                       </td>
-
                     </tr>
-
                   )
                 )}
-
               </tbody>
-
             </table>
-
           </div>
-
         )}
-
       </div>
 
-      {/* LIVE STATUS */}
       <div className="grid gap-4 md:grid-cols-2">
-
         <div className="rounded-2xl border border-green-100 bg-green-50 p-4">
-
           <div className="flex items-start gap-3">
-
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
               <CheckCircle2
                 size={19}
@@ -1042,7 +827,6 @@ export default function PrincipalHome() {
             </div>
 
             <div>
-
               <h3 className="text-sm font-semibold text-green-800">
                 Dashboard Updated
               </h3>
@@ -1050,17 +834,12 @@ export default function PrincipalHome() {
               <p className="mt-0.5 text-xs leading-5 text-green-700">
                 Principal dashboard automatically refreshes with the latest school records.
               </p>
-
             </div>
-
           </div>
-
         </div>
 
         <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-
           <div className="flex items-start gap-3">
-
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
               <Bell
                 size={19}
@@ -1069,23 +848,18 @@ export default function PrincipalHome() {
             </div>
 
             <div>
-
               <h3 className="text-sm font-semibold text-blue-800">
                 Live School Overview
               </h3>
 
               <p className="mt-0.5 text-xs leading-5 text-blue-700">
-                Students, teachers, fees and attendance are connected with the existing school database.
+                Students, teachers and attendance are connected with the existing school database.
               </p>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }
+
