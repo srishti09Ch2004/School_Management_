@@ -37,11 +37,7 @@ if (!is_array($data)) {
     exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Frontend sends USERS.ID
-|--------------------------------------------------------------------------
-*/
+// Frontend sends USERS.ID
 
 $teacher_id = (int)($data["teacher_id"] ?? 0);
 
@@ -57,12 +53,7 @@ $attendance_type = trim(
     $data["attendance_type"] ?? "Face"
 );
 
-
-/*
-|--------------------------------------------------------------------------
-| Basic validation
-|--------------------------------------------------------------------------
-*/
+// Basic validation
 
 if ($teacher_id <= 0) {
     http_response_code(400);
@@ -100,10 +91,8 @@ if (!in_array(
 
 
 /*
-|--------------------------------------------------------------------------
 | Teacher attendance type
-|--------------------------------------------------------------------------
-|
+
 | Teacher's own attendance can be:
 | Face / Fingerprint
 |
@@ -127,15 +116,7 @@ if (!in_array(
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Verify teacher
-|--------------------------------------------------------------------------
-|
-| IMPORTANT:
-| teacher_attendance.teacher_id references users.id
-|
-*/
+//  Verify teacher
 
 $teacherCheck = mysqli_prepare(
     $conn,
@@ -187,12 +168,7 @@ $teacher = mysqli_fetch_assoc($teacherResult);
 
 mysqli_stmt_close($teacherCheck);
 
-
-/*
-|--------------------------------------------------------------------------
-| Save teacher attendance
-|--------------------------------------------------------------------------
-*/
+// Save teacher attendance
 
 $sql = "
     INSERT INTO teacher_attendance
@@ -249,12 +225,7 @@ if (!mysqli_stmt_execute($stmt)) {
 
 mysqli_stmt_close($stmt);
 
-
-/*
-|--------------------------------------------------------------------------
-| Success
-|--------------------------------------------------------------------------
-*/
+//  Success
 
 echo json_encode([
     "status" => true,
