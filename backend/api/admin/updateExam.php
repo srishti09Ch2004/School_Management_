@@ -163,7 +163,6 @@
 
 
 
-
 <?php
 
 header("Content-Type: application/json");
@@ -188,9 +187,14 @@ if (!$data) {
     exit();
 }
 
-$id = isset($data["id"]) ? (int)$data["id"] : 0;
+$id = isset($data["id"])
+    ? (int)$data["id"]
+    : 0;
 
-$exam_name = trim($data["exam_name"] ?? "");
+$exam_session_id = isset($data["exam_session_id"])
+    ? (int)$data["exam_session_id"]
+    : 0;
+
 $class = trim($data["class"] ?? "");
 $section = trim($data["section"] ?? "");
 $subject = trim($data["subject"] ?? "");
@@ -208,13 +212,20 @@ $status = trim($data["status"] ?? "Scheduled");
 if ($id <= 0) {
     echo json_encode([
         "status" => false,
-        "message" => "Invalid exam ID"
+        "message" => "Invalid subject schedule ID"
+    ]);
+    exit();
+}
+
+if ($exam_session_id <= 0) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Exam session ID is required"
     ]);
     exit();
 }
 
 if (
-    $exam_name === "" ||
     $class === "" ||
     $section === "" ||
     $subject === "" ||
@@ -224,7 +235,15 @@ if (
 ) {
     echo json_encode([
         "status" => false,
-        "message" => "Please fill all required fields"
+        "message" => "Please fill all required subject fields"
+    ]);
+    exit();
+}
+
+if ($start_time >= $end_time) {
+    echo json_encode([
+        "status" => false,
+        "message" => "End time must be after start time"
     ]);
     exit();
 }
@@ -245,45 +264,192 @@ if ($passing_marks > $total_marks) {
     exit();
 }
 
-$checkSql = "SELECT
-                e.id,
-                e.exam_session_id,
-                s.status AS session_status
-             FROM exams e
-             LEFT JOIN exam_sessions s
-                ON s.id = e.exam_session_id
-             WHERE e.id = ?";
+$sessionSql = "SELECT
+                    id,
+                    exam_name,
+                    start_date,
+                    end_date,
+                    status
+               FROM exam_sessions
+               WHERE id = ?";
 
-$checkStmt = $conn->prepare($checkSql);
-$checkStmt->bind_param("i", $id);
-$checkStmt->execute();
+$sessionStmt = $conn->prepare($sessionSql);
+$sessionStmt->bind_param("i", $exam_session_id);
+$sessionStmt->execute();
 
-$checkResult = $checkStmt->get_result();
+$sessionResult = $sessionStmt->get_result();
 
-if ($checkResult->num_rows === 0) {
+if ($sessionResult->num_rows === 0) {
+    $sessionStmt->close();
+
     echo json_encode([
         "status" => false,
-        "message" => "Exam not found"
+        "message" => "Exam session not found"
     ]);
     exit();
 }
 
-$existingExam = $checkResult->fetch_assoc();
+$session = $sessionResult->fetch_assoc();
 
-$checkStmt->close();
+$sessionStmt->close();
+
+if ($session["status"] === "Completed") {
+    echo json_encode([
+        "status" => false,
+        "message" => "Completed examination cannot be modified"
+    ]);
+    exit();
+}
+
+if ($session["status"] === "Cancelled") {
+    echo json_encode([
+        "status" => false,
+        "message" => "Cancelled examination cannot be modified"
+    ]);
+    exit();
+}
+
+$existingSql = "SELECT
+                    id,
+                    exam_session_id
+                FROM exams
+                WHERE id = ?";
+
+$existingStmt = $conn->prepare($existingSql);
+$existingStmt->bind_param("i", $id);
+$existingStmt->execute();
+
+$existingResult = $existingStmt->get_result();
+
+if ($existingResult->num_rows === 0) {
+    $existingStmt->close();
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Subject schedule not found"
+    ]);
+    exit();
+}
+
+$existingExam = $existingResult->fetch_assoc();
+
+$existingStmt->close();
+
+if ((int)$existingExam["exam_session_id"] !== $exam_session_id) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Subject does not belong to this examination session"
+    ]);
+    exit();
+}
 
 if (
-    $existingExam["session_status"] === "Completed" ||
-    $existingExam["session_status"] === "Cancelled"
+    !empty($session["start_date"]) &&
+    $exam_date < $session["start_date"]
 ) {
     echo json_encode([
         "status" => false,
-        "message" => "This examination session cannot be modified"
+        "message" => "Exam date cannot be before examination start date"
     ]);
     exit();
 }
 
+if (
+    !empty($session["end_date"]) &&
+    $exam_date > $session["end_date"]
+) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Exam date cannot be after examination end date"
+    ]);
+    exit();
+}
+
+$duplicateSql = "SELECT id
+                 FROM exams
+                 WHERE exam_session_id = ?
+                 AND class = ?
+                 AND section = ?
+                 AND subject = ?
+                 AND exam_date = ?
+                 AND id != ?";
+
+$duplicateStmt = $conn->prepare($duplicateSql);
+
+$duplicateStmt->bind_param(
+    "issssi",
+    $exam_session_id,
+    $class,
+    $section,
+    $subject,
+    $exam_date,
+    $id
+);
+
+$duplicateStmt->execute();
+
+$duplicateResult = $duplicateStmt->get_result();
+
+if ($duplicateResult->num_rows > 0) {
+    $duplicateStmt->close();
+
+    echo json_encode([
+        "status" => false,
+        "message" => "This subject is already scheduled for this class and date"
+    ]);
+    exit();
+}
+
+$duplicateStmt->close();
+
+$conflictSql = "SELECT
+                    id,
+                    subject,
+                    start_time,
+                    end_time
+                FROM exams
+                WHERE exam_session_id = ?
+                AND class = ?
+                AND section = ?
+                AND exam_date = ?
+                AND start_time < ?
+                AND end_time > ?
+                AND id != ?";
+
+$conflictStmt = $conn->prepare($conflictSql);
+
+$conflictStmt->bind_param(
+    "isssssi",
+    $exam_session_id,
+    $class,
+    $section,
+    $exam_date,
+    $end_time,
+    $start_time,
+    $id
+);
+
+$conflictStmt->execute();
+
+$conflictResult = $conflictStmt->get_result();
+
+if ($conflictResult->num_rows > 0) {
+    $conflict = $conflictResult->fetch_assoc();
+
+    $conflictStmt->close();
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Time conflict with " . $conflict["subject"] . " scheduled from " .
+            $conflict["start_time"] . " to " . $conflict["end_time"]
+    ]);
+    exit();
+}
+
+$conflictStmt->close();
+
 $sql = "UPDATE exams SET
+            exam_session_id = ?,
             exam_name = ?,
             class = ?,
             section = ?,
@@ -307,8 +473,9 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    "sssssssiisi",
-    $exam_name,
+    "isssssssissi",
+    $exam_session_id,
+    $session["exam_name"],
     $class,
     $section,
     $subject,
@@ -324,12 +491,12 @@ $stmt->bind_param(
 if ($stmt->execute()) {
     echo json_encode([
         "status" => true,
-        "message" => "Exam updated successfully"
+        "message" => "Subject schedule updated successfully"
     ]);
 } else {
     echo json_encode([
         "status" => false,
-        "message" => "Update failed: " . $stmt->error
+        "message" => "Failed to update subject schedule: " . $stmt->error
     ]);
 }
 

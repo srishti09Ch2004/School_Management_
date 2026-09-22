@@ -54,7 +54,6 @@
 // ?>
 
 
-
 <?php
 
 header("Content-Type: application/json");
@@ -83,22 +82,26 @@ $sql = "SELECT
             e.passing_marks,
             e.status,
             e.created_at,
+            s.exam_name AS session_exam_name,
             s.academic_year,
             s.exam_type,
-            s.status AS session_status,
             s.start_date AS session_start_date,
-            s.end_date AS session_end_date
+            s.end_date AS session_end_date,
+            s.status AS session_status
         FROM exams e
-        LEFT JOIN exam_sessions s
+        INNER JOIN exam_sessions s
             ON s.id = e.exam_session_id
-        ORDER BY e.exam_date ASC, e.start_time ASC";
+        ORDER BY
+            e.exam_date ASC,
+            e.start_time ASC,
+            e.id ASC";
 
 $result = mysqli_query($conn, $sql);
 
 if (!$result) {
     echo json_encode([
         "status" => false,
-        "message" => "Database error: " . mysqli_error($conn),
+        "message" => mysqli_error($conn),
         "data" => []
     ]);
     exit();
@@ -107,6 +110,10 @@ if (!$result) {
 $exams = [];
 
 while ($row = mysqli_fetch_assoc($result)) {
+    $row["total_marks"] = (int)$row["total_marks"];
+    $row["passing_marks"] = (int)$row["passing_marks"];
+    $row["exam_session_id"] = (int)$row["exam_session_id"];
+
     $exams[] = $row;
 }
 
