@@ -673,6 +673,75 @@ function FingerModal({ onClose, onMark }) {
 export default function TeacherAttendance() {
   const [method, setMethod] = useState(null);
   const [teacherMarked, setTeacherMarked] = useState(false);
+
+const loadTeacherAttendance = async () => {
+  try {
+    const storedUser = localStorage.getItem("user");
+
+    if (!storedUser) {
+      setTeacherMarked(false);
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
+
+    const userId = Number(user.id);
+
+    if (!userId) {
+      setTeacherMarked(false);
+      return;
+    }
+
+    const params = new URLSearchParams({
+      user_id: String(userId),
+      attendance_date: selectedDate,
+    });
+
+    const response = await fetch(
+      `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/teacher/getTeacherAttendance.php?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Teacher attendance check failed: ${response.status}`
+      );
+    }
+
+    const result = await response.json();
+
+    console.log(
+      "Teacher attendance check:",
+      result
+    );
+
+    if (!result.status) {
+      throw new Error(
+        result.message ||
+        "Unable to check teacher attendance"
+      );
+    }
+
+    setTeacherMarked(
+      result.marked === true
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Teacher attendance check error:",
+      error
+    );
+
+    setTeacherMarked(false);
+  }
+};
+
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
   const [students, setStudents] = useState([]);
@@ -706,7 +775,7 @@ const loadStudents = async () => {
     });
 
     const response = await fetch(
-      `http://localhost/school_management_system/backend/api/teacher/getAttendance.php?${params.toString()}`
+      `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/teacher/getAttendance.php?${params.toString()}`
     );
 
     if (!response.ok) {
@@ -780,7 +849,7 @@ const loadClassSections = async () => {
     setLoadingClasses(true);
 
     const response = await fetch(
-      "http://localhost/school_management_system/backend/api/teacher/getClassSections.php"
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/teacher/getClassSections.php"
     );
 
     if (!response.ok) {
@@ -856,6 +925,10 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  loadTeacherAttendance();
+}, [selectedDate]);
+
+useEffect(() => {
   if (!selectedClass) {
     setSelectedSection("");
     return;
@@ -918,7 +991,7 @@ useEffect(() => {
     }
 
     const response = await fetch(
-      "http://localhost/school_management_system/backend/api/teacher/saveTeacherAttendance.php",
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/teacher/saveTeacherAttendance.php",
       {
         method: "POST",
         headers: {
@@ -928,7 +1001,10 @@ useEffect(() => {
           teacher_id: teacherId,
           attendance_date: selectedDate,
           status: "Present",
-          attendance_type: "Face",
+          attendance_type:
+          method === "finger"
+            ? "Fingerprint"
+            : "Face",
         }),
       }
     );
@@ -944,12 +1020,14 @@ useEffect(() => {
     }
 
     setTeacherMarked(true);
-    setMethod(null);
+setMethod(null);
 
-    showToast(
-      "Teacher attendance marked successfully!",
-      "success"
-    );
+showToast(
+  result.already_marked
+    ? "Your attendance is already marked for today."
+    : "Teacher attendance marked successfully!",
+  "success"
+);
 
   } catch (error) {
     console.error("Teacher attendance error:", error);
@@ -1009,7 +1087,7 @@ const handleSaveAttendance = async () => {
     );
 
     const response = await fetch(
-      "http://localhost/school_management_system/backend/api/teacher/saveAttendance.php",
+      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/teacher/saveAttendance.php",
       {
         method: "POST",
         headers: {

@@ -168,7 +168,86 @@ $teacher = mysqli_fetch_assoc($teacherResult);
 
 mysqli_stmt_close($teacherCheck);
 
-// Save teacher attendance
+/*
+| Check whether teacher has already marked attendance for this date
+*/
+
+$existingStmt = mysqli_prepare(
+    $conn,
+    "
+    SELECT
+        id,
+        status,
+        attendance_type
+    FROM teacher_attendance
+    WHERE teacher_id = ?
+      AND attendance_date = ?
+    LIMIT 1
+    "
+);
+
+if (!$existingStmt) {
+    http_response_code(500);
+
+    echo json_encode([
+        "status" => false,
+        "message" =>
+            "Unable to check existing attendance",
+        "error" =>
+            mysqli_error($conn)
+    ]);
+
+    exit;
+}
+
+mysqli_stmt_bind_param(
+    $existingStmt,
+    "is",
+    $teacher_id,
+    $attendance_date
+);
+
+mysqli_stmt_execute($existingStmt);
+
+$existingResult =
+    mysqli_stmt_get_result($existingStmt);
+
+if (
+    $existingResult &&
+    mysqli_num_rows($existingResult) > 0
+) {
+
+    $existing =
+        mysqli_fetch_assoc($existingResult);
+
+    mysqli_stmt_close($existingStmt);
+
+    echo json_encode([
+        "status" => true,
+        "already_marked" => true,
+        "message" =>
+            "Your attendance is already marked for this date.",
+        "teacher_id" =>
+            $teacher_id,
+        "teacher_name" =>
+            $teacher["full_name"],
+        "attendance_date" =>
+            $attendance_date,
+        "attendance_status" =>
+            $existing["status"],
+        "attendance_type" =>
+            $existing["attendance_type"]
+    ]);
+
+    exit;
+}
+
+mysqli_stmt_close($existingStmt);
+
+
+/*
+| Insert new teacher attendance
+*/
 
 $sql = "
     INSERT INTO teacher_attendance
@@ -179,11 +258,58 @@ $sql = "
         attendance_type
     )
     VALUES (?, ?, ?, ?)
-
-    ON DUPLICATE KEY UPDATE
-        status = VALUES(status),
-        attendance_type = VALUES(attendance_type)
 ";
+
+$stmt = mysqli_prepare(
+    $conn,
+    $sql
+);
+
+if (!$stmt) {
+
+    http_response_code(500);
+
+    echo json_encode([
+        "status" => false,
+        "message" =>
+            "Attendance query preparation failed",
+        "error" =>
+            mysqli_error($conn)
+    ]);
+
+    exit;
+}
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "isss",
+    $teacher_id,
+    $attendance_date,
+    $status,
+    $attendance_type
+);
+
+if (!mysqli_stmt_execute($stmt)) {
+
+    $error =
+        mysqli_stmt_error($stmt);
+
+    mysqli_stmt_close($stmt);
+
+    http_response_code(500);
+
+    echo json_encode([
+        "status" => false,
+        "message" =>
+            "Failed to save teacher attendance",
+        "error" =>
+            $error
+    ]);
+
+    exit;
+}
+
+mysqli_stmt_close($stmt);
 
 $stmt = mysqli_prepare($conn, $sql);
 
