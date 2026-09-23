@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 const API =
-  "https://futureacademy.site.je/api/teacher";
+  "https://school-backend-8rpa.onrender.com/teacher";
 
 export default function TeacherHome() {
 

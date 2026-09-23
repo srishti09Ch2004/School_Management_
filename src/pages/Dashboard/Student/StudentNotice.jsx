@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 const API =
-  "https://futureacademy.site.je/api/notifications";
+  "https://school-backend-8rpa.onrender.com/notifications";
 
 export default function StudentNotice() {
   const [user, setUser] = useState(null);

@@ -64,7 +64,7 @@ const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   if (!user.id) return;
 
-  fetch(`https://futureacademy.site.je/api/student/dashboard.php?user_id=${user.id}`)
+  fetch(`https://school-backend-8rpa.onrender.com/student/dashboard.php?user_id=${user.id}`)
     .then((res) => res.json())
     .then((data) => {
 

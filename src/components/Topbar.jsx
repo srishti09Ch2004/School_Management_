@@ -13,7 +13,7 @@ import {
 
 const API =
   // "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/notifications";
-  "https://futureacademy.site.je/api/notifications";
+  "https://school-backend-8rpa.onrender.com/notifications";
 
 const Topbar = ({ title = "Dashboard" }) => {
   const navigate = useNavigate();

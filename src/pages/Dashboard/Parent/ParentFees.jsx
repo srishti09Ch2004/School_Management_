@@ -41,7 +41,7 @@ const [paymentMessage, setPaymentMessage] = useState("");
       }
 
       const response = await fetch(
-        `https://futureacademy.site.je/api/parent/fees.php?user_id=${storedUser.id}`
+        `https://school-backend-8rpa.onrender.com/parent/fees.php?user_id=${storedUser.id}`
       );
 
       if (!response.ok) {
@@ -188,7 +188,7 @@ const handlePayment = async () => {
     setPaymentMessage("");
 
     const response = await fetch(
-      "https://futureacademy.site.je/api/parent/payFee.php",
+      "https://school-backend-8rpa.onrender.com/parent/payFee.php",
       {
         method: "POST",
 

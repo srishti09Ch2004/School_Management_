@@ -19,7 +19,7 @@ import {
 } from "recharts";
 
 const API_BASE =
-  "https://futureacademy.site.je/api/admin";
+  "https://school-backend-8rpa.onrender.com/admin";
 
 const EMPTY_SUMMARY = {
   present: 0,

@@ -68,7 +68,7 @@ const [formData, setFormData] = useState({
 
 
   const fetchTeachers = () => {
-  fetch("https://futureacademy.site.je/api/admin/teachers.php")
+  fetch("https://school-backend-8rpa.onrender.com/admin/teachers.php")
     .then((res) => res.json())
     .then((data) => {
       if (data.status) {
@@ -117,7 +117,7 @@ const handleView = async (id) => {
   setLoading(true);
 
   const res = await fetch(
-    `https://futureacademy.site.je/api/admin/teacher-view.php?id=${id}`
+    `https://school-backend-8rpa.onrender.com/admin/teacher-view.php?id=${id}`
   );
 
   const data = await res.json();
@@ -148,7 +148,7 @@ const handleSubmit = async () => {
   }
 
   const response = await fetch(
-    "https://futureacademy.site.je/api/admin/addTeacher.php",
+    "https://school-backend-8rpa.onrender.com/admin/addTeacher.php",
     {
       method: "POST",
       headers: {
@@ -191,7 +191,7 @@ const handleDelete = async (id) => {
   if (!confirmDelete) return;
 
   const response = await fetch(
-    "https://futureacademy.site.je/api/admin/deleteTeacher.php",
+    "https://school-backend-8rpa.onrender.com/admin/deleteTeacher.php",
     {
       method: "POST",
       headers: {
@@ -215,7 +215,7 @@ const handleDelete = async (id) => {
 const handleUpdate = async () => {
 
   const response = await fetch(
-    "https://futureacademy.site.je/api/admin/updateTeacher.php",
+    "https://school-backend-8rpa.onrender.com/admin/updateTeacher.php",
     {
       method: "POST",
       headers: {

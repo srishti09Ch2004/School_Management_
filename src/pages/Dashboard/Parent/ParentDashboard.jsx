@@ -57,7 +57,7 @@ export default function ParentDashboard() {
 // Parent Profile API
 
         const response = await fetch(
-          `https://futureacademy.site.je/api/parent/profile.php?user_id=${storedUser.id}`
+          `https://school-backend-8rpa.onrender.com/parent/profile.php?user_id=${storedUser.id}`
         );
 
 

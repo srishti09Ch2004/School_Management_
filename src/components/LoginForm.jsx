@@ -126,7 +126,7 @@ function LoginForm({ role }) {
 
       const response = await fetch(
         // "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/login.php",
-        "https://futureacademy.site.je/api/login.php",
+        "https://school-backend-8rpa.onrender.com/login.php",
         {
           method: "POST",
           headers: {

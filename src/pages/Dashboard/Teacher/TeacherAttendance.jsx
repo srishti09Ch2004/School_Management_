@@ -698,7 +698,7 @@ const loadTeacherAttendance = async () => {
     });
 
     const response = await fetch(
-      `https://futureacademy.site.je/api/teacher/getTeacherAttendance.php?${params.toString()}`,
+      `https://school-backend-8rpa.onrender.com/teacher/getTeacherAttendance.php?${params.toString()}`,
       {
         method: "GET",
         headers: {
@@ -775,7 +775,7 @@ const loadStudents = async () => {
     });
 
     const response = await fetch(
-      `https://futureacademy.site.je/api/teacher/getAttendance.php?${params.toString()}`
+      `https://school-backend-8rpa.onrender.com/teacher/getAttendance.php?${params.toString()}`
     );
 
     if (!response.ok) {
@@ -849,7 +849,7 @@ const loadClassSections = async () => {
     setLoadingClasses(true);
 
     const response = await fetch(
-      "https://futureacademy.site.je/api/teacher/getClassSections.php"
+      "https://school-backend-8rpa.onrender.com/teacher/getClassSections.php"
     );
 
     if (!response.ok) {
@@ -991,7 +991,7 @@ useEffect(() => {
     }
 
     const response = await fetch(
-      "https://futureacademy.site.je/api/teacher/saveTeacherAttendance.php",
+      "https://school-backend-8rpa.onrender.com/teacher/saveTeacherAttendance.php",
       {
         method: "POST",
         headers: {
@@ -1087,7 +1087,7 @@ const handleSaveAttendance = async () => {
     );
 
     const response = await fetch(
-      "https://futureacademy.site.je/api/teacher/saveAttendance.php",
+      "https://school-backend-8rpa.onrender.com/teacher/saveAttendance.php",
       {
         method: "POST",
         headers: {

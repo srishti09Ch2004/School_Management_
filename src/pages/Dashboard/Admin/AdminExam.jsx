@@ -21,7 +21,7 @@ import {
 //   "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api";
 
 const API_BASE =
-  "https://futureacademy.site.je/api";
+  "https://school-backend-8rpa.onrender.com";
 
 const emptySessionForm = {
   exam_name: "",

@@ -17,7 +17,7 @@ import {
 import toast from "react-hot-toast";
 
 const API =
-  "https://futureacademy.site.je/api/notifications";
+  "https://school-backend-8rpa.onrender.com/notifications";
 
 export default function PrincipalNotice() {
   const [notices, setNotices] = useState([]);

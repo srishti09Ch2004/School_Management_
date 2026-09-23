@@ -32,7 +32,7 @@ import {
 // =====================================================
 
 const API =
-  "https://futureacademy.site.je/api/admin";
+  "https://school-backend-8rpa.onrender.com/admin";
 
 // =====================================================
 // HELPERS

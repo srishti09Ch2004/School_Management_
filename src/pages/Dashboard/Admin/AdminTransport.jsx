@@ -32,7 +32,7 @@ export default function AdminTransport() {
   const fetchBuses = async () => {
   try {
     const response = await fetch(
-      "https://futureacademy.site.je/api/admin/transportbuses.php"
+      "https://school-backend-8rpa.onrender.com/admin/transportbuses.php"
     );
 
     const data = await response.json();
@@ -112,7 +112,7 @@ const handleAddBus = async () => {
   try {
 
     const response = await fetch(
-      "https://futureacademy.site.je/api/admin/addbus.php",
+      "https://school-backend-8rpa.onrender.com/admin/addbus.php",
       {
         method: "POST",
         headers: {
@@ -172,7 +172,7 @@ const handleUpdateBus = async () => {
   try {
 
     const response = await fetch(
-      "https://futureacademy.site.je/api/admin/updatebus.php",
+      "https://school-backend-8rpa.onrender.com/admin/updatebus.php",
       {
         method: "POST",
         headers: {
@@ -219,7 +219,7 @@ const handleDeleteBus = async (id) => {
   try {
 
     const response = await fetch(
-      "https://futureacademy.site.je/api/admin/deletebus.php",
+      "https://school-backend-8rpa.onrender.com/admin/deletebus.php",
       {
         method: "POST",
         headers: {

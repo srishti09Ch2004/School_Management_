@@ -30,7 +30,7 @@ export default function StudentFees() {
       }
 
       const response = await fetch(
-        `https://futureacademy.site.je/api/student/fees.php?user_id=${storedUser.id}`
+        `https://school-backend-8rpa.onrender.com/student/fees.php?user_id=${storedUser.id}`
       );
 
       if (!response.ok) {
@@ -674,7 +674,7 @@ export default function StudentFees() {
                             }
 
                             const receiptUrl =
-                              `https://futureacademy.site.je/api/student/generateReceipt.php` +
+                              `https://school-backend-8rpa.onrender.com/student/generateReceipt.php` +
                               `?payment_id=${payment.id}` +
                               `&user_id=${storedUser.id}`;
 

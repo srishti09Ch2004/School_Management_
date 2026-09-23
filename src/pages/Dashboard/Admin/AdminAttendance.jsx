@@ -63,7 +63,7 @@ const loadAttendance = async () => {
     // );
 
     const response = await fetch(
-      `https://futureacademy.site.je/api/admin/attendance.php?date=${selectedDate}&type=${type}`
+      `https://school-backend-8rpa.onrender.com/admin/attendance.php?date=${selectedDate}&type=${type}`
     );
 
     const result = await response.json();
@@ -97,7 +97,7 @@ const loadAttendance = async () => {
       // );
 
       const response = await fetch(
-        `https://futureacademy.site.je/api/admin/attendance-summary.php?date=${selectedDate}`
+        `https://school-backend-8rpa.onrender.com/admin/attendance-summary.php?date=${selectedDate}`
       );
 
       const result = await response.json();
