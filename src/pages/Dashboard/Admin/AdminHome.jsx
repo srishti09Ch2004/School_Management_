@@ -14,7 +14,7 @@ import {
   BookOpen,
 } from "lucide-react";
 
-const API = "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin";
+const API = "https://futureacademy.site.je/api/admin";
 
 const getArrayFromResponse = (result) => {
   if (!result) return [];

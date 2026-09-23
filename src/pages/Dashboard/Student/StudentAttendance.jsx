@@ -73,7 +73,7 @@ export default function StudentAttendance() {
       */
 
       const url =
-        `http://localhost/school_management_system/backend/api/student/getAttendance.php` +
+        `https://futureacademy.site.je/api/student/getAttendance.php` +
         `?user_id=${encodeURIComponent(user.id)}` +
         `&month=${encodeURIComponent(selectedMonth)}`;
 

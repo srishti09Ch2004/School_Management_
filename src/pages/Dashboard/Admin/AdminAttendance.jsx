@@ -58,8 +58,12 @@ const loadAttendance = async () => {
         ? "students"
         : "teachers";
 
+    // const response = await fetch(
+    //   `http://localhost/school_management_system/backend/api/admin/attendance.php?date=${selectedDate}&type=${type}`
+    // );
+
     const response = await fetch(
-      `http://localhost/school_management_system/backend/api/admin/attendance.php?date=${selectedDate}&type=${type}`
+      `https://futureacademy.site.je/api/admin/attendance.php?date=${selectedDate}&type=${type}`
     );
 
     const result = await response.json();
@@ -88,8 +92,12 @@ const loadAttendance = async () => {
  
   const loadSummary = async () => {
     try {
+      // const response = await fetch(
+      //   `http://localhost/school_management_system/backend/api/admin/attendance-summary.php?date=${selectedDate}`
+      // );
+
       const response = await fetch(
-        `http://localhost/school_management_system/backend/api/admin/attendance-summary.php?date=${selectedDate}`
+        `https://futureacademy.site.je/api/admin/attendance-summary.php?date=${selectedDate}`
       );
 
       const result = await response.json();

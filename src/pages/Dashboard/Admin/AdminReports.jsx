@@ -65,7 +65,7 @@ useEffect(() => {
     const fetchReportStats = async () => {
       try {
         const response = await fetch(
-          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/reportstats.php"
+          "https://futureacademy.site.je/api/admin/reportstats.php"
         );
 
         const data = await response.json();
@@ -90,7 +90,7 @@ useEffect(() => {
     setLoadingStudents(true);
 
     const response = await fetch(
-        "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/studentreport.php"    );
+        "https://futureacademy.site.je/api/admin/studentreport.php"    );
 
     const data = await response.json();
 
@@ -114,7 +114,7 @@ const fetchAttendanceReport = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/attendancereport.php"
+      "https://futureacademy.site.je/api/admin/attendancereport.php"
     );
 
     const data = await response.json();
@@ -138,7 +138,7 @@ const fetchFeeReports = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feereport.php"
+      "https://futureacademy.site.je/api/admin/feereport.php"
     );
 
     const data = await response.json();
@@ -162,7 +162,7 @@ const fetchExamReport = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/examreport.php"
+      "https://futureacademy.site.je/api/admin/examreport.php"
     );
 
     const data = await response.json();
@@ -195,16 +195,16 @@ useEffect(() => {
         examResponse,
       ] = await Promise.all([
         fetch(
-          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/studentreport.php"
+          "https://futureacademy.site.je/api/admin/studentreport.php"
         ),
         fetch(
-          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/attendancereport.php"
+          "https://futureacademy.site.je/api/admin/attendancereport.php"
         ),
         fetch(
-          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feereport.php"
+          "https://futureacademy.site.je/api/admin/feereport.php"
         ),
         fetch(
-          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/examreport.php"
+          "https://futureacademy.site.je/api/admin/examreport.php"
         ),
       ]);
 

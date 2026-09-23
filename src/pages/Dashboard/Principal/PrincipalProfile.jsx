@@ -20,7 +20,7 @@ import {
 import toast from "react-hot-toast";
 
 const API =
-  "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/principal";
+  "https://futureacademy.site.je/api/principal";
 
 const emptyForm = {
   full_name: "",

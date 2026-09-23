@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API = "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/notifications";
+const API = "https://futureacademy.site.je/api/notifications";
 
 const NOTICE_TYPES = [
   "General",

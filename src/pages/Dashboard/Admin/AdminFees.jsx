@@ -44,7 +44,7 @@ const [selectedFee, setSelectedFee] = useState(null);
   const fetchFees = async () => {
     try {
       const response = await fetch(
-        "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/fees.php"
+        "https://futureacademy.site.je/api/admin/fees.php"
       );
 
       if (!response.ok) {
@@ -71,7 +71,7 @@ const [selectedFee, setSelectedFee] = useState(null);
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feeStudents.php"
+        "https://futureacademy.site.je/api/admin/feeStudents.php"
       );
 
       if (!response.ok) {
@@ -125,7 +125,7 @@ const handleFeeSubmit = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addFee.php",
+      "https://futureacademy.site.je/api/admin/addFee.php",
       {
         method: "POST",
         headers: {
@@ -232,7 +232,7 @@ const handlePaymentSubmit = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addFeePayment.php",
+      "https://futureacademy.site.je/api/admin/addFeePayment.php",
       {
         method: "POST",
         headers: {
@@ -304,7 +304,7 @@ const closePaymentModal = () => {
   const handlePaymentHistory = async (fee) => {
     try {
       const response = await fetch(
-        `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feePayments.php?student_id=${fee.student_id}`
+        `https://futureacademy.site.je/api/admin/feePayments.php?student_id=${fee.student_id}`
       );
 
       if (!response.ok) {
@@ -336,7 +336,7 @@ const closePaymentModal = () => {
   }
 
   const url =
-    `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/paymentReceipt.php?payment_id=${paymentId}`;
+    `https://futureacademy.site.je/api/admin/paymentReceipt.php?payment_id=${paymentId}`;
 
   window.open(url, "_blank");
 };
@@ -344,7 +344,7 @@ const closePaymentModal = () => {
 const handleLatestReceipt = async (fee) => {
   try {
     const response = await fetch(
-      `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/feePayments.php?student_id=${fee.student_id}`
+      `https://futureacademy.site.je/api/admin/feePayments.php?student_id=${fee.student_id}`
     );
 
     if (!response.ok) {

@@ -49,7 +49,7 @@ const [formData, setFormData] = useState({
 });
 
 const fetchStudents = () => {
-  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/students.php")
+  fetch("https://futureacademy.site.je/api/admin/students.php")
     .then((res) => res.json())
     .then((data) => {
       if (data.status) {
@@ -168,7 +168,7 @@ const handleSubmit = async () => {
   try {
 
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addStudent.php",
+      "https://futureacademy.site.je/api/admin/addStudent.php",
       {
         method: "POST",
         headers: {
@@ -231,7 +231,7 @@ const handleView = async (id) => {
     console.log("View Student ID:", id);
 
     const res = await fetch(
-      `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/student-view.php?id=${id}`
+      `https://futureacademy.site.je/api/admin/student-view.php?id=${id}`
     );
 
     const data = await res.json();
@@ -274,7 +274,7 @@ const handleUpdate = async () => {
   }
 
   const response = await fetch(
-    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateStudent.php",
+    "https://futureacademy.site.je/api/admin/updateStudent.php",
     {
       method: "POST",
       headers: {
@@ -339,7 +339,7 @@ const handleDelete = async (id) => {
      */
 
     let response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
+      "https://futureacademy.site.je/api/admin/deleteStudent.php",
       {
         method: "POST",
         headers: {
@@ -375,7 +375,7 @@ const handleDelete = async (id) => {
       if (deleteParent) {
 
         response = await fetch(
-          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
+          "https://futureacademy.site.je/api/admin/deleteStudent.php",
           {
             method: "POST",
             headers: {
@@ -413,7 +413,7 @@ const handleDelete = async (id) => {
       else {
 
         response = await fetch(
-          "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteStudent.php",
+          "https://futureacademy.site.je/api/admin/deleteStudent.php",
           {
             method: "POST",
             headers: {

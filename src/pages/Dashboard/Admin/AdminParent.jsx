@@ -22,7 +22,7 @@ export default function AdminParent() {
 
   /* API URL */
   const API_URL =
-    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/parents.php";
+    "https://futureacademy.site.je/api/admin/parents.php";
 
   /* Fetch Parents */
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function AdminParent() {
   try {
 
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateParent.php",
+      "https://futureacademy.site.je/api/admin/updateParent.php",
       {
         method: "POST",
 
@@ -216,7 +216,7 @@ const handleDeleteParent = async (id) => {
 
   try {
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteParent.php",
+      "https://futureacademy.site.je/api/admin/deleteParent.php",
       {
         method: "POST",
         headers: {

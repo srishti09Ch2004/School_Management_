@@ -48,7 +48,7 @@ export default function AdminLibrary() {
   const fetchBooks = () => {
 
     fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/libraryBooks.php"
+      "https://futureacademy.site.je/api/admin/libraryBooks.php"
     )
       .then((res) => res.json())
       .then((data) => {
@@ -96,7 +96,7 @@ const handleIssueBook = async () => {
   try {
 
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/issueBook.php",
+      "https://futureacademy.site.je/api/admin/issueBook.php",
       {
         method: "POST",
         headers: {
@@ -156,7 +156,7 @@ const handleAddBook = async () => {
   try {
 
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addBook.php",
+      "https://futureacademy.site.je/api/admin/addBook.php",
       {
         method: "POST",
         headers: {
@@ -216,7 +216,7 @@ const handleDeleteBook = async (id) => {
   try {
 
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteBook.php",
+      "https://futureacademy.site.je/api/admin/deleteBook.php",
       {
         method: "POST",
         headers: {
@@ -267,7 +267,7 @@ const handleUpdateBook = async () => {
   try {
 
     const response = await fetch(
-      "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateBook.php",
+      "https://futureacademy.site.je/api/admin/updateBook.php",
       {
         method: "POST",
         headers: {

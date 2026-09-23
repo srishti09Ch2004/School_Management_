@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 const API =
-  "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/teacher";
+  "https://futureacademy.site.je/api/teacher";
 
 export default function TeacherHome() {
 

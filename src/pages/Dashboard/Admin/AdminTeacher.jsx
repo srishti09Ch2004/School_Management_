@@ -68,7 +68,7 @@ const [formData, setFormData] = useState({
 
 
   const fetchTeachers = () => {
-  fetch("http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/teachers.php")
+  fetch("https://futureacademy.site.je/api/admin/teachers.php")
     .then((res) => res.json())
     .then((data) => {
       if (data.status) {
@@ -117,7 +117,7 @@ const handleView = async (id) => {
   setLoading(true);
 
   const res = await fetch(
-    `http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/teacher-view.php?id=${id}`
+    `https://futureacademy.site.je/api/admin/teacher-view.php?id=${id}`
   );
 
   const data = await res.json();
@@ -148,7 +148,7 @@ const handleSubmit = async () => {
   }
 
   const response = await fetch(
-    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/addTeacher.php",
+    "https://futureacademy.site.je/api/admin/addTeacher.php",
     {
       method: "POST",
       headers: {
@@ -191,7 +191,7 @@ const handleDelete = async (id) => {
   if (!confirmDelete) return;
 
   const response = await fetch(
-    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/deleteTeacher.php",
+    "https://futureacademy.site.je/api/admin/deleteTeacher.php",
     {
       method: "POST",
       headers: {
@@ -215,7 +215,7 @@ const handleDelete = async (id) => {
 const handleUpdate = async () => {
 
   const response = await fetch(
-    "http://localhost/SCHOOL_MANAGEMENT_SYSTEM/backend/api/admin/updateTeacher.php",
+    "https://futureacademy.site.je/api/admin/updateTeacher.php",
     {
       method: "POST",
       headers: {
